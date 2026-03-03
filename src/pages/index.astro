@@ -1,0 +1,381 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="The Table Bible — Free Audio Bible with Word-by-Word Highlighting">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content container">
+      <div class="hero-badge">Come to the Table Ministries</div>
+      <h1>The Table Bible</h1>
+      <p class="hero-subtitle">
+        The World English Bible, read aloud with word-by-word highlighting 
+        in a timeless book-on-table format.
+      </p>
+      <p class="hero-promise">Always free to watch, download, and share.</p>
+      
+      <div class="hero-actions">
+        <a href="https://youtube.com/@TheTableBible" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+          </svg>
+          Watch on YouTube
+        </a>
+        <a href="/library" class="btn btn-secondary btn-lg">
+          Browse Library
+        </a>
+      </div>
+      
+      <p class="hero-tagline">"Come to the Table."</p>
+    </div>
+  </section>
+  
+  <!-- Mission Section -->
+  <section class="mission">
+    <div class="container container-narrow">
+      <div class="section-header">
+        <div class="divider"></div>
+        <h2>Our Mission</h2>
+      </div>
+      <p class="mission-text">
+        To make the Bible freely accessible to every person through peaceful, 
+        distraction-free video readings presented in a timeless book-on-table format — 
+        always free to watch, download, and share.
+      </p>
+      <div class="divider"></div>
+    </div>
+  </section>
+  
+  <!-- Featured Video Section -->
+  <section class="featured">
+    <div class="container">
+      <div class="section-header">
+        <h2>Experience Scripture</h2>
+        <p>Watch the Word come alive with word-by-word highlighting</p>
+      </div>
+      
+      <div class="featured-video">
+        <div class="video-wrapper">
+          <!-- Placeholder until first video is uploaded -->
+          <div class="video-placeholder">
+            <div class="video-placeholder-content">
+              <div class="brand-initial large">T</div>
+              <p>First video coming soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="featured-cta">
+        <a href="https://youtube.com/@TheTableBible" target="_blank" rel="noopener" class="btn btn-secondary">
+          Subscribe to The Table Bible
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Content Types Section -->
+  <section class="content-types">
+    <div class="container">
+      <div class="section-header">
+        <h2>What You'll Find</h2>
+        <p>Multiple ways to engage with Scripture</p>
+      </div>
+      
+      <div class="grid grid-3">
+        <div class="content-card">
+          <div class="content-icon">📖</div>
+          <h3>Daily Chapters</h3>
+          <p>Two chapters uploaded every day — one Old Testament, one New Testament. Perfect for daily devotion.</p>
+        </div>
+        
+        <div class="content-card">
+          <div class="content-icon">📚</div>
+          <h3>Full Books</h3>
+          <p>Entire books of the Bible in single videos. Perfect for focused study or overnight listening.</p>
+        </div>
+        
+        <div class="content-card">
+          <div class="content-icon">🎬</div>
+          <h3>Daily Shorts</h3>
+          <p>Quick verse highlights, Psalm meditations, and daily inspiration in bite-sized format.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature">
+          <h3>Word-by-Word Highlighting</h3>
+          <p>Follow along effortlessly as each word illuminates in sync with the narration.</p>
+        </div>
+        <div class="feature">
+          <h3>Premium 4K Quality</h3>
+          <p>Crystal-clear text rendering at 4K resolution for the sharpest reading experience.</p>
+        </div>
+        <div class="feature">
+          <h3>Peaceful Atmosphere</h3>
+          <p>Warm lighting, gentle ambiance, and calm narration create a contemplative space.</p>
+        </div>
+        <div class="feature">
+          <h3>Always Free</h3>
+          <p>Every video is free to watch, download, and share. No subscriptions, no paywalls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Support Section -->
+  <section class="support">
+    <div class="container container-narrow">
+      <div class="support-card">
+        <h2>Support This Ministry</h2>
+        <p>
+          The Table Bible is and always will be free. If this ministry blesses you, 
+          consider supporting the work so we can continue making Scripture accessible to all.
+        </p>
+        <a href="/donate" class="btn btn-primary">
+          Give a Gift
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ── Hero Section ────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-4xl) 0;
+    overflow: hidden;
+  }
+  
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at center, rgba(60, 50, 35, 0.4) 0%, transparent 60%),
+      url('/images/hero-bg.jpg') center/cover no-repeat;
+    opacity: 0.3;
+    z-index: -1;
+  }
+  
+  .hero-content {
+    max-width: 800px;
+  }
+  
+  .hero-badge {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-lg);
+    background: rgba(201, 168, 106, 0.1);
+    border: 1px solid rgba(201, 168, 106, 0.3);
+    border-radius: var(--radius-xl);
+    font-size: 0.875rem;
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-xl);
+  }
+  
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-lg);
+    background: linear-gradient(180deg, var(--cream) 0%, var(--gold-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto var(--space-md);
+    line-height: 1.6;
+  }
+  
+  .hero-promise {
+    font-size: 1.125rem;
+    color: var(--gold-light);
+    margin-bottom: var(--space-2xl);
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3xl);
+  }
+  
+  .hero-tagline {
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+  }
+  
+  /* ── Mission Section ─────────────────────────────────────────────── */
+  .mission {
+    background: var(--bg-secondary);
+  }
+  
+  .mission-text {
+    font-size: 1.375rem;
+    text-align: center;
+    line-height: 1.8;
+    color: var(--cream);
+  }
+  
+  /* ── Featured Video Section ──────────────────────────────────────── */
+  .featured {
+    padding-top: var(--space-4xl);
+    padding-bottom: var(--space-4xl);
+  }
+  
+  .featured-video {
+    max-width: 900px;
+    margin: 0 auto var(--space-2xl);
+  }
+  
+  .video-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+  }
+  
+  .video-placeholder-content {
+    text-align: center;
+    color: var(--text-muted);
+  }
+  
+  .video-placeholder-content .brand-initial {
+    width: 80px;
+    height: 80px;
+    font-size: 48px;
+    margin: 0 auto var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, var(--gold), var(--gold-dark));
+    border-radius: 12px;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: var(--crimson);
+  }
+  
+  .featured-cta {
+    text-align: center;
+  }
+  
+  /* ── Content Types Section ───────────────────────────────────────── */
+  .content-types {
+    background: var(--bg-secondary);
+  }
+  
+  .content-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    text-align: center;
+    border: 1px solid rgba(201, 168, 106, 0.1);
+    transition: all var(--transition-base);
+  }
+  
+  .content-card:hover {
+    border-color: rgba(201, 168, 106, 0.25);
+    transform: translateY(-4px);
+  }
+  
+  .content-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-lg);
+  }
+  
+  .content-card h3 {
+    margin-bottom: var(--space-md);
+    color: var(--gold-light);
+  }
+  
+  .content-card p {
+    color: var(--text-muted);
+    margin: 0;
+  }
+  
+  /* ── Features Section ────────────────────────────────────────────── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-2xl);
+  }
+  
+  .feature {
+    padding: var(--space-lg);
+    border-left: 2px solid var(--gold-light);
+  }
+  
+  .feature h3 {
+    font-size: 1.125rem;
+    color: var(--cream);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .feature p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+  
+  /* ── Support Section ─────────────────────────────────────────────── */
+  .support {
+    padding-bottom: var(--space-4xl);
+  }
+  
+  .support-card {
+    background: linear-gradient(145deg, rgba(107, 15, 26, 0.3), rgba(42, 35, 30, 0.8));
+    border: 1px solid rgba(201, 168, 106, 0.2);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    text-align: center;
+  }
+  
+  .support-card h2 {
+    margin-bottom: var(--space-lg);
+  }
+  
+  .support-card p {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    max-width: 500px;
+    margin: 0 auto var(--space-xl);
+  }
+  
+  /* ── Responsive ──────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 80vh;
+    }
+    
+    .hero-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .hero-actions .btn {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+</style>

@@ -1,0 +1,343 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Contact — The Table Bible" description="Get in touch with Come to the Table Ministries. We'd love to hear from you.">
+  <section class="contact-hero">
+    <div class="container container-narrow">
+      <h1>Contact Us</h1>
+      <div class="divider"></div>
+      <p class="contact-intro">
+        We'd love to hear from you. Whether you have questions, suggestions, 
+        or just want to say hello — we're here.
+      </p>
+    </div>
+  </section>
+  
+  <section class="contact-main">
+    <div class="container container-narrow">
+      <div class="contact-card">
+        <div class="contact-method">
+          <div class="contact-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+          </div>
+          <h2>Email Us</h2>
+          <p>For all inquiries, reach us at:</p>
+          <a href="mailto:hello@TheTableBible.org" class="email-link">
+            hello@TheTableBible.org
+          </a>
+          <p class="response-time">
+            We typically respond within 2-3 business days.
+          </p>
+        </div>
+      </div>
+      
+      <div class="contact-topics">
+        <h3>How Can We Help?</h3>
+        <div class="topics-grid">
+          <div class="topic-item">
+            <h4>General Questions</h4>
+            <p>
+              Questions about The Table Bible, our videos, or how to use them? 
+              We're happy to help.
+            </p>
+          </div>
+          <div class="topic-item">
+            <h4>Technical Issues</h4>
+            <p>
+              Having trouble accessing content or experiencing a problem? 
+              Let us know and we'll work to fix it.
+            </p>
+          </div>
+          <div class="topic-item">
+            <h4>Partnership Opportunities</h4>
+            <p>
+              Interested in collaborating or featuring our content? 
+              We'd love to explore possibilities.
+            </p>
+          </div>
+          <div class="topic-item">
+            <h4>Prayer Requests</h4>
+            <p>
+              We believe in the power of prayer. Share your requests 
+              and we'll lift them up.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="contact-social">
+    <div class="container container-narrow">
+      <h3>Find Us Online</h3>
+      <div class="social-grid">
+        <a href="https://youtube.com/@TheTableBible" class="social-card" target="_blank" rel="noopener noreferrer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+          </svg>
+          <span>YouTube</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <section class="contact-faq">
+    <div class="container container-narrow">
+      <h3>Quick Answers</h3>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Can I use your videos in my church?</summary>
+          <p>
+            Absolutely! All Table Bible videos are free to use in church services, 
+            Bible studies, small groups, or any ministry setting. No permission needed.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I download the videos?</summary>
+          <p>
+            Yes. You can download from YouTube using various tools, or check our 
+            Library for direct download links (coming soon via Internet Archive).
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>What translation do you use?</summary>
+          <p>
+            We use the World English Bible (WEB), a modern public domain translation. 
+            Learn more on our <a href="/about#public-domain">Public Domain</a> page.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>How can I support your ministry?</summary>
+          <p>
+            Visit our <a href="/donate">Support</a> page for ways to give. 
+            Even subscribing on YouTube and sharing videos helps tremendously!
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ── Contact Hero ────────────────────────────────────────────────── */
+  .contact-hero {
+    padding: var(--space-4xl) 0;
+    text-align: center;
+    background: var(--bg-secondary);
+  }
+  
+  .contact-intro {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+  
+  /* ── Contact Main ────────────────────────────────────────────────── */
+  .contact-main {
+    padding: var(--space-4xl) 0;
+  }
+  
+  .contact-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(201, 168, 106, 0.1);
+    padding: var(--space-3xl);
+    text-align: center;
+    margin-bottom: var(--space-4xl);
+  }
+  
+  .contact-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-xl);
+    color: var(--espresso);
+  }
+  
+  .contact-method h2 {
+    margin-bottom: var(--space-md);
+  }
+  
+  .contact-method > p {
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .email-link {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-family: var(--ff-serif);
+    color: var(--gold-light);
+    text-decoration: none;
+    padding: var(--space-md) var(--space-xl);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+  }
+  
+  .email-link:hover {
+    background: var(--espresso);
+    transform: translateY(-2px);
+  }
+  
+  .response-time {
+    margin-top: var(--space-lg);
+    font-size: 0.875rem;
+    color: var(--text-dim);
+  }
+  
+  /* ── Topics Grid ─────────────────────────────────────────────────── */
+  .contact-topics h3 {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    color: var(--cream);
+  }
+  
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+  }
+  
+  .topic-item {
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(201, 168, 106, 0.1);
+  }
+  
+  .topic-item h4 {
+    font-family: var(--ff-sans);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--gold-light);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .topic-item p {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  /* ── Social Section ──────────────────────────────────────────────── */
+  .contact-social {
+    padding: var(--space-3xl) 0;
+    background: var(--bg-secondary);
+    text-align: center;
+  }
+  
+  .contact-social h3 {
+    margin-bottom: var(--space-xl);
+    color: var(--cream);
+  }
+  
+  .social-grid {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+  
+  .social-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-xl);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    color: var(--cream);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(201, 168, 106, 0.1);
+  }
+  
+  .social-card:hover {
+    background: var(--espresso);
+    transform: translateY(-2px);
+    color: var(--gold-light);
+  }
+  
+  .social-card svg {
+    color: var(--gold);
+  }
+  
+  /* ── FAQ Section ─────────────────────────────────────────────────── */
+  .contact-faq {
+    padding: var(--space-4xl) 0;
+  }
+  
+  .contact-faq h3 {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    color: var(--cream);
+  }
+  
+  .faq-list {
+    display: grid;
+    gap: var(--space-md);
+  }
+  
+  .faq-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(201, 168, 106, 0.1);
+    overflow: hidden;
+  }
+  
+  .faq-item summary {
+    padding: var(--space-lg);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--cream);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+  
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.5rem;
+    color: var(--gold);
+    font-weight: 300;
+    transition: transform 0.2s ease;
+  }
+  
+  .faq-item[open] summary::after {
+    transform: rotate(45deg);
+  }
+  
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  
+  .faq-item p {
+    padding: 0 var(--space-lg) var(--space-lg);
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+  
+  .faq-item a {
+    color: var(--gold-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  
+  .faq-item a:hover {
+    color: var(--gold);
+  }
+</style>
