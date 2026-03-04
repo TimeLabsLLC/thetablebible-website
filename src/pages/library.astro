@@ -42,7 +42,7 @@ const sections = [
   {
     id: 'apocrypha',
     title: 'The Apocrypha',
-    subtitle: 'Deuterocanonical Books',
+    subtitle: 'Additional books recognized by Catholic and Orthodox traditions',
     books: ['Tobit', 'Judith', 'Additions to Esther', 'Wisdom', 'Sirach', 'Baruch', '1 Maccabees', '2 Maccabees', '1 Esdras', '2 Esdras', 'Prayer of Manasseh', 'Psalm 151', '3 Maccabees', '4 Maccabees']
   }
 ];
@@ -69,11 +69,11 @@ function getNextColor() {
 }
 ---
 
-<BaseLayout title="Library — The Table Bible" description="Browse all 81 books of the World English Bible. Watch chapters, full books, or volume collections.">
+<BaseLayout title="Library — The Table Bible" description="Browse all 66 books of the Bible plus 14 deuterocanonical books from the World English Bible. Watch chapters, full books, or volume collections.">
   <section class="library-hero">
     <div class="container">
       <h1>Library</h1>
-      <p>Browse the entire World English Bible — 81 books, over 1,400 chapters</p>
+      <p>The complete Bible — all 66 books of the Old and New Testaments — plus 14 additional deuterocanonical books included in the World English Bible.</p>
     </div>
   </section>
   
@@ -99,7 +99,7 @@ function getNextColor() {
           {section.books.map(book => {
             const color = getNextColor();
             return (
-              <a href={`https://youtube.com/@TheTableBible`} target="_blank" rel="noopener" class="book-card" style={`--card-color: ${color}`}>
+              <a href={`https://youtube.com/@TheTableBible1`} target="_blank" rel="noopener" class="book-card" style={`--card-color: ${color}`}>
                 <div class="book-card-bg"></div>
                 <div class="book-card-content">
                   <h3>{book}</h3>
@@ -118,7 +118,7 @@ function getNextColor() {
       <div class="cta-card">
         <h2>Subscribe for Updates</h2>
         <p>Be the first to know when new chapters are uploaded</p>
-        <a href="https://youtube.com/@TheTableBible?sub_confirmation=1" target="_blank" rel="noopener" class="btn btn-primary">
+        <a href="https://youtube.com/@TheTableBible1?sub_confirmation=1" target="_blank" rel="noopener" class="btn btn-primary">
           Subscribe on YouTube
         </a>
       </div>
