@@ -9,6 +9,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <div class="hero-content container">
       <div class="hero-badge">Come to the Table Ministries</div>
       <h1>The Table Bible</h1>
+      
+      <div class="hero-video">
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/EDBfm0fmf1Y?autoplay=1&mute=1"
+            title="John Chapter 1 | WEB | The Table Bible"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+      
       <p class="hero-subtitle">
         The World English Bible, read aloud with word-by-word highlighting 
         in a timeless book-on-table format.
@@ -47,33 +60,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </div>
   </section>
   
-  <!-- Featured Video Section -->
-  <section class="featured">
-    <div class="container">
-      <div class="section-header">
-        <h2>Experience Scripture</h2>
-        <p>Watch the Word come alive with word-by-word highlighting</p>
-      </div>
-      
-      <div class="featured-video">
-        <div class="video-wrapper">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/EDBfm0fmf1Y"
-            title="John Chapter 1 | WEB | The Table Bible"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-      
-      <div class="featured-cta">
-        <a href="https://youtube.com/@TheTableBible1" target="_blank" rel="noopener" class="btn btn-secondary">
-          Subscribe to The Table Bible
-        </a>
-      </div>
-    </div>
-  </section>
+
   
   <!-- Content Types Section -->
   <section class="content-types">
@@ -170,7 +157,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   
   .hero-content {
-    max-width: 800px;
+    max-width: 900px;
+    width: 100%;
+  }
+  
+  .hero-video {
+    margin: var(--space-2xl) auto;
+    max-width: 100%;
   }
   
   .hero-badge {
@@ -236,49 +229,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--cream);
   }
   
-  /* ── Featured Video Section ──────────────────────────────────────── */
-  .featured {
-    padding-top: var(--space-4xl);
-    padding-bottom: var(--space-4xl);
-  }
-  
-  .featured-video {
-    max-width: 900px;
-    margin: 0 auto var(--space-2xl);
-  }
-  
-  .video-placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-secondary);
-  }
-  
-  .video-placeholder-content {
-    text-align: center;
-    color: var(--text-muted);
-  }
-  
-  .video-placeholder-content .brand-initial {
-    width: 80px;
-    height: 80px;
-    font-size: 48px;
-    margin: 0 auto var(--space-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(145deg, var(--gold), var(--gold-dark));
-    border-radius: 12px;
-    font-family: var(--font-serif);
-    font-weight: 700;
-    color: var(--crimson);
-  }
-  
-  .featured-cta {
-    text-align: center;
-  }
+
   
   /* ── Content Types Section ───────────────────────────────────────── */
   .content-types {
