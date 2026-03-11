@@ -1,0 +1,302 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import libraryData from '../../data/library.json';
+
+export function getStaticPaths() {
+  const books: any[] = [];
+  for (const section of libraryData.sections) {
+    for (const book of section.books) {
+      books.push({
+        params: { book: book.slug },
+        props: { book, sectionTitle: section.title },
+      });
+    }
+  }
+  return books;
+}
+
+const { book, sectionTitle } = Astro.props;
+const chapters = Array.from({ length: book.chapters }, (_, i) => i + 1);
+const fullBookVideoId = book.fullBookVideoId || null;
+---
+
+<BaseLayout
+  title={`${book.name} — The Table Bible`}
+  description={`Listen to the Book of ${book.name} — all ${book.chapters} chapters with word-by-word highlighted text. World English Bible (WEB).`}
+>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb container" aria-label="Breadcrumb">
+    <a href="/library/">Library</a>
+    <span class="separator">›</span>
+    <span class="current">{book.name}</span>
+  </nav>
+
+  <!-- Book Header -->
+  <section class="book-hero">
+    <div class="container">
+      <h1>{book.name}</h1>
+      <p class="book-meta">{sectionTitle} · {book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</p>
+    </div>
+  </section>
+
+  <!-- Top Row: Full Book Video + MP3 -->
+  <section class="top-row container">
+    <div class="top-row-grid">
+      <div class="top-row-item">
+        <h2>📖 Full Book Video</h2>
+        {fullBookVideoId ? (
+          <a href={`/watch/?v=${fullBookVideoId}`} class="top-row-card">
+            <div class="top-row-thumb">
+              <img
+                src={`/thumbs/${book.abbr}_1_thumb.webp`}
+                alt={`${book.name} — Full Book`}
+                width="640" height="360"
+                loading="eager"
+              />
+              <div class="play-overlay">▶</div>
+            </div>
+            <span class="top-row-label">Watch All {book.chapters} Chapters</span>
+          </a>
+        ) : (
+          <div class="top-row-card coming-soon">
+            <div class="top-row-thumb">
+              <img
+                src={`/thumbs/${book.abbr}_1_thumb.webp`}
+                alt={`${book.name} — Full Book`}
+                width="640" height="360"
+                loading="eager"
+              />
+              <div class="coming-overlay">Coming Soon</div>
+            </div>
+            <span class="top-row-label">Full Book — Coming Soon</span>
+          </div>
+        )}
+      </div>
+
+      <div class="top-row-item">
+        <h2>🎧 MP3 Audio</h2>
+        <div class="top-row-card coming-soon">
+          <div class="top-row-thumb mp3-thumb">
+            <div class="mp3-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+          </div>
+          <span class="top-row-label">MP3 Download — Coming Soon</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter Thumbnails Grid -->
+  <section class="chapters-section container">
+    <h2>Chapters</h2>
+    <div class="chapter-grid">
+      {chapters.map(ch => {
+        const videoId = book.videos?.[String(ch)] || null;
+        return (
+          <a
+            href={videoId ? `/watch/?v=${videoId}` : undefined}
+            class:list={['chapter-card', { 'has-video': !!videoId, 'no-video': !videoId }]}
+          >
+            <div class="card-thumb">
+              {videoId && <div class="play-icon" aria-hidden="true">▶</div>}
+              <img
+                src={`/thumbs/${book.abbr}_${ch}_thumb.webp`}
+                alt={`${book.name} Chapter ${ch}`}
+                width="640" height="360"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <span class="card-label">Chapter {ch}</span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- Back to Library -->
+  <section class="back-section container">
+    <a href="/library/" class="btn btn-secondary">← Back to Library</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .breadcrumb {
+    padding: var(--space-lg) var(--space-lg) 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+  .breadcrumb a { color: var(--gold-light); }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .separator { margin: 0 var(--space-sm); color: var(--text-muted); }
+  .breadcrumb .current { color: var(--cream); }
+
+  .book-hero {
+    padding: var(--space-2xl) 0;
+    text-align: center;
+  }
+  .book-hero h1 { margin-bottom: var(--space-sm); }
+  .book-meta { color: var(--gold-light); font-size: 1rem; }
+
+  /* ── Top Row ─────────────────────────────────────────────────────── */
+  .top-row { padding-bottom: var(--space-3xl); }
+  .top-row-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+  .top-row-item h2 {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: var(--space-md);
+  }
+  .top-row-card {
+    display: block;
+    border: 1px solid rgba(201, 168, 106, 0.15);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--transition-fast), transform var(--transition-base);
+  }
+  .top-row-card:hover:not(.coming-soon) {
+    border-color: var(--gold-light);
+    transform: translateY(-2px);
+  }
+  .top-row-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-secondary);
+  }
+  .top-row-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+  }
+  .top-row-card:hover .play-overlay { opacity: 1; }
+  .coming-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--cream);
+    background: rgba(0, 0, 0, 0.55);
+    letter-spacing: 0.05em;
+  }
+  .top-row-label {
+    display: block;
+    padding: var(--space-md);
+    font-size: 0.9375rem;
+    color: var(--cream);
+    text-align: center;
+  }
+
+  .mp3-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-light);
+  }
+
+  /* ── Chapter Grid ────────────────────────────────────────────────── */
+  .chapters-section {
+    padding-bottom: var(--space-3xl);
+  }
+  .chapters-section h2 {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(201, 168, 106, 0.15);
+  }
+  .chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+  }
+  .chapter-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--transition-base);
+  }
+  .chapter-card.has-video { cursor: pointer; }
+  .chapter-card.has-video:hover { transform: translateY(-3px); }
+  .chapter-card.no-video { pointer-events: none; }
+
+  .card-thumb {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(201, 168, 106, 0.15);
+    transition: border-color var(--transition-fast);
+  }
+  .chapter-card.has-video:hover .card-thumb { border-color: var(--gold-light); }
+  .card-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--bg-secondary);
+  }
+  .play-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .chapter-card.has-video:hover .play-icon { opacity: 1; }
+  .card-label {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--cream);
+  }
+
+  .back-section {
+    padding-bottom: var(--space-4xl);
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .top-row-grid { grid-template-columns: 1fr; }
+    .chapter-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  }
+</style>

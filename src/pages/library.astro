@@ -12,7 +12,7 @@ const { sections } = libraryData;
       <p>The complete Bible — all 66 books of the Old and New Testaments — plus 14 additional deuterocanonical books included in the World English Bible.</p>
       
       <div class="search-bar">
-        <input type="text" id="library-search" placeholder="Search by book name or chapter..." autocomplete="off" />
+        <input type="text" id="library-search" placeholder="Search by book name..." autocomplete="off" />
       </div>
     </div>
   </section>
@@ -37,46 +37,20 @@ const { sections } = libraryData;
         
         <div class="book-grid">
           {section.books.map(book => (
-            <div class="book-group" data-book={book.name.toLowerCase()} data-abbr={book.abbr}>
-              <button class="book-card" aria-expanded="false">
-                <div class="book-card-thumb">
-                  <img
-                    src={`/thumbs/${book.abbr}_1_thumb.webp`}
-                    alt={book.name}
-                    width="640"
-                    height="360"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-                <span class="book-card-name">{book.name}</span>
-                <span class="book-card-count">{book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</span>
-              </button>
-              <div class="chapter-drawer" hidden>
-                <div class="chapter-grid">
-                  {Array.from({ length: book.chapters }, (_, i) => i + 1).map(ch => {
-                    const videoId = book.videos?.[String(ch)] || null;
-                    return (
-                    <div class="chapter-card" data-book={book.name.toLowerCase()} data-chapter={ch} data-video-id={videoId || undefined}>
-                      <span class="card-title">{book.name}</span>
-                      <div class="card-thumb">
-                        {videoId && <div class="play-icon" aria-hidden="true">▶</div>}
-                        <img
-                          src={`/thumbs/${book.abbr}_${ch}_thumb.webp`}
-                          alt={`${book.name} Chapter ${ch}`}
-                          width="640"
-                          height="360"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                      <span class="card-subtitle">Chapter {ch}</span>
-                    </div>
-                    );
-                  })}
-                </div>
+            <a href={`/library/${book.slug}/`} class="book-card" data-book={book.name.toLowerCase()}>
+              <div class="book-card-thumb">
+                <img
+                  src={`/thumbs/${book.abbr}_1_thumb.webp`}
+                  alt={book.name}
+                  width="640"
+                  height="360"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
-            </div>
+              <span class="book-card-name">{book.name}</span>
+              <span class="book-card-count">{book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</span>
+            </a>
           ))}
         </div>
       </section>
@@ -98,103 +72,45 @@ const { sections } = libraryData;
 
 <script>
   const searchInput = document.getElementById('library-search') as HTMLInputElement;
-  const bookGroups = document.querySelectorAll('.book-group');
+  const bookCards = document.querySelectorAll('.book-card[data-book]');
   const bookSections = document.querySelectorAll('.book-section');
 
   searchInput?.addEventListener('input', () => {
     const q = searchInput.value.toLowerCase().trim();
     
     if (!q) {
-      bookGroups.forEach(g => (g as HTMLElement).style.display = '');
+      bookCards.forEach(c => (c as HTMLElement).style.display = '');
       bookSections.forEach(s => (s as HTMLElement).style.display = '');
       return;
     }
 
-    bookGroups.forEach(group => {
-      const bookName = (group as HTMLElement).dataset.book || '';
-      const show = bookName.includes(q);
-      (group as HTMLElement).style.display = show ? '' : 'none';
+    bookCards.forEach(card => {
+      const name = (card as HTMLElement).dataset.book || '';
+      (card as HTMLElement).style.display = name.includes(q) ? '' : 'none';
     });
 
     bookSections.forEach(section => {
-      const visibleGroups = section.querySelectorAll('.book-group');
-      const anyVisible = Array.from(visibleGroups).some(
-        g => (g as HTMLElement).style.display !== 'none'
-      );
+      const cards = section.querySelectorAll('.book-card[data-book]');
+      const anyVisible = Array.from(cards).some(c => (c as HTMLElement).style.display !== 'none');
       (section as HTMLElement).style.display = anyVisible ? '' : 'none';
-    });
-  });
-
-  // Book card expand/collapse
-  document.querySelectorAll('.book-card').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const group = btn.closest('.book-group')!;
-      const drawer = group.querySelector('.chapter-drawer') as HTMLElement;
-      const isOpen = btn.getAttribute('aria-expanded') === 'true';
-
-      if (isOpen) {
-        btn.setAttribute('aria-expanded', 'false');
-        drawer.hidden = true;
-      } else {
-        btn.setAttribute('aria-expanded', 'true');
-        drawer.hidden = false;
-        // Scroll the drawer into view smoothly
-        drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    });
-  });
-
-  // Click-to-play: open modal with YouTube embed when a chapter card with a video ID is clicked
-  const modal = document.createElement('div');
-  modal.className = 'video-modal';
-  modal.innerHTML = '<div class="video-modal-backdrop"></div><div class="video-modal-content"><button class="video-modal-close" aria-label="Close">&times;</button><div class="video-modal-player"></div></div>';
-  document.body.appendChild(modal);
-
-  function closeModal() {
-    modal.classList.remove('active');
-    modal.querySelector('.video-modal-player')!.innerHTML = '';
-  }
-
-  modal.querySelector('.video-modal-backdrop')!.addEventListener('click', closeModal);
-  modal.querySelector('.video-modal-close')!.addEventListener('click', closeModal);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-
-  document.querySelectorAll('.chapter-card[data-video-id]').forEach(card => {
-    (card as HTMLElement).style.cursor = 'pointer';
-    card.addEventListener('click', () => {
-      const videoId = (card as HTMLElement).dataset.videoId;
-      if (!videoId) return;
-      const player = modal.querySelector('.video-modal-player')!;
-      player.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-      modal.classList.add('active');
     });
   });
 </script>
 
 <style>
-  /* ── Library Hero ────────────────────────────────────────────────── */
   .library-hero {
     padding: var(--space-4xl) 0 var(--space-2xl);
     text-align: center;
     background: var(--bg-secondary);
   }
-  
-  .library-hero h1 {
-    margin-bottom: var(--space-md);
-  }
-  
+  .library-hero h1 { margin-bottom: var(--space-md); }
   .library-hero p {
     color: var(--text-muted);
     font-size: 1.125rem;
     margin-bottom: var(--space-xl);
   }
-  
-  /* ── Search Bar ──────────────────────────────────────────────────── */
-  .search-bar {
-    max-width: 500px;
-    margin: 0 auto;
-  }
-  
+
+  .search-bar { max-width: 500px; margin: 0 auto; }
   .search-bar input {
     width: 100%;
     padding: var(--space-md) var(--space-lg);
@@ -207,16 +123,9 @@ const { sections } = libraryData;
     outline: none;
     transition: border-color var(--transition-fast);
   }
-  
-  .search-bar input::placeholder {
-    color: var(--text-muted);
-  }
-  
-  .search-bar input:focus {
-    border-color: var(--gold-light);
-  }
-  
-  /* ── Section Navigation ──────────────────────────────────────────── */
+  .search-bar input::placeholder { color: var(--text-muted); }
+  .search-bar input:focus { border-color: var(--gold-light); }
+
   .library-nav {
     position: sticky;
     top: 72px;
@@ -226,7 +135,6 @@ const { sections } = libraryData;
     border-bottom: 1px solid rgba(201, 168, 106, 0.1);
     padding: var(--space-md) 0;
   }
-  
   .section-tabs {
     display: flex;
     gap: var(--space-sm);
@@ -235,16 +143,8 @@ const { sections } = libraryData;
     scrollbar-width: thin;
     scrollbar-color: var(--gold-light) transparent;
   }
-  
-  .section-tabs::-webkit-scrollbar {
-    height: 4px;
-  }
-  
-  .section-tabs::-webkit-scrollbar-thumb {
-    background: var(--gold-light);
-    border-radius: 2px;
-  }
-  
+  .section-tabs::-webkit-scrollbar { height: 4px; }
+  .section-tabs::-webkit-scrollbar-thumb { background: var(--gold-light); border-radius: 2px; }
   .section-tab {
     flex-shrink: 0;
     padding: var(--space-sm) var(--space-lg);
@@ -255,78 +155,42 @@ const { sections } = libraryData;
     white-space: nowrap;
     transition: all var(--transition-fast);
   }
-  
   .section-tab:hover {
     color: var(--cream);
     border-color: var(--gold-light);
     background: rgba(201, 168, 106, 0.1);
   }
-  
-  /* ── Library Content ─────────────────────────────────────────────── */
-  .library-content {
-    padding: var(--space-3xl) var(--space-lg);
-  }
-  
-  .book-section {
-    margin-bottom: var(--space-4xl);
-    scroll-margin-top: 160px;
-  }
-  
-  .book-section .section-header {
-    margin-bottom: var(--space-2xl);
-  }
-  
-  .book-section .section-header h2 {
-    margin-bottom: var(--space-xs);
-  }
-  
-  .book-section .section-header p {
-    color: var(--gold-light);
-    font-size: 1rem;
-  }
-  
-  /* ── Book Grid (book cards layout) ─────────────────────────────────── */
+
+  .library-content { padding: var(--space-3xl) var(--space-lg); }
+  .book-section { margin-bottom: var(--space-4xl); scroll-margin-top: 160px; }
+  .book-section .section-header { margin-bottom: var(--space-2xl); }
+  .book-section .section-header h2 { margin-bottom: var(--space-xs); }
+  .book-section .section-header p { color: var(--gold-light); font-size: 1rem; }
+
   .book-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--space-lg);
   }
 
-  /* ── Book Group (card + hidden drawer) ──────────────────────────── */
-  .book-group {
-    display: contents;
-  }
-
-  .book-group[data-expanded] .chapter-drawer {
-    grid-column: 1 / -1;
-  }
-
-  /* ── Book Card (clickable) ──────────────────────────────────────── */
   .book-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: var(--space-sm);
-    background: none;
     border: 1px solid rgba(201, 168, 106, 0.15);
     border-radius: var(--radius-md);
     padding: var(--space-sm);
     cursor: pointer;
     transition: transform var(--transition-base), border-color var(--transition-fast), background var(--transition-fast);
-    font-family: var(--font-sans);
-    color: var(--cream);
+    text-decoration: none;
+    color: inherit;
   }
-
   .book-card:hover {
     transform: translateY(-3px);
     border-color: var(--gold-light);
     background: rgba(201, 168, 106, 0.05);
-  }
-
-  .book-card[aria-expanded="true"] {
-    border-color: var(--gold-light);
-    background: rgba(201, 168, 106, 0.08);
   }
 
   .book-card-thumb {
@@ -334,7 +198,6 @@ const { sections } = libraryData;
     border-radius: var(--radius-sm);
     overflow: hidden;
   }
-
   .book-card-thumb img {
     display: block;
     width: 100%;
@@ -350,149 +213,15 @@ const { sections } = libraryData;
     font-weight: 500;
     color: var(--cream);
   }
-
   .book-card-count {
     font-size: 0.8125rem;
     color: var(--text-muted);
   }
 
-  /* ── Chapter Drawer (expanded chapters) ────────────────────────── */
-  .chapter-drawer {
-    grid-column: 1 / -1;
-    padding: var(--space-xl) 0;
-    border-top: 1px solid rgba(201, 168, 106, 0.15);
-    margin-top: var(--space-md);
-  }
-  
-  /* ── Chapter Grid ────────────────────────────────────────────────── */
-  .chapter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--space-lg);
-  }
-  
-  .chapter-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--space-sm);
-    transition: transform var(--transition-base);
-  }
-  
-  .chapter-card:hover {
-    transform: translateY(-3px);
-  }
-  
-  .card-title,
-  .card-subtitle {
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--cream);
-    line-height: 1.3;
-  }
-  
-  .card-thumb {
-    position: relative;
-    width: 100%;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 1px solid rgba(201, 168, 106, 0.15);
-    transition: border-color var(--transition-fast);
-  }
-  
-  .chapter-card:hover .card-thumb {
-    border-color: var(--gold-light);
-  }
-  
-  .card-thumb img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    background: var(--bg-secondary);
-  }
-  
-  /* ── Play Icon (shown on cards with YouTube IDs) ─────────────────── */
-  .play-icon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-    background: rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: opacity var(--transition-fast);
-    z-index: 2;
-    pointer-events: none;
-  }
-  
-  .chapter-card:hover .play-icon {
-    opacity: 1;
-  }
-  
-  /* ── Video Modal ─────────────────────────────────────────────────── */
-  .video-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .video-modal.active {
-    display: flex;
-  }
-  
-  .video-modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-  }
-  
-  .video-modal-content {
-    position: relative;
-    width: 90vw;
-    max-width: 960px;
-    z-index: 1;
-  }
-  
-  .video-modal-close {
-    position: absolute;
-    top: -40px;
-    right: 0;
-    background: none;
-    border: none;
-    color: var(--cream);
-    font-size: 2rem;
-    cursor: pointer;
-    line-height: 1;
-  }
-  
-  .video-modal-player {
-    aspect-ratio: 16 / 9;
-    width: 100%;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    background: #000;
-  }
-  
-  .video-modal-player iframe {
-    width: 100%;
-    height: 100%;
-  }
-  
-  /* ── CTA Section ─────────────────────────────────────────────────── */
   .library-cta {
     padding: var(--space-3xl) 0 var(--space-4xl);
     background: var(--bg-secondary);
   }
-  
   .cta-card {
     text-align: center;
     padding: var(--space-3xl);
@@ -500,37 +229,14 @@ const { sections } = libraryData;
     border-radius: var(--radius-xl);
     border: 1px solid rgba(201, 168, 106, 0.1);
   }
-  
-  .cta-card h2 {
-    margin-bottom: var(--space-md);
-  }
-  
-  .cta-card p {
-    color: var(--text-muted);
-    margin-bottom: var(--space-xl);
-  }
-  
-  /* ── Responsive ──────────────────────────────────────────────────── */
+  .cta-card h2 { margin-bottom: var(--space-md); }
+  .cta-card p { color: var(--text-muted); margin-bottom: var(--space-xl); }
+
   @media (max-width: 768px) {
-    .book-grid {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-    
-    .chapter-grid {
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    }
-    
-    .library-nav {
-      top: 56px;
-    }
-    
-    .book-section {
-      scroll-margin-top: 140px;
-    }
-    
-    .card-title,
-    .card-subtitle {
-      font-size: 0.8125rem;
-    }
+    .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    .library-nav { top: 56px; }
+    .book-section { scroll-margin-top: 140px; }
+    .book-card-name { font-size: 0.875rem; }
+    .book-card-count { font-size: 0.75rem; }
   }
 </style>

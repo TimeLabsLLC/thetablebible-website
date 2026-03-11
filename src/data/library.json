@@ -5,11 +5,36 @@
       "title": "The Pentateuch",
       "subtitle": "The Five Books of Moses",
       "books": [
-        { "abbr": "GEN", "name": "Genesis", "chapters": 50 },
-        { "abbr": "EXO", "name": "Exodus", "chapters": 40 },
-        { "abbr": "LEV", "name": "Leviticus", "chapters": 27 },
-        { "abbr": "NUM", "name": "Numbers", "chapters": 36 },
-        { "abbr": "DEU", "name": "Deuteronomy", "chapters": 34 }
+        {
+          "abbr": "GEN",
+          "name": "Genesis",
+          "chapters": 50,
+          "slug": "genesis"
+        },
+        {
+          "abbr": "EXO",
+          "name": "Exodus",
+          "chapters": 40,
+          "slug": "exodus"
+        },
+        {
+          "abbr": "LEV",
+          "name": "Leviticus",
+          "chapters": 27,
+          "slug": "leviticus"
+        },
+        {
+          "abbr": "NUM",
+          "name": "Numbers",
+          "chapters": 36,
+          "slug": "numbers"
+        },
+        {
+          "abbr": "DEU",
+          "name": "Deuteronomy",
+          "chapters": 34,
+          "slug": "deuteronomy"
+        }
       ]
     },
     {
@@ -17,18 +42,78 @@
       "title": "Historical Books",
       "subtitle": "From Joshua to Esther",
       "books": [
-        { "abbr": "JOS", "name": "Joshua", "chapters": 24 },
-        { "abbr": "JDG", "name": "Judges", "chapters": 21 },
-        { "abbr": "RUT", "name": "Ruth", "chapters": 4 },
-        { "abbr": "1SA", "name": "1 Samuel", "chapters": 31 },
-        { "abbr": "2SA", "name": "2 Samuel", "chapters": 24 },
-        { "abbr": "1KI", "name": "1 Kings", "chapters": 22 },
-        { "abbr": "2KI", "name": "2 Kings", "chapters": 25 },
-        { "abbr": "1CH", "name": "1 Chronicles", "chapters": 29 },
-        { "abbr": "2CH", "name": "2 Chronicles", "chapters": 36 },
-        { "abbr": "EZR", "name": "Ezra", "chapters": 10 },
-        { "abbr": "NEH", "name": "Nehemiah", "chapters": 13 },
-        { "abbr": "EST", "name": "Esther", "chapters": 10 }
+        {
+          "abbr": "JOS",
+          "name": "Joshua",
+          "chapters": 24,
+          "slug": "joshua"
+        },
+        {
+          "abbr": "JDG",
+          "name": "Judges",
+          "chapters": 21,
+          "slug": "judges"
+        },
+        {
+          "abbr": "RUT",
+          "name": "Ruth",
+          "chapters": 4,
+          "slug": "ruth"
+        },
+        {
+          "abbr": "1SA",
+          "name": "1 Samuel",
+          "chapters": 31,
+          "slug": "1-samuel"
+        },
+        {
+          "abbr": "2SA",
+          "name": "2 Samuel",
+          "chapters": 24,
+          "slug": "2-samuel"
+        },
+        {
+          "abbr": "1KI",
+          "name": "1 Kings",
+          "chapters": 22,
+          "slug": "1-kings"
+        },
+        {
+          "abbr": "2KI",
+          "name": "2 Kings",
+          "chapters": 25,
+          "slug": "2-kings"
+        },
+        {
+          "abbr": "1CH",
+          "name": "1 Chronicles",
+          "chapters": 29,
+          "slug": "1-chronicles"
+        },
+        {
+          "abbr": "2CH",
+          "name": "2 Chronicles",
+          "chapters": 36,
+          "slug": "2-chronicles"
+        },
+        {
+          "abbr": "EZR",
+          "name": "Ezra",
+          "chapters": 10,
+          "slug": "ezra"
+        },
+        {
+          "abbr": "NEH",
+          "name": "Nehemiah",
+          "chapters": 13,
+          "slug": "nehemiah"
+        },
+        {
+          "abbr": "EST",
+          "name": "Esther",
+          "chapters": 10,
+          "slug": "esther"
+        }
       ]
     },
     {
@@ -36,11 +121,36 @@
       "title": "Wisdom Literature",
       "subtitle": "Poetry and Wisdom",
       "books": [
-        { "abbr": "JOB", "name": "Job", "chapters": 42 },
-        { "abbr": "PSA", "name": "Psalms", "chapters": 150 },
-        { "abbr": "PRO", "name": "Proverbs", "chapters": 31 },
-        { "abbr": "ECC", "name": "Ecclesiastes", "chapters": 12 },
-        { "abbr": "SNG", "name": "Song of Solomon", "chapters": 8 }
+        {
+          "abbr": "JOB",
+          "name": "Job",
+          "chapters": 42,
+          "slug": "job"
+        },
+        {
+          "abbr": "PSA",
+          "name": "Psalms",
+          "chapters": 150,
+          "slug": "psalms"
+        },
+        {
+          "abbr": "PRO",
+          "name": "Proverbs",
+          "chapters": 31,
+          "slug": "proverbs"
+        },
+        {
+          "abbr": "ECC",
+          "name": "Ecclesiastes",
+          "chapters": 12,
+          "slug": "ecclesiastes"
+        },
+        {
+          "abbr": "SNG",
+          "name": "Song of Solomon",
+          "chapters": 8,
+          "slug": "song-of-solomon"
+        }
       ]
     },
     {
@@ -48,23 +158,108 @@
       "title": "The Prophets",
       "subtitle": "Major and Minor Prophets",
       "books": [
-        { "abbr": "ISA", "name": "Isaiah", "chapters": 66 },
-        { "abbr": "JER", "name": "Jeremiah", "chapters": 52 },
-        { "abbr": "LAM", "name": "Lamentations", "chapters": 5 },
-        { "abbr": "EZK", "name": "Ezekiel", "chapters": 48 },
-        { "abbr": "DAN", "name": "Daniel", "chapters": 12 },
-        { "abbr": "HOS", "name": "Hosea", "chapters": 14 },
-        { "abbr": "JOL", "name": "Joel", "chapters": 3 },
-        { "abbr": "AMO", "name": "Amos", "chapters": 9 },
-        { "abbr": "OBA", "name": "Obadiah", "chapters": 1 },
-        { "abbr": "JON", "name": "Jonah", "chapters": 4 },
-        { "abbr": "MIC", "name": "Micah", "chapters": 7 },
-        { "abbr": "NAM", "name": "Nahum", "chapters": 3 },
-        { "abbr": "HAB", "name": "Habakkuk", "chapters": 3 },
-        { "abbr": "ZEP", "name": "Zephaniah", "chapters": 3 },
-        { "abbr": "HAG", "name": "Haggai", "chapters": 2 },
-        { "abbr": "ZEC", "name": "Zechariah", "chapters": 14 },
-        { "abbr": "MAL", "name": "Malachi", "chapters": 4 }
+        {
+          "abbr": "ISA",
+          "name": "Isaiah",
+          "chapters": 66,
+          "slug": "isaiah"
+        },
+        {
+          "abbr": "JER",
+          "name": "Jeremiah",
+          "chapters": 52,
+          "slug": "jeremiah"
+        },
+        {
+          "abbr": "LAM",
+          "name": "Lamentations",
+          "chapters": 5,
+          "slug": "lamentations"
+        },
+        {
+          "abbr": "EZK",
+          "name": "Ezekiel",
+          "chapters": 48,
+          "slug": "ezekiel"
+        },
+        {
+          "abbr": "DAN",
+          "name": "Daniel",
+          "chapters": 12,
+          "slug": "daniel"
+        },
+        {
+          "abbr": "HOS",
+          "name": "Hosea",
+          "chapters": 14,
+          "slug": "hosea"
+        },
+        {
+          "abbr": "JOL",
+          "name": "Joel",
+          "chapters": 3,
+          "slug": "joel"
+        },
+        {
+          "abbr": "AMO",
+          "name": "Amos",
+          "chapters": 9,
+          "slug": "amos"
+        },
+        {
+          "abbr": "OBA",
+          "name": "Obadiah",
+          "chapters": 1,
+          "slug": "obadiah"
+        },
+        {
+          "abbr": "JON",
+          "name": "Jonah",
+          "chapters": 4,
+          "slug": "jonah"
+        },
+        {
+          "abbr": "MIC",
+          "name": "Micah",
+          "chapters": 7,
+          "slug": "micah"
+        },
+        {
+          "abbr": "NAM",
+          "name": "Nahum",
+          "chapters": 3,
+          "slug": "nahum"
+        },
+        {
+          "abbr": "HAB",
+          "name": "Habakkuk",
+          "chapters": 3,
+          "slug": "habakkuk"
+        },
+        {
+          "abbr": "ZEP",
+          "name": "Zephaniah",
+          "chapters": 3,
+          "slug": "zephaniah"
+        },
+        {
+          "abbr": "HAG",
+          "name": "Haggai",
+          "chapters": 2,
+          "slug": "haggai"
+        },
+        {
+          "abbr": "ZEC",
+          "name": "Zechariah",
+          "chapters": 14,
+          "slug": "zechariah"
+        },
+        {
+          "abbr": "MAL",
+          "name": "Malachi",
+          "chapters": 4,
+          "slug": "malachi"
+        }
       ]
     },
     {
@@ -72,10 +267,30 @@
       "title": "The Gospels",
       "subtitle": "The Life of Jesus",
       "books": [
-        { "abbr": "MAT", "name": "Matthew", "chapters": 28 },
-        { "abbr": "MRK", "name": "Mark", "chapters": 16 },
-        { "abbr": "LUK", "name": "Luke", "chapters": 24 },
-        { "abbr": "JHN", "name": "John", "chapters": 21 }
+        {
+          "abbr": "MAT",
+          "name": "Matthew",
+          "chapters": 28,
+          "slug": "matthew"
+        },
+        {
+          "abbr": "MRK",
+          "name": "Mark",
+          "chapters": 16,
+          "slug": "mark"
+        },
+        {
+          "abbr": "LUK",
+          "name": "Luke",
+          "chapters": 24,
+          "slug": "luke"
+        },
+        {
+          "abbr": "JHN",
+          "name": "John",
+          "chapters": 21,
+          "slug": "john"
+        }
       ]
     },
     {
@@ -83,29 +298,144 @@
       "title": "Acts & Letters",
       "subtitle": "The Early Church",
       "books": [
-        { "abbr": "ACT", "name": "Acts", "chapters": 28 },
-        { "abbr": "ROM", "name": "Romans", "chapters": 16 },
-        { "abbr": "1CO", "name": "1 Corinthians", "chapters": 16 },
-        { "abbr": "2CO", "name": "2 Corinthians", "chapters": 13 },
-        { "abbr": "GAL", "name": "Galatians", "chapters": 6 },
-        { "abbr": "EPH", "name": "Ephesians", "chapters": 6 },
-        { "abbr": "PHP", "name": "Philippians", "chapters": 4 },
-        { "abbr": "COL", "name": "Colossians", "chapters": 4 },
-        { "abbr": "1TH", "name": "1 Thessalonians", "chapters": 5 },
-        { "abbr": "2TH", "name": "2 Thessalonians", "chapters": 3 },
-        { "abbr": "1TI", "name": "1 Timothy", "chapters": 6 },
-        { "abbr": "2TI", "name": "2 Timothy", "chapters": 4 },
-        { "abbr": "TIT", "name": "Titus", "chapters": 3 },
-        { "abbr": "PHM", "name": "Philemon", "chapters": 1 },
-        { "abbr": "HEB", "name": "Hebrews", "chapters": 13 },
-        { "abbr": "JAS", "name": "James", "chapters": 5 },
-        { "abbr": "1PE", "name": "1 Peter", "chapters": 5 },
-        { "abbr": "2PE", "name": "2 Peter", "chapters": 3 },
-        { "abbr": "1JN", "name": "1 John", "chapters": 5 },
-        { "abbr": "2JN", "name": "2 John", "chapters": 1 },
-        { "abbr": "3JN", "name": "3 John", "chapters": 1 },
-        { "abbr": "JUD", "name": "Jude", "chapters": 1 },
-        { "abbr": "REV", "name": "Revelation", "chapters": 22 }
+        {
+          "abbr": "ACT",
+          "name": "Acts",
+          "chapters": 28,
+          "slug": "acts"
+        },
+        {
+          "abbr": "ROM",
+          "name": "Romans",
+          "chapters": 16,
+          "slug": "romans"
+        },
+        {
+          "abbr": "1CO",
+          "name": "1 Corinthians",
+          "chapters": 16,
+          "slug": "1-corinthians"
+        },
+        {
+          "abbr": "2CO",
+          "name": "2 Corinthians",
+          "chapters": 13,
+          "slug": "2-corinthians"
+        },
+        {
+          "abbr": "GAL",
+          "name": "Galatians",
+          "chapters": 6,
+          "slug": "galatians"
+        },
+        {
+          "abbr": "EPH",
+          "name": "Ephesians",
+          "chapters": 6,
+          "slug": "ephesians"
+        },
+        {
+          "abbr": "PHP",
+          "name": "Philippians",
+          "chapters": 4,
+          "slug": "philippians"
+        },
+        {
+          "abbr": "COL",
+          "name": "Colossians",
+          "chapters": 4,
+          "slug": "colossians"
+        },
+        {
+          "abbr": "1TH",
+          "name": "1 Thessalonians",
+          "chapters": 5,
+          "slug": "1-thessalonians"
+        },
+        {
+          "abbr": "2TH",
+          "name": "2 Thessalonians",
+          "chapters": 3,
+          "slug": "2-thessalonians"
+        },
+        {
+          "abbr": "1TI",
+          "name": "1 Timothy",
+          "chapters": 6,
+          "slug": "1-timothy"
+        },
+        {
+          "abbr": "2TI",
+          "name": "2 Timothy",
+          "chapters": 4,
+          "slug": "2-timothy"
+        },
+        {
+          "abbr": "TIT",
+          "name": "Titus",
+          "chapters": 3,
+          "slug": "titus"
+        },
+        {
+          "abbr": "PHM",
+          "name": "Philemon",
+          "chapters": 1,
+          "slug": "philemon"
+        },
+        {
+          "abbr": "HEB",
+          "name": "Hebrews",
+          "chapters": 13,
+          "slug": "hebrews"
+        },
+        {
+          "abbr": "JAS",
+          "name": "James",
+          "chapters": 5,
+          "slug": "james"
+        },
+        {
+          "abbr": "1PE",
+          "name": "1 Peter",
+          "chapters": 5,
+          "slug": "1-peter"
+        },
+        {
+          "abbr": "2PE",
+          "name": "2 Peter",
+          "chapters": 3,
+          "slug": "2-peter"
+        },
+        {
+          "abbr": "1JN",
+          "name": "1 John",
+          "chapters": 5,
+          "slug": "1-john"
+        },
+        {
+          "abbr": "2JN",
+          "name": "2 John",
+          "chapters": 1,
+          "slug": "2-john"
+        },
+        {
+          "abbr": "3JN",
+          "name": "3 John",
+          "chapters": 1,
+          "slug": "3-john"
+        },
+        {
+          "abbr": "JUD",
+          "name": "Jude",
+          "chapters": 1,
+          "slug": "jude"
+        },
+        {
+          "abbr": "REV",
+          "name": "Revelation",
+          "chapters": 22,
+          "slug": "revelation"
+        }
       ]
     },
     {
@@ -113,21 +443,96 @@
       "title": "The Apocrypha",
       "subtitle": "Additional books recognized by Catholic and Orthodox traditions",
       "books": [
-        { "abbr": "TOB", "name": "Tobit", "chapters": 14 },
-        { "abbr": "JDT", "name": "Judith", "chapters": 16 },
-        { "abbr": "ESG", "name": "Additions to Esther", "chapters": 10 },
-        { "abbr": "WIS", "name": "Wisdom", "chapters": 19 },
-        { "abbr": "SIR", "name": "Sirach", "chapters": 51 },
-        { "abbr": "BAR", "name": "Baruch", "chapters": 6 },
-        { "abbr": "DAG", "name": "Additions to Daniel", "chapters": 14 },
-        { "abbr": "1MA", "name": "1 Maccabees", "chapters": 16 },
-        { "abbr": "2MA", "name": "2 Maccabees", "chapters": 15 },
-        { "abbr": "1ES", "name": "1 Esdras", "chapters": 9 },
-        { "abbr": "2ES", "name": "2 Esdras", "chapters": 16 },
-        { "abbr": "MAN", "name": "Prayer of Manasseh", "chapters": 1 },
-        { "abbr": "PS2", "name": "Psalm 151", "chapters": 1 },
-        { "abbr": "3MA", "name": "3 Maccabees", "chapters": 7 },
-        { "abbr": "4MA", "name": "4 Maccabees", "chapters": 18 }
+        {
+          "abbr": "TOB",
+          "name": "Tobit",
+          "chapters": 14,
+          "slug": "tobit"
+        },
+        {
+          "abbr": "JDT",
+          "name": "Judith",
+          "chapters": 16,
+          "slug": "judith"
+        },
+        {
+          "abbr": "ESG",
+          "name": "Additions to Esther",
+          "chapters": 10,
+          "slug": "additions-to-esther"
+        },
+        {
+          "abbr": "WIS",
+          "name": "Wisdom",
+          "chapters": 19,
+          "slug": "wisdom"
+        },
+        {
+          "abbr": "SIR",
+          "name": "Sirach",
+          "chapters": 51,
+          "slug": "sirach"
+        },
+        {
+          "abbr": "BAR",
+          "name": "Baruch",
+          "chapters": 6,
+          "slug": "baruch"
+        },
+        {
+          "abbr": "DAG",
+          "name": "Additions to Daniel",
+          "chapters": 14,
+          "slug": "additions-to-daniel"
+        },
+        {
+          "abbr": "1MA",
+          "name": "1 Maccabees",
+          "chapters": 16,
+          "slug": "1-maccabees"
+        },
+        {
+          "abbr": "2MA",
+          "name": "2 Maccabees",
+          "chapters": 15,
+          "slug": "2-maccabees"
+        },
+        {
+          "abbr": "1ES",
+          "name": "1 Esdras",
+          "chapters": 9,
+          "slug": "1-esdras"
+        },
+        {
+          "abbr": "2ES",
+          "name": "2 Esdras",
+          "chapters": 16,
+          "slug": "2-esdras"
+        },
+        {
+          "abbr": "MAN",
+          "name": "Prayer of Manasseh",
+          "chapters": 1,
+          "slug": "prayer-of-manasseh"
+        },
+        {
+          "abbr": "PS2",
+          "name": "Psalm 151",
+          "chapters": 1,
+          "slug": "psalm-151"
+        },
+        {
+          "abbr": "3MA",
+          "name": "3 Maccabees",
+          "chapters": 7,
+          "slug": "3-maccabees"
+        },
+        {
+          "abbr": "4MA",
+          "name": "4 Maccabees",
+          "chapters": 18,
+          "slug": "4-maccabees"
+        }
       ]
     }
   ]
