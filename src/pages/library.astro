@@ -3,9 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import libraryData from '../data/library.json';
 
 const { sections } = libraryData;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Library", "item": "https://thetablebible.org/library/" },
+  ],
+};
 ---
 
-<BaseLayout title="Library — The Table Bible" description="Browse all 66 books of the Bible plus 14 deuterocanonical books from the World English Bible. Watch chapters, full books, or volume collections.">
+<BaseLayout title="Library — The Table Bible" description="Browse all 66 books of the Bible plus 14 deuterocanonical books from the World English Bible. Watch chapters, full books, or volume collections." jsonLd={breadcrumbLd}>
   <section class="library-hero">
     <div class="container">
       <h1>Library</h1>
