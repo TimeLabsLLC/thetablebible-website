@@ -9,31 +9,36 @@
           "abbr": "GEN",
           "name": "Genesis",
           "chapters": 50,
-          "slug": "genesis"
+          "slug": "genesis",
+          "description": "The beginning of everything. God speaks the universe into existence, forms humanity from dust, and breathes life into us. From the fall in Eden to the faith of Abraham, the journey of Jacob, and the suffering and exaltation of Joseph — Genesis lays the groundwork for every promise God will ever make."
         },
         {
           "abbr": "EXO",
           "name": "Exodus",
           "chapters": 40,
-          "slug": "exodus"
+          "slug": "exodus",
+          "description": "God hears the cry of His people in bondage and comes down to deliver them. Through Moses, ten plagues, and a parted sea, Israel passes from slavery into covenant. At Sinai, God gives His law — not to burden them, but to set them apart as His own."
         },
         {
           "abbr": "LEV",
           "name": "Leviticus",
           "chapters": 27,
-          "slug": "leviticus"
+          "slug": "leviticus",
+          "description": "A holy God tells a rescued people how to draw near to Him. Leviticus is not merely rules and rituals — it is the language of access. Every sacrifice, every cleansing, every feast points to the cost of sin and the grace that covers it."
         },
         {
           "abbr": "NUM",
           "name": "Numbers",
           "chapters": 36,
-          "slug": "numbers"
+          "slug": "numbers",
+          "description": "Israel stands at the edge of the Promised Land — and refuses to enter. Numbers records what happens when a delivered people choose fear over faith: forty years of wandering, and a generation that never sees what God prepared for them. Yet even in the wilderness, God does not abandon His own."
         },
         {
           "abbr": "DEU",
           "name": "Deuteronomy",
           "chapters": 34,
-          "slug": "deuteronomy"
+          "slug": "deuteronomy",
+          "description": "Moses speaks his final words to a new generation about to cross the Jordan. Deuteronomy is a sermon — a father's plea to his children to remember what God has done and to choose life. Love the Lord your God with all your heart. That command begins here."
         }
       ]
     },
@@ -46,73 +51,85 @@
           "abbr": "JOS",
           "name": "Joshua",
           "chapters": 24,
-          "slug": "joshua"
+          "slug": "joshua",
+          "description": "The promise becomes reality. Under Joshua's leadership, Israel crosses the Jordan, takes Jericho, and begins to inhabit the land God swore to their fathers. Joshua is the story of what happens when a people finally trust the voice that called them."
         },
         {
           "abbr": "JDG",
           "name": "Judges",
           "chapters": 21,
-          "slug": "judges"
+          "slug": "judges",
+          "description": "A cycle of rebellion, oppression, repentance, and deliverance — repeated until the pattern becomes unbearable. Everyone did what was right in their own eyes. Judges shows what a nation looks like when it forgets the God who saved it."
         },
         {
           "abbr": "RUT",
           "name": "Ruth",
           "chapters": 4,
-          "slug": "ruth"
+          "slug": "ruth",
+          "description": "In the darkest period of the judges, a quiet love story unfolds. A Moabite widow clings to her mother-in-law and to Israel's God. Through ordinary faithfulness, Ruth enters the lineage of David — and of Christ. Grace finds the most unlikely people."
         },
         {
           "abbr": "1SA",
           "name": "1 Samuel",
           "chapters": 31,
-          "slug": "1-samuel"
+          "slug": "1-samuel",
+          "description": "Israel demands a king, and God gives them what they ask for. Saul rises tall and falls hard. Meanwhile, a shepherd boy is anointed in secret — because God does not look at outward appearance. He looks at the heart."
         },
         {
           "abbr": "2SA",
           "name": "2 Samuel",
           "chapters": 24,
-          "slug": "2-samuel"
+          "slug": "2-samuel",
+          "description": "David takes the throne and brings the ark to Jerusalem. He is a man after God's own heart — and a man capable of devastating sin. Second Samuel does not hide the cost of David's choices, nor the mercy that follows his repentance."
         },
         {
           "abbr": "1KI",
           "name": "1 Kings",
           "chapters": 22,
-          "slug": "1-kings"
+          "slug": "1-kings",
+          "description": "Solomon builds the Temple in glory, then tears the kingdom apart with idolatry. The nation splits in two. Elijah stands alone on Mount Carmel and asks the question that echoes through every generation: How long will you waver between two opinions?"
         },
         {
           "abbr": "2KI",
           "name": "2 Kings",
           "chapters": 25,
-          "slug": "2-kings"
+          "slug": "2-kings",
+          "description": "The northern kingdom falls to Assyria. The southern kingdom follows into Babylonian exile. A few faithful kings — Hezekiah, Josiah — shine briefly, but the trajectory is downward. Second Kings is the cost of sustained disobedience, and a warning that patience has a limit."
         },
         {
           "abbr": "1CH",
           "name": "1 Chronicles",
           "chapters": 29,
-          "slug": "1-chronicles"
+          "slug": "1-chronicles",
+          "description": "A retelling of Israel's story from Adam to David, written for a people returning from exile who needed to remember who they were. Chronicles emphasizes worship, the Temple, and the faithfulness of God across every generation."
         },
         {
           "abbr": "2CH",
           "name": "2 Chronicles",
           "chapters": 36,
-          "slug": "2-chronicles"
+          "slug": "2-chronicles",
+          "description": "From Solomon's Temple dedication to the exile and the decree of Cyrus, Second Chronicles traces the spiritual life of Judah's kings. The refrain is consistent: when the king sought the Lord, the nation prospered. When he turned away, it fell."
         },
         {
           "abbr": "EZR",
           "name": "Ezra",
           "chapters": 10,
-          "slug": "ezra"
+          "slug": "ezra",
+          "description": "The exile ends. A remnant returns to Jerusalem to rebuild the Temple — not with the grandeur of Solomon, but with tears and determination. Ezra is the story of starting over, of putting God's house in order when everything around you lies in ruins."
         },
         {
           "abbr": "NEH",
           "name": "Nehemiah",
           "chapters": 13,
-          "slug": "nehemiah"
+          "slug": "nehemiah",
+          "description": "A cupbearer to the king of Persia weeps over the broken walls of Jerusalem — then does something about it. Nehemiah rebuilds the walls in fifty-two days against relentless opposition. It is a story of prayer, leadership, and the refusal to stop when the work matters."
         },
         {
           "abbr": "EST",
           "name": "Esther",
           "chapters": 10,
-          "slug": "esther"
+          "slug": "esther",
+          "description": "God's name never appears in this book, yet His hand is on every page. A Jewish orphan becomes queen of Persia and stands between her people and annihilation. Perhaps you have come to your position for such a time as this."
         }
       ]
     },
@@ -125,31 +142,36 @@
           "abbr": "JOB",
           "name": "Job",
           "chapters": 42,
-          "slug": "job"
+          "slug": "job",
+          "description": "A righteous man loses everything — children, wealth, health — and is told by his friends that he must deserve it. Job refuses to curse God, but he does demand an answer. What he receives is not an explanation, but an encounter. Sometimes God does not answer the question. He reveals Himself instead."
         },
         {
           "abbr": "PSA",
           "name": "Psalms",
           "chapters": 150,
-          "slug": "psalms"
+          "slug": "psalms",
+          "description": "The prayer book of the Bible. One hundred and fifty songs that hold nothing back — praise and lament, trust and terror, thanksgiving and raw grief. The Psalms give you language for every season of the soul. Whatever you are feeling, someone has prayed it here before you."
         },
         {
           "abbr": "PRO",
           "name": "Proverbs",
           "chapters": 31,
-          "slug": "proverbs"
+          "slug": "proverbs",
+          "description": "Wisdom calls out in the streets. Proverbs is a father teaching his son how to live — not merely how to succeed, but how to walk with integrity before God. The fear of the Lord is the beginning of knowledge, and everything in this book flows from that single truth."
         },
         {
           "abbr": "ECC",
           "name": "Ecclesiastes",
           "chapters": 12,
-          "slug": "ecclesiastes"
+          "slug": "ecclesiastes",
+          "description": "The Teacher has tried everything — wealth, pleasure, work, wisdom — and declares it all vanity. Ecclesiastes is the most honest book in the Bible about the emptiness of life apart from God. It does not offer easy comfort. It offers the truth, and trusts you to receive it."
         },
         {
           "abbr": "SNG",
           "name": "Song of Solomon",
           "chapters": 8,
-          "slug": "song-of-solomon"
+          "slug": "song-of-solomon",
+          "description": "A love poem between a bride and bridegroom, unashamed and beautiful. The Song of Solomon celebrates the gift of intimacy as God designed it — and has been read for centuries as a portrait of the love between God and His people. Love is as strong as death."
         }
       ]
     },
@@ -162,103 +184,120 @@
           "abbr": "ISA",
           "name": "Isaiah",
           "chapters": 66,
-          "slug": "isaiah"
+          "slug": "isaiah",
+          "description": "The prophet who saw farther than any other. Isaiah speaks judgment against a rebellious nation — then unfolds the most breathtaking vision of redemption in the Old Testament. The suffering servant, the prince of peace, the new heavens and new earth. No book outside the Gospels points to Christ more clearly."
         },
         {
           "abbr": "JER",
           "name": "Jeremiah",
           "chapters": 52,
-          "slug": "jeremiah"
+          "slug": "jeremiah",
+          "description": "The weeping prophet. God calls a young man to deliver a message no one wants to hear: judgment is coming, and it cannot be stopped. Jeremiah is faithful for forty years with almost no visible fruit. Yet in the ruins, he speaks the promise of a new covenant — written not on stone, but on the heart."
         },
         {
           "abbr": "LAM",
           "name": "Lamentations",
           "chapters": 5,
-          "slug": "lamentations"
+          "slug": "lamentations",
+          "description": "Jerusalem has fallen. The Temple is ash. Lamentations is grief given form — five poems of devastating sorrow over the destruction of everything God's people held dear. Yet at the center stands one of the most quoted declarations of faith in Scripture: His mercies are new every morning."
         },
         {
           "abbr": "EZK",
           "name": "Ezekiel",
           "chapters": 48,
-          "slug": "ezekiel"
+          "slug": "ezekiel",
+          "description": "A priest in exile sees visions of God's glory departing the Temple — then returning. Ezekiel's prophecies are vivid, strange, and unforgettable: dry bones rising, a river flowing from the altar, a valley of death becoming an army of the living. God asks one question: Can these bones live?"
         },
         {
           "abbr": "DAN",
           "name": "Daniel",
           "chapters": 12,
-          "slug": "daniel"
+          "slug": "daniel",
+          "description": "A young man taken captive to Babylon refuses to compromise — and God honors his faithfulness with wisdom, visions, and deliverance from both a lion's den and a furnace. Daniel stands as proof that you can live with integrity in an empire that opposes everything you believe."
         },
         {
           "abbr": "HOS",
           "name": "Hosea",
           "chapters": 14,
-          "slug": "hosea"
+          "slug": "hosea",
+          "description": "God tells a prophet to marry a woman who will be unfaithful — and then to take her back. Hosea's marriage becomes a living parable of God's relentless love for Israel. No matter how far you wander, He comes after you."
         },
         {
           "abbr": "JOL",
           "name": "Joel",
           "chapters": 3,
-          "slug": "joel"
+          "slug": "joel",
+          "description": "A devastating locust plague becomes a window into the Day of the Lord. Joel calls a nation to repentance with urgency — and promises that afterward, God will pour out His Spirit on all flesh. Your sons and daughters will prophesy."
         },
         {
           "abbr": "AMO",
           "name": "Amos",
           "chapters": 9,
-          "slug": "amos"
+          "slug": "amos",
+          "description": "A shepherd from Tekoa delivers a message the powerful do not want to hear: God is not impressed by worship that ignores injustice. Amos speaks to nations — and individuals — who assume God's favor while oppressing the poor. Let justice roll down like waters."
         },
         {
           "abbr": "OBA",
           "name": "Obadiah",
           "chapters": 1,
-          "slug": "obadiah"
+          "slug": "obadiah",
+          "description": "The shortest book in the Old Testament, but its message is sharp: Edom watched Jerusalem fall and gloated. God does not overlook cruelty — especially from those who should have been family. What you have done will be done to you."
         },
         {
           "abbr": "JON",
           "name": "Jonah",
           "chapters": 4,
-          "slug": "jonah"
+          "slug": "jonah",
+          "description": "God sends a prophet to the enemies of Israel — and the prophet runs the other way. Jonah is less about a great fish and more about a great God whose mercy extends beyond the borders we draw. The question at the end remains unanswered: Should I not be concerned about that great city?"
         },
         {
           "abbr": "MIC",
           "name": "Micah",
           "chapters": 7,
-          "slug": "micah"
+          "slug": "micah",
+          "description": "What does the Lord require of you? To do justice, to love mercy, and to walk humbly with your God. Micah delivers one of the most piercing summaries of faithful living in all of Scripture — set against warnings of judgment for corruption and idolatry."
         },
         {
           "abbr": "NAM",
           "name": "Nahum",
           "chapters": 3,
-          "slug": "nahum"
+          "slug": "nahum",
+          "description": "Nineveh repented once under Jonah's preaching. Now, generations later, it has returned to cruelty. Nahum delivers the verdict: God is slow to anger, but He does not leave the guilty unpunished. The great Assyrian empire will fall — and it does."
         },
         {
           "abbr": "HAB",
           "name": "Habakkuk",
           "chapters": 3,
-          "slug": "habakkuk"
+          "slug": "habakkuk",
+          "description": "A prophet bold enough to question God directly: Why do you tolerate injustice? The answer shakes him — God will use Babylon as His instrument of judgment. Habakkuk wrestles honestly with the mystery of God's ways, and arrives at a declaration of trust that has echoed for millennia: The righteous shall live by faith."
         },
         {
           "abbr": "ZEP",
           "name": "Zephaniah",
           "chapters": 3,
-          "slug": "zephaniah"
+          "slug": "zephaniah",
+          "description": "The Day of the Lord is near — a day of wrath, distress, and devastation. But Zephaniah does not end in darkness. God will restore a humble remnant, and He will rejoice over them with singing. The God who judges is the same God who delights in His people."
         },
         {
           "abbr": "HAG",
           "name": "Haggai",
           "chapters": 2,
-          "slug": "haggai"
+          "slug": "haggai",
+          "description": "The people have returned from exile but neglected the Temple while building their own homes. Haggai asks a convicting question: Is it time for you to live in paneled houses while this house lies in ruins? Priorities reveal what we truly worship."
         },
         {
           "abbr": "ZEC",
           "name": "Zechariah",
           "chapters": 14,
-          "slug": "zechariah"
+          "slug": "zechariah",
+          "description": "Night visions, a crowned priest, and a king riding on a donkey — Zechariah's prophecies are layered and luminous. He speaks of a day when God's people will look on the one they have pierced and mourn for him. Zechariah sees the end from the middle of the story."
         },
         {
           "abbr": "MAL",
           "name": "Malachi",
           "chapters": 4,
-          "slug": "malachi"
+          "slug": "malachi",
+          "description": "The last voice of the Old Testament. God confronts a people who have grown bored with worship and indifferent to obedience. I have loved you, says the Lord — and the people respond: How have you loved us? Malachi closes with a promise: Elijah will return before the great and terrible day."
         }
       ]
     },
@@ -271,25 +310,29 @@
           "abbr": "MAT",
           "name": "Matthew",
           "chapters": 28,
-          "slug": "matthew"
+          "slug": "matthew",
+          "description": "Written to a Jewish audience, Matthew presents Jesus as the long-awaited King — the fulfillment of every promise, the Son of David, the one greater than the Temple. From the Sermon on the Mount to the Great Commission, Matthew shows that the Kingdom of Heaven has come near."
         },
         {
           "abbr": "MRK",
           "name": "Mark",
           "chapters": 16,
-          "slug": "mark"
+          "slug": "mark",
+          "description": "The shortest Gospel moves at an urgent pace. Immediately — Mark's favorite word — Jesus heals, teaches, confronts, and suffers. There is no time to waste. Mark presents the Son of God as the suffering servant who came not to be served, but to serve, and to give His life as a ransom for many."
         },
         {
           "abbr": "LUK",
           "name": "Luke",
           "chapters": 24,
-          "slug": "luke"
+          "slug": "luke",
+          "description": "A physician writes the most detailed account of Jesus' life — with special attention to the poor, the outcast, the women, and the forgotten. Luke's Jesus eats with sinners, tells parables of radical mercy, and announces that the Spirit of the Lord is upon Him to proclaim good news to the poor."
         },
         {
           "abbr": "JHN",
           "name": "John",
           "chapters": 21,
-          "slug": "john"
+          "slug": "john",
+          "description": "In the beginning was the Word, and the Word was with God, and the Word was God. John writes so that you may believe. His Gospel goes deeper than events — it reveals who Jesus is. The bread of life, the light of the world, the resurrection and the life. These things are written that you may have life in His name."
         }
       ]
     },
@@ -302,139 +345,162 @@
           "abbr": "ACT",
           "name": "Acts",
           "chapters": 28,
-          "slug": "acts"
+          "slug": "acts",
+          "description": "Jesus ascends. The Spirit descends. The church is born — not in a cathedral, but in a room full of ordinary people set on fire. Acts follows the gospel from Jerusalem to the ends of the earth, through persecution, shipwreck, and the unstoppable spread of a message no empire could contain."
         },
         {
           "abbr": "ROM",
           "name": "Romans",
           "chapters": 16,
-          "slug": "romans"
+          "slug": "romans",
+          "description": "Paul's masterwork. Romans lays out the entire gospel with devastating clarity: all have sinned, and grace is the only remedy. Justification by faith, freedom from the law, life in the Spirit, the sovereignty of God, and the mercies that transform how we live. There is now no condemnation for those who are in Christ Jesus."
         },
         {
           "abbr": "1CO",
           "name": "1 Corinthians",
           "chapters": 16,
-          "slug": "1-corinthians"
+          "slug": "1-corinthians",
+          "description": "A gifted but divided church receives a letter that refuses to let them stay comfortable. Paul addresses everything — sexual immorality, lawsuits, marriage, spiritual gifts, and the resurrection — with a single thread running through it all: love is the way. If I have not love, I am nothing."
         },
         {
           "abbr": "2CO",
           "name": "2 Corinthians",
           "chapters": 13,
-          "slug": "2-corinthians"
+          "slug": "2-corinthians",
+          "description": "Paul's most personal letter. He opens his heart about weakness, suffering, and the strange power of God that works best when we are at our most fragile. My grace is sufficient for you, for my power is made perfect in weakness. Second Corinthians is where theology meets tears."
         },
         {
           "abbr": "GAL",
           "name": "Galatians",
           "chapters": 6,
-          "slug": "galatians"
+          "slug": "galatians",
+          "description": "Freedom. That is the heartbeat of Galatians. Paul is astonished that the churches are turning back to legalism after receiving grace. Christ has set you free — stand firm and do not submit again to a yoke of slavery. This letter drew the line that shaped Christianity."
         },
         {
           "abbr": "EPH",
           "name": "Ephesians",
           "chapters": 6,
-          "slug": "ephesians"
+          "slug": "ephesians",
+          "description": "A sweeping vision of what God has done, is doing, and will do through Christ and His church. Ephesians begins in the heavenly places and lands in the daily — marriage, parenting, work, spiritual warfare. By grace you have been saved through faith, and this is not of yourselves; it is the gift of God."
         },
         {
           "abbr": "PHP",
           "name": "Philippians",
           "chapters": 4,
-          "slug": "philippians"
+          "slug": "philippians",
+          "description": "A letter of joy written from a prison cell. Paul gives thanks, pours out affection, and calls the church to the mind of Christ — who emptied Himself and took the form of a servant. Rejoice in the Lord always. I will say it again: Rejoice."
         },
         {
           "abbr": "COL",
           "name": "Colossians",
           "chapters": 4,
-          "slug": "colossians"
+          "slug": "colossians",
+          "description": "He is the image of the invisible God, the firstborn over all creation. Colossians anchors everything in the supremacy of Christ — over philosophy, over tradition, over every spiritual power. In Him all the fullness of God was pleased to dwell. Nothing else is needed."
         },
         {
           "abbr": "1TH",
           "name": "1 Thessalonians",
           "chapters": 5,
-          "slug": "1-thessalonians"
+          "slug": "1-thessalonians",
+          "description": "Paul writes to a young church facing persecution with remarkable joy. He encourages them to keep living holy lives, to love one another, and to be ready — because the Lord will return. This is the earliest written letter in the New Testament, and its urgency still burns."
         },
         {
           "abbr": "2TH",
           "name": "2 Thessalonians",
           "chapters": 3,
-          "slug": "2-thessalonians"
+          "slug": "2-thessalonians",
+          "description": "Some in Thessalonica believed the Day of the Lord had already come. Paul corrects the confusion, reminds them of what must happen first, and gives a pointed instruction: if anyone will not work, neither let him eat. Waiting for Christ does not mean standing idle."
         },
         {
           "abbr": "1TI",
           "name": "1 Timothy",
           "chapters": 6,
-          "slug": "1-timothy"
+          "slug": "1-timothy",
+          "description": "Paul writes to his young protégé about how to lead the church. Sound doctrine, godly character, and faithful service — these are the marks of a true shepherd. Let no one despise your youth, but set an example for the believers in speech, in conduct, in love, in faith, in purity."
         },
         {
           "abbr": "2TI",
           "name": "2 Timothy",
           "chapters": 4,
-          "slug": "2-timothy"
+          "slug": "2-timothy",
+          "description": "Paul's final letter, written from a Roman prison with execution near. He does not waver. I have fought the good fight, I have finished the course, I have kept the faith. Second Timothy is a father's last charge to his son in the faith: endure, preach the word, guard the deposit."
         },
         {
           "abbr": "TIT",
           "name": "Titus",
           "chapters": 3,
-          "slug": "titus"
+          "slug": "titus",
+          "description": "Titus is on the island of Crete, tasked with establishing order in unruly churches. Paul's instructions are practical and direct: appoint elders of proven character, teach sound doctrine, and insist on good works. The grace of God has appeared, bringing salvation to all people."
         },
         {
           "abbr": "PHM",
           "name": "Philemon",
           "chapters": 1,
-          "slug": "philemon"
+          "slug": "philemon",
+          "description": "A runaway slave has become a brother in Christ. Paul sends him back to his master — not as property, but as family. Philemon is the gospel in miniature: what was owed is paid by another, and what was lost is received back forever."
         },
         {
           "abbr": "HEB",
           "name": "Hebrews",
           "chapters": 13,
-          "slug": "hebrews"
+          "slug": "hebrews",
+          "description": "Christ is greater — greater than angels, than Moses, than the priesthood, than every sacrifice offered under the old covenant. Hebrews calls wavering believers to hold fast to their confession, surrounded by a great cloud of witnesses. Let us run with endurance the race that is set before us."
         },
         {
           "abbr": "JAS",
           "name": "James",
           "chapters": 5,
-          "slug": "james"
+          "slug": "james",
+          "description": "Faith without works is dead. James wastes no words — he demands that belief produce action. Care for the poor, control your tongue, resist favoritism, and pray with expectation. This letter is the conscience of the New Testament: do not merely listen to the word. Do what it says."
         },
         {
           "abbr": "1PE",
           "name": "1 Peter",
           "chapters": 5,
-          "slug": "1-peter"
+          "slug": "1-peter",
+          "description": "Peter writes to suffering believers scattered across the Roman Empire. His message is not escape, but endurance. You are a chosen people, a royal priesthood. Live as strangers in this world, do good even when it costs you, and remember: the same sufferings are being experienced by your brothers and sisters throughout the world."
         },
         {
           "abbr": "2PE",
           "name": "2 Peter",
           "chapters": 3,
-          "slug": "2-peter"
+          "slug": "2-peter",
+          "description": "False teachers are coming — and some are already here. Peter warns the church to guard what they have received and to grow in the knowledge of Christ. The Lord is not slow concerning His promise. He is patient, not wanting anyone to perish."
         },
         {
           "abbr": "1JN",
           "name": "1 John",
           "chapters": 5,
-          "slug": "1-john"
+          "slug": "1-john",
+          "description": "God is light. God is love. These twin declarations frame a letter of fierce tenderness. John calls believers to walk in truth, to love one another in action, and to test every spirit. If we say we have fellowship with Him and walk in darkness, we lie. First John will not let you be comfortable with contradiction."
         },
         {
           "abbr": "2JN",
           "name": "2 John",
           "chapters": 1,
-          "slug": "2-john"
+          "slug": "2-john",
+          "description": "A brief letter to a chosen lady and her children — a warning against deceivers who deny that Christ came in the flesh. Love and truth are not opposites; they walk together. Do not welcome teaching that abandons either one."
         },
         {
           "abbr": "3JN",
           "name": "3 John",
           "chapters": 1,
-          "slug": "3-john"
+          "slug": "3-john",
+          "description": "A personal note commending Gaius for his hospitality and rebuking Diotrephes for his arrogance. Third John is a snapshot of the early church — real people, real conflict, and a simple standard: imitate what is good, not what is evil."
         },
         {
           "abbr": "JUD",
           "name": "Jude",
           "chapters": 1,
-          "slug": "jude"
+          "slug": "jude",
+          "description": "Jude intended to write about salvation. Instead, he was compelled to write about contending for the faith. Certain people have crept in unnoticed, turning grace into license. This letter is short, sharp, and urgent: keep yourselves in the love of God."
         },
         {
           "abbr": "REV",
           "name": "Revelation",
           "chapters": 22,
-          "slug": "revelation"
+          "slug": "revelation",
+          "description": "The final word. John, exiled on Patmos, receives a vision of things past, present, and to come. Letters to seven churches, seals and trumpets, the fall of Babylon, and the return of the King. Revelation is not a puzzle to be solved — it is a promise to be received. He who sits on the throne says: Behold, I am making all things new."
         }
       ]
     },
@@ -447,91 +513,106 @@
           "abbr": "TOB",
           "name": "Tobit",
           "chapters": 14,
-          "slug": "tobit"
+          "slug": "tobit",
+          "description": "A story of faithfulness in exile. Tobit, a righteous Israelite in Nineveh, and Sarah, a young woman in desperate prayer, are both delivered through the angel Raphael. Tobit is a reminder that God hears the prayers of the faithful — even when they cannot see His hand at work."
         },
         {
           "abbr": "JDT",
           "name": "Judith",
           "chapters": 16,
-          "slug": "judith"
+          "slug": "judith",
+          "description": "When the Assyrian army threatens Israel, a widow steps forward where the men have failed. Judith is brave, devout, and deliberate. Her story declares that God does not always deliver through armies and power — sometimes He delivers through the courage of one faithful life."
         },
         {
           "abbr": "ESG",
           "name": "Additions to Esther",
           "chapters": 10,
-          "slug": "additions-to-esther"
+          "slug": "additions-to-esther",
+          "description": "These additions to the Book of Esther supply what the Hebrew text omits — prayers, letters, and direct references to God. They make explicit what the original story implies: it is God who orchestrates deliverance, even when His name goes unspoken."
         },
         {
           "abbr": "WIS",
           "name": "Wisdom",
           "chapters": 19,
-          "slug": "wisdom"
+          "slug": "wisdom",
+          "description": "Written in the voice of Solomon, the Wisdom of Solomon explores righteousness, immortality, and the folly of idolatry. It bridges Old Testament wisdom and Greek philosophical thought, declaring that the souls of the righteous are in the hand of God, and no torment will ever touch them."
         },
         {
           "abbr": "SIR",
           "name": "Sirach",
           "chapters": 51,
-          "slug": "sirach"
+          "slug": "sirach",
+          "description": "Also called Ecclesiasticus, Sirach is a treasury of practical wisdom — on friendship, speech, wealth, humility, and the fear of the Lord. It reads like an extended Proverbs, grounded in the conviction that all wisdom begins and ends with God."
         },
         {
           "abbr": "BAR",
           "name": "Baruch",
           "chapters": 6,
-          "slug": "baruch"
+          "slug": "baruch",
+          "description": "Written in the voice of Jeremiah's scribe, Baruch is a prayer of confession from the exiles in Babylon and a call to embrace wisdom. It includes a letter warning against the folly of idol worship — the gods of the nations are nothing."
         },
         {
           "abbr": "DAG",
           "name": "Additions to Daniel",
           "chapters": 14,
-          "slug": "additions-to-daniel"
+          "slug": "additions-to-daniel",
+          "description": "Three additions to the Book of Daniel: the Prayer of Azariah in the furnace, the Song of the Three Young Men, and the stories of Susanna and Bel and the Dragon. Each one testifies that God vindicates the faithful and exposes what is false."
         },
         {
           "abbr": "1MA",
           "name": "1 Maccabees",
           "chapters": 16,
-          "slug": "1-maccabees"
+          "slug": "1-maccabees",
+          "description": "A historical account of the Jewish revolt against the Seleucid Empire. Mattathias and his sons — Judas Maccabeus foremost among them — fight to preserve their faith, reclaim the Temple, and restore worship. First Maccabees is the story behind Hanukkah."
         },
         {
           "abbr": "2MA",
           "name": "2 Maccabees",
           "chapters": 15,
-          "slug": "2-maccabees"
+          "slug": "2-maccabees",
+          "description": "A theological retelling of the Maccabean struggle, focused on God's justice and the hope of resurrection. Second Maccabees emphasizes that martyrdom is not defeat — it is faithfulness carried to its ultimate cost."
         },
         {
           "abbr": "1ES",
           "name": "1 Esdras",
           "chapters": 9,
-          "slug": "1-esdras"
+          "slug": "1-esdras",
+          "description": "A parallel account of Israel's return from exile, overlapping with Chronicles, Ezra, and Nehemiah. First Esdras includes the famous debate of the three guards before King Darius, in which truth is declared the strongest thing on earth."
         },
         {
           "abbr": "2ES",
           "name": "2 Esdras",
           "chapters": 16,
-          "slug": "2-esdras"
+          "slug": "2-esdras",
+          "description": "An apocalyptic work in which Ezra wrestles with the deepest questions of theodicy — why does God allow suffering, and what is the fate of the wicked? The visions are striking, the questions unflinching, and the answer is the same as ever: trust the God whose ways are higher than yours."
         },
         {
           "abbr": "MAN",
           "name": "Prayer of Manasseh",
           "chapters": 1,
-          "slug": "prayer-of-manasseh"
+          "slug": "prayer-of-manasseh",
+          "description": "The most wicked king in Judah's history prays from captivity — and God hears him. The Prayer of Manasseh is brief and stunning: a confession that no sin is beyond the reach of mercy, and that repentance is never too late."
         },
         {
           "abbr": "PS2",
           "name": "Psalm 151",
           "chapters": 1,
-          "slug": "psalm-151"
+          "slug": "psalm-151",
+          "description": "A psalm attributed to David after his victory over Goliath. I was small among my brothers, the youngest in my father's house — but the Lord chose me. Psalm 151 is a song of the overlooked one whom God exalted."
         },
         {
           "abbr": "3MA",
           "name": "3 Maccabees",
           "chapters": 7,
-          "slug": "3-maccabees"
+          "slug": "3-maccabees",
+          "description": "Despite its name, this book predates the Maccabean revolt. It tells of the persecution of Egyptian Jews under Ptolemy IV and their miraculous deliverance. Third Maccabees is a story of faith under pressure — and God's faithfulness to those who refuse to bend."
         },
         {
           "abbr": "4MA",
           "name": "4 Maccabees",
           "chapters": 18,
-          "slug": "4-maccabees"
+          "slug": "4-maccabees",
+          "description": "A philosophical discourse on whether reason, guided by piety, can master the passions. Illustrated through the martyrdoms of Eleazar and a mother with her seven sons, Fourth Maccabees argues that faithfulness to God is the highest form of rational life — even unto death."
         }
       ]
     }

@@ -31,7 +31,7 @@ const breadcrumbLd = {
 
 <BaseLayout
   title={`${book.name} — The Table Bible`}
-  description={`Listen to the Book of ${book.name} — all ${book.chapters} chapters with word-by-word highlighted text. World English Bible (WEB).`}
+  description={book.description || `Listen to the Book of ${book.name} — all ${book.chapters} chapters with word-by-word highlighted text. World English Bible (WEB).`}
   image={`/thumbs/${book.abbr}_fullbook_thumb.webp`}
   jsonLd={breadcrumbLd}
 >
@@ -47,6 +47,9 @@ const breadcrumbLd = {
     <div class="container">
       <h1>{book.name}</h1>
       <p class="book-meta">{sectionTitle} · {book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</p>
+      {book.description && (
+        <p class="book-description">{book.description}</p>
+      )}
     </div>
   </section>
 
@@ -151,6 +154,15 @@ const breadcrumbLd = {
   }
   .book-hero h1 { margin-bottom: var(--space-sm); }
   .book-meta { color: var(--gold-light); font-size: 1rem; }
+  .book-description {
+    max-width: 640px;
+    margin: var(--space-lg) auto 0;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    font-style: italic;
+  }
 
   /* ── Top Row ─────────────────────────────────────────────────────── */
   .top-row { padding-bottom: var(--space-3xl); }
