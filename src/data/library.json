@@ -1,0 +1,134 @@
+{
+  "sections": [
+    {
+      "id": "pentateuch",
+      "title": "The Pentateuch",
+      "subtitle": "The Five Books of Moses",
+      "books": [
+        { "abbr": "GEN", "name": "Genesis", "chapters": 50 },
+        { "abbr": "EXO", "name": "Exodus", "chapters": 40 },
+        { "abbr": "LEV", "name": "Leviticus", "chapters": 27 },
+        { "abbr": "NUM", "name": "Numbers", "chapters": 36 },
+        { "abbr": "DEU", "name": "Deuteronomy", "chapters": 34 }
+      ]
+    },
+    {
+      "id": "history",
+      "title": "Historical Books",
+      "subtitle": "From Joshua to Esther",
+      "books": [
+        { "abbr": "JOS", "name": "Joshua", "chapters": 24 },
+        { "abbr": "JDG", "name": "Judges", "chapters": 21 },
+        { "abbr": "RUT", "name": "Ruth", "chapters": 4 },
+        { "abbr": "1SA", "name": "1 Samuel", "chapters": 31 },
+        { "abbr": "2SA", "name": "2 Samuel", "chapters": 24 },
+        { "abbr": "1KI", "name": "1 Kings", "chapters": 22 },
+        { "abbr": "2KI", "name": "2 Kings", "chapters": 25 },
+        { "abbr": "1CH", "name": "1 Chronicles", "chapters": 29 },
+        { "abbr": "2CH", "name": "2 Chronicles", "chapters": 36 },
+        { "abbr": "EZR", "name": "Ezra", "chapters": 10 },
+        { "abbr": "NEH", "name": "Nehemiah", "chapters": 13 },
+        { "abbr": "EST", "name": "Esther", "chapters": 10 }
+      ]
+    },
+    {
+      "id": "wisdom",
+      "title": "Wisdom Literature",
+      "subtitle": "Poetry and Wisdom",
+      "books": [
+        { "abbr": "JOB", "name": "Job", "chapters": 42 },
+        { "abbr": "PSA", "name": "Psalms", "chapters": 150 },
+        { "abbr": "PRO", "name": "Proverbs", "chapters": 31 },
+        { "abbr": "ECC", "name": "Ecclesiastes", "chapters": 12 },
+        { "abbr": "SNG", "name": "Song of Solomon", "chapters": 8 }
+      ]
+    },
+    {
+      "id": "prophets",
+      "title": "The Prophets",
+      "subtitle": "Major and Minor Prophets",
+      "books": [
+        { "abbr": "ISA", "name": "Isaiah", "chapters": 66 },
+        { "abbr": "JER", "name": "Jeremiah", "chapters": 52 },
+        { "abbr": "LAM", "name": "Lamentations", "chapters": 5 },
+        { "abbr": "EZK", "name": "Ezekiel", "chapters": 48 },
+        { "abbr": "DAN", "name": "Daniel", "chapters": 12 },
+        { "abbr": "HOS", "name": "Hosea", "chapters": 14 },
+        { "abbr": "JOL", "name": "Joel", "chapters": 3 },
+        { "abbr": "AMO", "name": "Amos", "chapters": 9 },
+        { "abbr": "OBA", "name": "Obadiah", "chapters": 1 },
+        { "abbr": "JON", "name": "Jonah", "chapters": 4 },
+        { "abbr": "MIC", "name": "Micah", "chapters": 7 },
+        { "abbr": "NAM", "name": "Nahum", "chapters": 3 },
+        { "abbr": "HAB", "name": "Habakkuk", "chapters": 3 },
+        { "abbr": "ZEP", "name": "Zephaniah", "chapters": 3 },
+        { "abbr": "HAG", "name": "Haggai", "chapters": 2 },
+        { "abbr": "ZEC", "name": "Zechariah", "chapters": 14 },
+        { "abbr": "MAL", "name": "Malachi", "chapters": 4 }
+      ]
+    },
+    {
+      "id": "gospels",
+      "title": "The Gospels",
+      "subtitle": "The Life of Jesus",
+      "books": [
+        { "abbr": "MAT", "name": "Matthew", "chapters": 28 },
+        { "abbr": "MRK", "name": "Mark", "chapters": 16 },
+        { "abbr": "LUK", "name": "Luke", "chapters": 24 },
+        { "abbr": "JHN", "name": "John", "chapters": 21 }
+      ]
+    },
+    {
+      "id": "acts-letters",
+      "title": "Acts & Letters",
+      "subtitle": "The Early Church",
+      "books": [
+        { "abbr": "ACT", "name": "Acts", "chapters": 28 },
+        { "abbr": "ROM", "name": "Romans", "chapters": 16 },
+        { "abbr": "1CO", "name": "1 Corinthians", "chapters": 16 },
+        { "abbr": "2CO", "name": "2 Corinthians", "chapters": 13 },
+        { "abbr": "GAL", "name": "Galatians", "chapters": 6 },
+        { "abbr": "EPH", "name": "Ephesians", "chapters": 6 },
+        { "abbr": "PHP", "name": "Philippians", "chapters": 4 },
+        { "abbr": "COL", "name": "Colossians", "chapters": 4 },
+        { "abbr": "1TH", "name": "1 Thessalonians", "chapters": 5 },
+        { "abbr": "2TH", "name": "2 Thessalonians", "chapters": 3 },
+        { "abbr": "1TI", "name": "1 Timothy", "chapters": 6 },
+        { "abbr": "2TI", "name": "2 Timothy", "chapters": 4 },
+        { "abbr": "TIT", "name": "Titus", "chapters": 3 },
+        { "abbr": "PHM", "name": "Philemon", "chapters": 1 },
+        { "abbr": "HEB", "name": "Hebrews", "chapters": 13 },
+        { "abbr": "JAS", "name": "James", "chapters": 5 },
+        { "abbr": "1PE", "name": "1 Peter", "chapters": 5 },
+        { "abbr": "2PE", "name": "2 Peter", "chapters": 3 },
+        { "abbr": "1JN", "name": "1 John", "chapters": 5 },
+        { "abbr": "2JN", "name": "2 John", "chapters": 1 },
+        { "abbr": "3JN", "name": "3 John", "chapters": 1 },
+        { "abbr": "JUD", "name": "Jude", "chapters": 1 },
+        { "abbr": "REV", "name": "Revelation", "chapters": 22 }
+      ]
+    },
+    {
+      "id": "apocrypha",
+      "title": "The Apocrypha",
+      "subtitle": "Additional books recognized by Catholic and Orthodox traditions",
+      "books": [
+        { "abbr": "TOB", "name": "Tobit", "chapters": 14 },
+        { "abbr": "JDT", "name": "Judith", "chapters": 16 },
+        { "abbr": "ESG", "name": "Additions to Esther", "chapters": 10 },
+        { "abbr": "WIS", "name": "Wisdom", "chapters": 19 },
+        { "abbr": "SIR", "name": "Sirach", "chapters": 51 },
+        { "abbr": "BAR", "name": "Baruch", "chapters": 6 },
+        { "abbr": "DAG", "name": "Additions to Daniel", "chapters": 14 },
+        { "abbr": "1MA", "name": "1 Maccabees", "chapters": 16 },
+        { "abbr": "2MA", "name": "2 Maccabees", "chapters": 15 },
+        { "abbr": "1ES", "name": "1 Esdras", "chapters": 9 },
+        { "abbr": "2ES", "name": "2 Esdras", "chapters": 16 },
+        { "abbr": "MAN", "name": "Prayer of Manasseh", "chapters": 1 },
+        { "abbr": "PS2", "name": "Psalm 151", "chapters": 1 },
+        { "abbr": "3MA", "name": "3 Maccabees", "chapters": 7 },
+        { "abbr": "4MA", "name": "4 Maccabees", "chapters": 18 }
+      ]
+    }
+  ]
+}

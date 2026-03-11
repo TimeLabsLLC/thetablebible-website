@@ -1,72 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import libraryData from '../data/library.json';
 
-// Bible books organized by section
-const sections = [
-  {
-    id: 'pentateuch',
-    title: 'The Pentateuch',
-    subtitle: 'The Five Books of Moses',
-    books: ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy']
-  },
-  {
-    id: 'history',
-    title: 'Historical Books',
-    subtitle: 'From Joshua to Esther',
-    books: ['Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther']
-  },
-  {
-    id: 'wisdom',
-    title: 'Wisdom Literature',
-    subtitle: 'Poetry and Wisdom',
-    books: ['Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon']
-  },
-  {
-    id: 'prophets',
-    title: 'The Prophets',
-    subtitle: 'Major and Minor Prophets',
-    books: ['Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi']
-  },
-  {
-    id: 'gospels',
-    title: 'The Gospels',
-    subtitle: 'The Life of Jesus',
-    books: ['Matthew', 'Mark', 'Luke', 'John']
-  },
-  {
-    id: 'acts-letters',
-    title: 'Acts & Letters',
-    subtitle: 'The Early Church',
-    books: ['Acts', 'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation']
-  },
-  {
-    id: 'apocrypha',
-    title: 'The Apocrypha',
-    subtitle: 'Additional books recognized by Catholic and Orthodox traditions',
-    books: ['Tobit', 'Judith', 'Additions to Esther', 'Wisdom', 'Sirach', 'Baruch', '1 Maccabees', '2 Maccabees', '1 Esdras', '2 Esdras', 'Prayer of Manasseh', 'Psalm 151', '3 Maccabees', '4 Maccabees']
-  }
-];
-
-// Color palette for book cards (cycles through)
-const colors = [
-  '#2D4A3E', // Deep forest
-  '#1A2A3A', // Warm navy
-  '#6A1F1F', // Burgundy
-  '#4A2040', // Plum
-  '#3B2A1A', // Espresso
-  '#2A4A50', // Slate teal
-  '#5A1A2A', // Oxblood
-  '#3A3520', // Charcoal gold
-  '#1A1A3A', // Midnight
-  '#6A3A1A', // Sienna
-];
-
-let colorIndex = 0;
-function getNextColor() {
-  const color = colors[colorIndex % colors.length];
-  colorIndex++;
-  return color;
-}
+const { sections } = libraryData;
 ---
 
 <BaseLayout title="Library — The Table Bible" description="Browse all 66 books of the Bible plus 14 deuterocanonical books from the World English Bible. Watch chapters, full books, or volume collections.">
@@ -74,6 +10,10 @@ function getNextColor() {
     <div class="container">
       <h1>Library</h1>
       <p>The complete Bible — all 66 books of the Old and New Testaments — plus 14 additional deuterocanonical books included in the World English Bible.</p>
+      
+      <div class="search-bar">
+        <input type="text" id="library-search" placeholder="Search by book name or chapter..." autocomplete="off" />
+      </div>
     </div>
   </section>
   
@@ -95,20 +35,29 @@ function getNextColor() {
           <p>{section.subtitle}</p>
         </div>
         
-        <div class="book-grid">
-          {section.books.map(book => {
-            const color = getNextColor();
-            return (
-              <a href={`https://youtube.com/@thetablebibleorg`} target="_blank" rel="noopener" class="book-card" style={`--card-color: ${color}`}>
-                <div class="book-card-bg"></div>
-                <div class="book-card-content">
-                  <h3>{book}</h3>
-                  <span class="book-status">Coming Soon</span>
+        {section.books.map(book => (
+          <div class="book-group" data-book={book.name.toLowerCase()}>
+            <h3 class="book-group-title">{book.name}</h3>
+            <div class="chapter-grid">
+              {Array.from({ length: book.chapters }, (_, i) => i + 1).map(ch => (
+                <div class="chapter-card" data-book={book.name.toLowerCase()} data-chapter={ch}>
+                  <span class="card-title">{book.name}</span>
+                  <div class="card-thumb">
+                    <img
+                      src={`/thumbs/${book.abbr}_${ch}_thumb.webp`}
+                      alt={`${book.name} Chapter ${ch}`}
+                      width="640"
+                      height="360"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <span class="card-subtitle">Chapter {ch}</span>
                 </div>
-              </a>
-            );
-          })}
-        </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
     ))}
   </div>
@@ -126,6 +75,57 @@ function getNextColor() {
   </section>
 </BaseLayout>
 
+<script>
+  const searchInput = document.getElementById('library-search') as HTMLInputElement;
+  const bookGroups = document.querySelectorAll('.book-group');
+  const chapterCards = document.querySelectorAll('.chapter-card');
+  const bookSections = document.querySelectorAll('.book-section');
+
+  searchInput?.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    
+    if (!q) {
+      bookGroups.forEach(g => (g as HTMLElement).style.display = '');
+      chapterCards.forEach(c => (c as HTMLElement).style.display = '');
+      bookSections.forEach(s => (s as HTMLElement).style.display = '');
+      return;
+    }
+
+    const chapterMatch = q.match(/^(.+?)\s+(\d+)$/);
+    
+    bookGroups.forEach(group => {
+      const bookName = (group as HTMLElement).dataset.book || '';
+      const cards = group.querySelectorAll('.chapter-card');
+      let anyVisible = false;
+
+      cards.forEach(card => {
+        const cardBook = (card as HTMLElement).dataset.book || '';
+        const cardCh = (card as HTMLElement).dataset.chapter || '';
+        let show = false;
+
+        if (chapterMatch) {
+          show = cardBook.includes(chapterMatch[1]) && cardCh === chapterMatch[2];
+        } else {
+          show = cardBook.includes(q);
+        }
+
+        (card as HTMLElement).style.display = show ? '' : 'none';
+        if (show) anyVisible = true;
+      });
+
+      (group as HTMLElement).style.display = anyVisible ? '' : 'none';
+    });
+
+    bookSections.forEach(section => {
+      const visibleGroups = section.querySelectorAll('.book-group');
+      const anyVisible = Array.from(visibleGroups).some(
+        g => (g as HTMLElement).style.display !== 'none'
+      );
+      (section as HTMLElement).style.display = anyVisible ? '' : 'none';
+    });
+  });
+</script>
+
 <style>
   /* ── Library Hero ────────────────────────────────────────────────── */
   .library-hero {
@@ -141,6 +141,34 @@ function getNextColor() {
   .library-hero p {
     color: var(--text-muted);
     font-size: 1.125rem;
+    margin-bottom: var(--space-xl);
+  }
+  
+  /* ── Search Bar ──────────────────────────────────────────────────── */
+  .search-bar {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .search-bar input {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--cream);
+    background: rgba(42, 35, 30, 0.8);
+    border: 1px solid rgba(201, 168, 106, 0.3);
+    border-radius: var(--radius-xl);
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+  
+  .search-bar input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .search-bar input:focus {
+    border-color: var(--gold-light);
   }
   
   /* ── Section Navigation ──────────────────────────────────────────── */
@@ -200,7 +228,7 @@ function getNextColor() {
   }
   
   .book-section .section-header {
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
   }
   
   .book-section .section-header h2 {
@@ -212,63 +240,69 @@ function getNextColor() {
     font-size: 1rem;
   }
   
-  /* ── Book Grid ───────────────────────────────────────────────────── */
-  .book-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: var(--space-md);
+  /* ── Book Group ──────────────────────────────────────────────────── */
+  .book-group {
+    margin-bottom: var(--space-3xl);
   }
   
-  .book-card {
-    position: relative;
-    aspect-ratio: 3 / 4;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    text-decoration: none;
+  .book-group-title {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(201, 168, 106, 0.15);
+  }
+  
+  /* ── Chapter Grid ────────────────────────────────────────────────── */
+  .chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+  }
+  
+  .chapter-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-sm);
     transition: transform var(--transition-base);
   }
   
-  .book-card:hover {
-    transform: translateY(-4px) scale(1.02);
+  .chapter-card:hover {
+    transform: translateY(-3px);
   }
   
-  .book-card-bg {
-    position: absolute;
-    inset: 0;
-    background: var(--card-color);
-    opacity: 0.85;
-  }
-  
-  .book-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.6) 100%);
-    z-index: 1;
-  }
-  
-  .book-card-content {
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: var(--space-md);
-  }
-  
-  .book-card h3 {
-    font-size: 1rem;
-    font-weight: 400;
+  .card-title,
+  .card-subtitle {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--cream);
     line-height: 1.3;
-    margin-bottom: var(--space-xs);
   }
   
-  .book-status {
-    font-size: 0.75rem;
-    color: var(--gold-light);
-    opacity: 0.8;
+  .card-thumb {
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(201, 168, 106, 0.15);
+    transition: border-color var(--transition-fast);
+  }
+  
+  .chapter-card:hover .card-thumb {
+    border-color: var(--gold-light);
+  }
+  
+  .card-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--bg-secondary);
   }
   
   /* ── CTA Section ─────────────────────────────────────────────────── */
@@ -296,8 +330,8 @@ function getNextColor() {
   
   /* ── Responsive ──────────────────────────────────────────────────── */
   @media (max-width: 768px) {
-    .book-grid {
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    .chapter-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
     
     .library-nav {
@@ -306,6 +340,11 @@ function getNextColor() {
     
     .book-section {
       scroll-margin-top: 140px;
+    }
+    
+    .card-title,
+    .card-subtitle {
+      font-size: 0.8125rem;
     }
   }
 </style>
