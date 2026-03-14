@@ -150,7 +150,12 @@
           "name": "Psalms",
           "chapters": 150,
           "slug": "psalms",
-          "description": "The prayer book of the Bible. One hundred and fifty songs that hold nothing back — praise and lament, trust and terror, thanksgiving and raw grief. The Psalms give you language for every season of the soul. Whatever you are feeling, someone has prayed it here before you."
+          "description": "The prayer book of the Bible. One hundred and fifty songs that hold nothing back — praise and lament, trust and terror, thanksgiving and raw grief. The Psalms give you language for every season of the soul. Whatever you are feeling, someone has prayed it here before you.",
+          "videos": {
+            "1": "KMmhSfidgxs",
+            "2": "GBapxo308TU",
+            "3": "9Thm7QOo0Ew"
+          }
         },
         {
           "abbr": "PRO",
@@ -332,7 +337,11 @@
           "name": "John",
           "chapters": 21,
           "slug": "john",
-          "description": "In the beginning was the Word, and the Word was with God, and the Word was God. John writes so that you may believe. His Gospel goes deeper than events — it reveals who Jesus is. The bread of life, the light of the world, the resurrection and the life. These things are written that you may have life in His name."
+          "description": "In the beginning was the Word, and the Word was with God, and the Word was God. John writes so that you may believe. His Gospel goes deeper than events — it reveals who Jesus is. The bread of life, the light of the world, the resurrection and the life. These things are written that you may have life in His name.",
+          "videos": {
+            "1": "MOARldNiyY0",
+            "2": "-C6T--FvP9o"
+          }
         }
       ]
     },
