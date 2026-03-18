@@ -1,0 +1,311 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getAllBooksWithSections, getChapterUrl, getChapterVideoId, getFullBookVideoId } from '../../../utils/library';
+
+export function getStaticPaths() {
+  return getAllBooksWithSections().flatMap(({ book, sectionTitle }) =>
+    Array.from({ length: book.chapters }, (_, index) => {
+      const chapter = index + 1;
+      return {
+        params: {
+          book: book.slug,
+          chapter: String(chapter),
+        },
+        props: {
+          book,
+          sectionTitle,
+          chapter,
+        },
+      };
+    })
+  );
+}
+
+const { book, sectionTitle, chapter } = Astro.props;
+const videoId = getChapterVideoId(book, chapter);
+const fullBookVideoId = getFullBookVideoId(book);
+const chapterUrl = `https://thetablebible.org${getChapterUrl(book.slug, chapter)}`;
+const prevChapterUrl = chapter > 1 ? getChapterUrl(book.slug, chapter - 1) : null;
+const nextChapterUrl = chapter < book.chapters ? getChapterUrl(book.slug, chapter + 1) : null;
+
+const description = videoId
+  ? `Watch ${book.name} chapter ${chapter} from the World English Bible with word-by-word highlighted text on The Table Bible.`
+  : `Explore ${book.name} chapter ${chapter} from the World English Bible. This chapter page is live, and video availability is coming soon on The Table Bible.`;
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Library', item: 'https://thetablebible.org/library/' },
+    { '@type': 'ListItem', position: 2, name: book.name, item: `https://thetablebible.org/library/${book.slug}/` },
+    { '@type': 'ListItem', position: 3, name: `Chapter ${chapter}`, item: chapterUrl },
+  ],
+};
+
+const webPageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: `${book.name} Chapter ${chapter} — The Table Bible`,
+  url: chapterUrl,
+  description,
+  isPartOf: {
+    '@type': 'CollectionPage',
+    name: `${book.name} — The Table Bible`,
+    url: `https://thetablebible.org/library/${book.slug}/`,
+  },
+  breadcrumb: {
+    '@id': chapterUrl + '#breadcrumb',
+  },
+};
+
+const videoLd = videoId
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'VideoObject',
+      name: `${book.name} Chapter ${chapter} | World English Bible | The Table Bible`,
+      description,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+      contentUrl: `https://www.youtube.com/watch?v=${videoId}`,
+      thumbnailUrl: [`https://thetablebible.org/thumbs/${book.abbr}_${chapter}_thumb.webp`],
+      isFamilyFriendly: true,
+      inLanguage: 'en',
+      publisher: {
+        '@type': 'Organization',
+        name: 'The Table Bible',
+        url: 'https://thetablebible.org',
+      },
+    }
+  : null;
+---
+
+<BaseLayout
+  title={`${book.name} Chapter ${chapter} — The Table Bible`}
+  description={description}
+  image={`/thumbs/${book.abbr}_${chapter}_thumb.webp`}
+  jsonLd={videoLd ? [breadcrumbLd, webPageLd, videoLd] : [breadcrumbLd, webPageLd]}
+>
+  <nav class="breadcrumb container" aria-label="Breadcrumb">
+    <a href="/library/">Library</a>
+    <span class="separator">›</span>
+    <a href={`/library/${book.slug}/`}>{book.name}</a>
+    <span class="separator">›</span>
+    <span class="current">Chapter {chapter}</span>
+  </nav>
+
+  <section class="chapter-hero container">
+    <p class="chapter-kicker">{sectionTitle}</p>
+    <h1>{book.name} Chapter {chapter}</h1>
+    <p class="chapter-meta">World English Bible · Chapter {chapter} of {book.chapters}</p>
+    <p class="chapter-description">{description}</p>
+  </section>
+
+  <section class="chapter-player container">
+    {videoId ? (
+      <div class="video-shell">
+        <div class="video-wrapper">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+            title={`${book.name} Chapter ${chapter} | The Table Bible`}
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="chapter-actions">
+          <a href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank" rel="noopener" class="btn btn-primary">Watch on YouTube</a>
+          <a href={`/library/${book.slug}/`} class="btn btn-secondary">Back to {book.name}</a>
+        </div>
+      </div>
+    ) : (
+      <div class="coming-soon-card">
+        <img
+          src={`/thumbs/${book.abbr}_${chapter}_thumb.webp`}
+          alt={`${book.name} Chapter ${chapter}`}
+          width="1280"
+          height="720"
+          loading="eager"
+        />
+        <div class="coming-soon-copy">
+          <h2>Chapter Video Coming Soon</h2>
+          <p>This page is already live so it can be indexed and linked. The matching video has not been synced to the website yet.</p>
+          <div class="chapter-actions">
+            <a href="https://youtube.com/@thetablebibleorg?sub_confirmation=1" target="_blank" rel="noopener" class="btn btn-primary">Subscribe for Updates</a>
+            <a href={`/library/${book.slug}/`} class="btn btn-secondary">Back to {book.name}</a>
+          </div>
+        </div>
+      </div>
+    )}
+  </section>
+
+  <section class="chapter-content container">
+    <div class="content-grid">
+      <article class="content-card">
+        <h2>About This Chapter</h2>
+        <p>{book.name} chapter {chapter} is part of the World English Bible reading library on The Table Bible. Use this page to watch the chapter video, move through the book in order, and stay within a clean, indexable chapter archive.</p>
+      </article>
+      <article class="content-card">
+        <h2>About {book.name}</h2>
+        <p>{book.description || `${book.name} is part of the Bible library on The Table Bible.`}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="chapter-navigation container">
+    <div class="nav-grid">
+      {prevChapterUrl ? <a href={prevChapterUrl} class="nav-card">← {book.name} Chapter {chapter - 1}</a> : <div></div>}
+      {fullBookVideoId ? <a href={`/watch/?v=${fullBookVideoId}`} class="nav-card nav-card-center">Full Book Video</a> : <a href={`/library/${book.slug}/`} class="nav-card nav-card-center">Book Overview</a>}
+      {nextChapterUrl ? <a href={nextChapterUrl} class="nav-card">{book.name} Chapter {chapter + 1} →</a> : <div></div>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .breadcrumb {
+    padding: var(--space-lg) var(--space-lg) 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .breadcrumb a { color: var(--gold-light); }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .separator { margin: 0 var(--space-sm); }
+  .current { color: var(--cream); }
+
+  .chapter-hero {
+    padding: var(--space-2xl) var(--space-lg) var(--space-xl);
+    text-align: center;
+  }
+
+  .chapter-kicker {
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .chapter-meta {
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .chapter-description {
+    max-width: 760px;
+    margin: 0 auto;
+    color: var(--cream);
+    font-size: 1.05rem;
+  }
+
+  .chapter-player,
+  .chapter-content,
+  .chapter-navigation {
+    padding-bottom: var(--space-3xl);
+  }
+
+  .video-shell,
+  .coming-soon-card,
+  .content-card,
+  .nav-card {
+    border: 1px solid rgba(201, 168, 106, 0.15);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  .video-wrapper {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: #000;
+  }
+
+  .video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .chapter-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: var(--space-lg);
+  }
+
+  .coming-soon-card {
+    overflow: hidden;
+  }
+
+  .coming-soon-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .coming-soon-copy {
+    padding: var(--space-xl);
+    text-align: center;
+  }
+
+  .coming-soon-copy p {
+    max-width: 680px;
+    margin: 0 auto;
+    color: var(--text-muted);
+  }
+
+  .content-grid,
+  .nav-grid {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .content-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .content-card {
+    padding: var(--space-xl);
+  }
+
+  .content-card h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .content-card p {
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .nav-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .nav-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    text-align: center;
+    color: var(--cream);
+    text-decoration: none;
+    transition: border-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .nav-card:hover {
+    border-color: var(--gold-light);
+    transform: translateY(-2px);
+  }
+
+  .nav-card-center {
+    color: var(--gold-light);
+  }
+
+  @media (max-width: 768px) {
+    .nav-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

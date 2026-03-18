@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import libraryData from '../../data/library.json';
+import { getChapterUrl, getFullBookVideoId } from '../../utils/library';
 
 export function getStaticPaths() {
   const books: any[] = [];
@@ -17,7 +18,7 @@ export function getStaticPaths() {
 
 const { book, sectionTitle } = Astro.props;
 const chapters = Array.from({ length: book.chapters }, (_, i) => i + 1);
-const fullBookVideoId = book.fullBookVideoId || null;
+const fullBookVideoId = getFullBookVideoId(book);
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
@@ -27,13 +28,23 @@ const breadcrumbLd = {
     { "@type": "ListItem", "position": 2, "name": book.name, "item": `https://thetablebible.org/library/${book.slug}/` },
   ],
 };
+
+const bookLd = {
+  "@context": "https://schema.org",
+  "@type": "Book",
+  "name": book.name,
+  "url": `https://thetablebible.org/library/${book.slug}/`,
+  "description": book.description || `Read the Book of ${book.name} on The Table Bible.`,
+  "bookFormat": "EBook",
+  "inLanguage": "en",
+};
 ---
 
 <BaseLayout
   title={`${book.name} — The Table Bible`}
   description={book.description || `Listen to the Book of ${book.name} — all ${book.chapters} chapters with word-by-word highlighted text. World English Bible (WEB).`}
   image={`/thumbs/${book.abbr}_fullbook_thumb.webp`}
-  jsonLd={breadcrumbLd}
+  jsonLd={[breadcrumbLd, bookLd]}
 >
   <!-- Breadcrumb -->
   <nav class="breadcrumb container" aria-label="Breadcrumb">
@@ -111,8 +122,9 @@ const breadcrumbLd = {
         const videoId = book.videos?.[String(ch)] || null;
         return (
           <a
-            href={videoId ? `/watch/?v=${videoId}` : undefined}
+            href={getChapterUrl(book.slug, ch)}
             class:list={['chapter-card', { 'has-video': !!videoId, 'no-video': !videoId }]}
+            aria-label={`${book.name} Chapter ${ch}`}
           >
             <div class="card-thumb">
               {videoId && <div class="play-icon" aria-hidden="true">▶</div>}
