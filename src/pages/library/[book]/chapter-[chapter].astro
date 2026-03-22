@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getAllBooksWithSections, getChapterUrl, getChapterVideoId, getFullBookVideoId } from '../../../utils/library';
+import { getAllBooksWithSections, getChapterThumbUrl, getChapterUrl, getChapterVideoId, getFullBookVideoId, getVideoUploadDate } from '../../../utils/library';
 
 export function getStaticPaths() {
   return getAllBooksWithSections().flatMap(({ book, sectionTitle }) =>
@@ -25,6 +25,8 @@ const { book, sectionTitle, chapter } = Astro.props;
 const videoId = getChapterVideoId(book, chapter);
 const fullBookVideoId = getFullBookVideoId(book);
 const chapterUrl = `https://thetablebible.org${getChapterUrl(book.slug, chapter)}`;
+const chapterThumbUrl = getChapterThumbUrl(book.abbr, chapter);
+const uploadDate = getVideoUploadDate(videoId);
 const prevChapterUrl = chapter > 1 ? getChapterUrl(book.slug, chapter - 1) : null;
 const nextChapterUrl = chapter < book.chapters ? getChapterUrl(book.slug, chapter + 1) : null;
 
@@ -35,6 +37,7 @@ const description = videoId
 const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
+  '@id': `${chapterUrl}#breadcrumb`,
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Library', item: 'https://thetablebible.org/library/' },
     { '@type': 'ListItem', position: 2, name: book.name, item: `https://thetablebible.org/library/${book.slug}/` },
@@ -66,7 +69,8 @@ const videoLd = videoId
       description,
       embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
       contentUrl: `https://www.youtube.com/watch?v=${videoId}`,
-      thumbnailUrl: [`https://thetablebible.org/thumbs/${book.abbr}_${chapter}_thumb.webp`],
+      thumbnailUrl: [`https://thetablebible.org${chapterThumbUrl}`],
+      ...(uploadDate ? { uploadDate } : {}),
       isFamilyFriendly: true,
       inLanguage: 'en',
       publisher: {
@@ -81,7 +85,7 @@ const videoLd = videoId
 <BaseLayout
   title={`${book.name} Chapter ${chapter} — The Table Bible`}
   description={description}
-  image={`/thumbs/${book.abbr}_${chapter}_thumb.webp`}
+  image={chapterThumbUrl}
   jsonLd={videoLd ? [breadcrumbLd, webPageLd, videoLd] : [breadcrumbLd, webPageLd]}
 >
   <nav class="breadcrumb container" aria-label="Breadcrumb">
@@ -119,7 +123,7 @@ const videoLd = videoId
     ) : (
       <div class="coming-soon-card">
         <img
-          src={`/thumbs/${book.abbr}_${chapter}_thumb.webp`}
+          src={chapterThumbUrl}
           alt={`${book.name} Chapter ${chapter}`}
           width="1280"
           height="720"

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import libraryData from '../../data/library.json';
-import { getChapterUrl, getFullBookVideoId } from '../../utils/library';
+import { getChapterThumbUrl, getChapterUrl, getFullBookThumbUrl, getFullBookVideoId } from '../../utils/library';
 
 export function getStaticPaths() {
   const books: any[] = [];
@@ -23,6 +23,7 @@ const fullBookVideoId = getFullBookVideoId(book);
 const breadcrumbLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
+  "@id": `https://thetablebible.org/library/${book.slug}/#breadcrumb`,
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Library", "item": "https://thetablebible.org/library/" },
     { "@type": "ListItem", "position": 2, "name": book.name, "item": `https://thetablebible.org/library/${book.slug}/` },
@@ -43,7 +44,7 @@ const bookLd = {
 <BaseLayout
   title={`${book.name} — The Table Bible`}
   description={book.description || `Listen to the Book of ${book.name} — all ${book.chapters} chapters with word-by-word highlighted text. World English Bible (WEB).`}
-  image={`/thumbs/${book.abbr}_fullbook_thumb.webp`}
+  image={getFullBookThumbUrl(book.abbr)}
   jsonLd={[breadcrumbLd, bookLd]}
 >
   <!-- Breadcrumb -->
@@ -73,7 +74,7 @@ const bookLd = {
           <a href={`/watch/?v=${fullBookVideoId}`} class="top-row-card">
             <div class="top-row-thumb">
               <img
-                src={`/thumbs/${book.abbr}_1_thumb.webp`}
+                src={getFullBookThumbUrl(book.abbr)}
                 alt={`${book.name} — Full Book`}
                 width="640" height="360"
                 loading="eager"
@@ -86,7 +87,7 @@ const bookLd = {
           <div class="top-row-card coming-soon">
             <div class="top-row-thumb">
               <img
-                src={`/thumbs/${book.abbr}_1_thumb.webp`}
+                src={getFullBookThumbUrl(book.abbr)}
                 alt={`${book.name} — Full Book`}
                 width="640" height="360"
                 loading="eager"
@@ -129,7 +130,7 @@ const bookLd = {
             <div class="card-thumb">
               {videoId && <div class="play-icon" aria-hidden="true">▶</div>}
               <img
-                src={`/thumbs/${book.abbr}_${ch}_thumb.webp`}
+                src={getChapterThumbUrl(book.abbr, ch)}
                 alt={`${book.name} Chapter ${ch}`}
                 width="640" height="360"
                 loading="lazy"

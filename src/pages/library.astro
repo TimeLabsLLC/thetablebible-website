@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import libraryData from '../data/library.json';
+import { getFullBookThumbUrl } from '../utils/library';
 
 const { sections } = libraryData;
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
+  "@id": "https://thetablebible.org/library/#breadcrumb",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Library", "item": "https://thetablebible.org/library/" },
   ],
@@ -48,7 +50,7 @@ const breadcrumbLd = {
             <a href={`/library/${book.slug}/`} class="book-card" data-book={book.name.toLowerCase()}>
               <div class="book-card-thumb">
                 <img
-                  src={`/thumbs/${book.abbr}_fullbook_thumb.webp`}
+                  src={getFullBookThumbUrl(book.abbr)}
                   alt={book.name}
                   width="640"
                   height="360"
