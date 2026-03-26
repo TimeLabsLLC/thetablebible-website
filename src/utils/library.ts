@@ -19,7 +19,7 @@ export type LibrarySection = {
   books: LibraryBook[];
 };
 
-const THUMB_VERSION = '20260321b';
+const THUMB_VERSION = '20260326a';
 
 export function getLibrarySections(): LibrarySection[] {
   return libraryData.sections as LibrarySection[];
@@ -55,5 +55,43 @@ export function getVideoUploadDate(videoId: string | null): string | null {
   if (!videoId) {
     return null;
   }
-  return (videoUploadDates as Record<string, string>)[videoId] || null;
+  const rawDate = (videoUploadDates as Record<string, string>)[videoId] || null;
+  if (!rawDate) {
+    return null;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+    return `${rawDate}T00:00:00Z`;
+  }
+
+  return rawDate;
+}
+
+export function getPlayableChapterSequence(book: LibraryBook, startChapter = 1): Array<{ chapter: number; videoId: string }> {
+  const sequence: Array<{ chapter: number; videoId: string }> = [];
+
+  for (let chapter = startChapter; chapter <= book.chapters; chapter += 1) {
+    const videoId = getChapterVideoId(book, chapter);
+    if (!videoId) {
+      break;
+    }
+
+    sequence.push({ chapter, videoId });
+  }
+
+  return sequence;
+}
+
+export function getPlayAllUrl(book: LibraryBook, startChapter = 1): string | null {
+  const sequence = getPlayableChapterSequence(book, startChapter);
+  if (sequence.length === 0) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    flow: '1',
+    autoplay: '1',
+  });
+
+  return `${getChapterUrl(book.slug, startChapter)}?${params.toString()}`;
 }

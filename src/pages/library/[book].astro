@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import libraryData from '../../data/library.json';
-import { getChapterThumbUrl, getChapterUrl, getFullBookThumbUrl, getFullBookVideoId } from '../../utils/library';
+import { getChapterThumbUrl, getChapterUrl, getFullBookThumbUrl, getFullBookVideoId, getPlayAllUrl, getPlayableChapterSequence } from '../../utils/library';
 
 export function getStaticPaths() {
   const books: any[] = [];
@@ -19,6 +19,10 @@ export function getStaticPaths() {
 const { book, sectionTitle } = Astro.props;
 const chapters = Array.from({ length: book.chapters }, (_, i) => i + 1);
 const fullBookVideoId = getFullBookVideoId(book);
+const availableStarts = chapters.filter(chapter => getPlayableChapterSequence(book, chapter).length > 0);
+const defaultStartChapter = availableStarts[0] ?? 1;
+const defaultPlayAllUrl = getPlayAllUrl(book, defaultStartChapter);
+const defaultPlayAllCount = getPlayableChapterSequence(book, defaultStartChapter).length;
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
@@ -61,6 +65,42 @@ const bookLd = {
       <p class="book-meta">{sectionTitle} · {book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</p>
       {book.description && (
         <p class="book-description">{book.description}</p>
+      )}
+
+      {availableStarts.length > 0 && (
+        <div class="play-all-panel">
+          <div class="play-all-copy">
+            <span class="play-all-kicker">Play In Order</span>
+            <h2>Start this book anywhere and keep going</h2>
+            <p>
+              Choose a chapter, open that chapter page, and continue through the remaining available chapters automatically.
+            </p>
+          </div>
+          <div class="play-all-controls">
+            <label for="play-all-start" class="sr-only">Choose starting chapter</label>
+            <select id="play-all-start" class="play-all-select" data-base-book={book.name}>
+              {availableStarts.map(chapter => {
+                const sequenceCount = getPlayableChapterSequence(book, chapter).length;
+                return (
+                  <option value={chapter} selected={chapter === defaultStartChapter}>
+                    Start at chapter {chapter} · {sequenceCount} {sequenceCount === 1 ? 'video' : 'videos'}
+                  </option>
+                );
+              })}
+            </select>
+            {defaultPlayAllUrl && (
+              <a
+                href={defaultPlayAllUrl}
+                class="btn btn-primary btn-lg play-all-button"
+                id="play-all-link"
+                data-book-slug={book.slug}
+              >
+                Play all from chapter {defaultStartChapter}{defaultPlayAllCount > 0 ? ` (${defaultPlayAllCount})` : ''}
+              </a>
+            )}
+            <p class="play-all-helper">Choose any available chapter and its chapter page starts the onward flow right away.</p>
+          </div>
+        </div>
       )}
     </div>
   </section>
@@ -121,11 +161,12 @@ const bookLd = {
     <div class="chapter-grid">
       {chapters.map(ch => {
         const videoId = book.videos?.[String(ch)] || null;
+        const playFromChapterUrl = videoId ? getPlayAllUrl(book, ch) : null;
         return (
           <a
-            href={getChapterUrl(book.slug, ch)}
+            href={playFromChapterUrl || getChapterUrl(book.slug, ch)}
             class:list={['chapter-card', { 'has-video': !!videoId, 'no-video': !videoId }]}
-            aria-label={`${book.name} Chapter ${ch}`}
+            aria-label={videoId ? `${book.name} Chapter ${ch}, play from this chapter onward` : `${book.name} Chapter ${ch}`}
           >
             <div class="card-thumb">
               {videoId && <div class="play-icon" aria-hidden="true">▶</div>}
@@ -138,6 +179,7 @@ const bookLd = {
               />
             </div>
             <span class="card-label">Chapter {ch}</span>
+            {videoId && <span class="card-status">Play from here</span>}
           </a>
         );
       })}
@@ -150,7 +192,48 @@ const bookLd = {
   </section>
 </BaseLayout>
 
+<script define:vars={{ availableStarts, bookName: book.name, bookSlug: book.slug, playMap: Object.fromEntries(availableStarts.map(chapter => [chapter, { url: getPlayAllUrl(book, chapter), count: getPlayableChapterSequence(book, chapter).length }])) }}>
+  const playAllSelect = document.getElementById('play-all-start');
+  const playAllLink = document.getElementById('play-all-link');
+  const playMapData = playMap;
+
+  const syncPlayAllLink = () => {
+    if (!(playAllSelect instanceof HTMLSelectElement) || !(playAllLink instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    const selectedChapter = Number(playAllSelect.value);
+    const selected = playMapData[selectedChapter];
+    if (!selected?.url) {
+      return;
+    }
+
+    playAllLink.href = selected.url;
+    playAllLink.textContent = `Play all from chapter ${selectedChapter} (${selected.count})`;
+  };
+
+  syncPlayAllLink();
+  playAllSelect?.addEventListener('change', () => {
+    syncPlayAllLink();
+    if (playAllLink instanceof HTMLAnchorElement && playAllLink.href) {
+      window.location.href = playAllLink.href;
+    }
+  });
+</script>
+
 <style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .breadcrumb {
     padding: var(--space-lg) var(--space-lg) 0;
     font-size: 0.875rem;
@@ -186,6 +269,68 @@ const bookLd = {
     color: #6B0F1A;
     background: #C9A227;
     border-radius: 3px;
+  }
+
+  .play-all-panel {
+    margin: var(--space-2xl) auto 0;
+    max-width: 920px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+    gap: var(--space-xl);
+    align-items: center;
+    padding: var(--space-xl);
+    border: 1px solid rgba(201, 168, 106, 0.18);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at top left, rgba(201, 168, 106, 0.12), transparent 45%),
+      linear-gradient(180deg, rgba(42, 35, 30, 0.98), rgba(30, 24, 20, 0.98));
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+  }
+
+  .play-all-kicker {
+    display: inline-block;
+    margin-bottom: var(--space-sm);
+    color: var(--gold-light);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .play-all-copy h2 {
+    margin-bottom: var(--space-sm);
+    font-size: clamp(1.35rem, 2.2vw, 1.8rem);
+  }
+
+  .play-all-copy p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .play-all-controls {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .play-all-helper {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+
+  .play-all-select {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(201, 168, 106, 0.25);
+    background: rgba(20, 17, 14, 0.82);
+    color: var(--cream);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+  }
+
+  .play-all-button {
+    width: 100%;
+    justify-content: center;
   }
 
   /* ── Top Row ─────────────────────────────────────────────────────── */
@@ -337,12 +482,24 @@ const bookLd = {
     color: var(--cream);
   }
 
+  .card-status {
+    font-size: 0.75rem;
+    color: var(--gold-light);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
   .back-section {
     padding-bottom: var(--space-4xl);
     text-align: center;
   }
 
   @media (max-width: 768px) {
+    .play-all-panel {
+      grid-template-columns: 1fr;
+      text-align: left;
+    }
+
     .top-row-grid { grid-template-columns: 1fr; }
     .chapter-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   }

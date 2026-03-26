@@ -26,6 +26,11 @@ const breadcrumbLd = {
       </div>
     </div>
 
+    <div class="watch-sequence" id="watch-sequence" hidden>
+      <h2 id="watch-sequence-title">Chapter queue</h2>
+      <p id="watch-sequence-copy"></p>
+    </div>
+
     <div class="watch-actions">
       <button class="btn btn-secondary" id="back-btn" onclick="history.back()">← Back</button>
     </div>
@@ -35,16 +40,43 @@ const breadcrumbLd = {
 <script>
   const params = new URLSearchParams(window.location.search);
   const videoId = params.get('v');
+  const listType = params.get('listType');
+  const idsParam = params.get('ids');
+  const bookName = params.get('book');
+  const startChapter = params.get('start');
   const frame = document.getElementById('player-frame')!;
+  const sequencePanel = document.getElementById('watch-sequence');
+  const sequenceCopy = document.getElementById('watch-sequence-copy');
+  const sequenceTitle = document.getElementById('watch-sequence-title');
+
+  const parsedIds = (idsParam || '')
+    .split(',')
+    .map(id => id.trim())
+    .filter(id => /^[a-zA-Z0-9_-]{11}$/.test(id));
+
+  const isSequence = listType === 'sequence' && parsedIds.length > 1 && videoId === parsedIds[0];
 
   if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+    const embedParams = new URLSearchParams({ autoplay: '1' });
+    if (isSequence) {
+      embedParams.set('playlist', parsedIds.slice(1).join(','));
+    }
+
     frame.innerHTML = `<iframe
-      src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
+      src="https://www.youtube-nocookie.com/embed/${videoId}?${embedParams.toString()}"
       title="The Table Bible"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
     ></iframe>`;
+
+    if (isSequence && sequencePanel && sequenceCopy && sequenceTitle) {
+      sequenceTitle.textContent = bookName ? `${bookName} chapter queue` : 'Chapter queue';
+      sequenceCopy.textContent = startChapter
+        ? `Starting at chapter ${startChapter}. ${parsedIds.length} videos will play in order.`
+        : `${parsedIds.length} videos will play in order.`;
+      sequencePanel.hidden = false;
+    }
   } else {
     frame.innerHTML = '<p class="player-error">Video not found. <a href="/library/">Return to Library</a></p>';
   }
@@ -92,5 +124,25 @@ const breadcrumbLd = {
 
   .watch-actions {
     text-align: center;
+  }
+
+  .watch-sequence {
+    margin: 0 0 var(--space-xl);
+    padding: var(--space-lg);
+    border: 1px solid rgba(201, 168, 106, 0.16);
+    border-radius: var(--radius-lg);
+    background: rgba(42, 35, 30, 0.72);
+    text-align: center;
+  }
+
+  .watch-sequence h2 {
+    margin-bottom: var(--space-sm);
+    font-size: 1.1rem;
+    color: var(--gold-light);
+  }
+
+  .watch-sequence p {
+    margin: 0;
+    color: var(--text-muted);
   }
 </style>

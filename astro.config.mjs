@@ -7,5 +7,7 @@ export default defineConfig({
   output: 'static',
   site: 'https://thetablebible.org',
   trailingSlash: 'always',
-  integrations: [sitemap()],
+  integrations: [sitemap({
+    filter: (page) => !page.endsWith('/watch/'),
+  })],
 });

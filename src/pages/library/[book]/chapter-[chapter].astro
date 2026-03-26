@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getAllBooksWithSections, getChapterThumbUrl, getChapterUrl, getChapterVideoId, getFullBookVideoId, getVideoUploadDate } from '../../../utils/library';
+import { getAllBooksWithSections, getChapterThumbUrl, getChapterUrl, getChapterVideoId, getFullBookVideoId, getPlayAllUrl, getPlayableChapterSequence, getVideoUploadDate } from '../../../utils/library';
 
 export function getStaticPaths() {
   return getAllBooksWithSections().flatMap(({ book, sectionTitle }) =>
@@ -29,6 +29,12 @@ const chapterThumbUrl = getChapterThumbUrl(book.abbr, chapter);
 const uploadDate = getVideoUploadDate(videoId);
 const prevChapterUrl = chapter > 1 ? getChapterUrl(book.slug, chapter - 1) : null;
 const nextChapterUrl = chapter < book.chapters ? getChapterUrl(book.slug, chapter + 1) : null;
+const availableStarts = Array.from({ length: book.chapters }, (_, index) => index + 1).filter(startChapter => getPlayableChapterSequence(book, startChapter).length > 0);
+const defaultStartChapter = availableStarts.includes(chapter) ? chapter : (availableStarts[availableStarts.length - 1] ?? 1);
+const playAllUrl = getPlayAllUrl(book, defaultStartChapter);
+const playAllCount = getPlayableChapterSequence(book, defaultStartChapter).length;
+const nextFlowChapter = getPlayableChapterSequence(book, chapter)[1]?.chapter ?? null;
+const nextFlowUrl = nextFlowChapter ? getPlayAllUrl(book, nextFlowChapter) : null;
 
 const description = videoId
   ? `Watch ${book.name} chapter ${chapter} from the World English Bible with word-by-word highlighted text on The Table Bible.`
@@ -108,7 +114,8 @@ const videoLd = videoId
       <div class="video-shell">
         <div class="video-wrapper">
           <iframe
-            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+            id="chapter-player-frame"
+            src={`https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&rel=0&playsinline=1`}
             title={`${book.name} Chapter ${chapter} | The Table Bible`}
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -147,6 +154,26 @@ const videoLd = videoId
         <h2>About This Chapter</h2>
         <p>{book.name} chapter {chapter} is part of the World English Bible reading library on The Table Bible. Use this page to watch the chapter video, move through the book in order, and stay within a clean, indexable chapter archive.</p>
       </article>
+      {availableStarts.length > 0 && playAllUrl && (
+        <article class="content-card content-card-accent">
+          <h2>Play In Order</h2>
+          <p>Choose any available chapter, open that chapter page, and continue chapter by chapter to the end without another click.</p>
+          <label for="chapter-play-all-start" class="sr-only">Choose starting chapter</label>
+          <select id="chapter-play-all-start" class="chapter-play-all-select">
+            {availableStarts.map(startChapter => {
+              const sequenceCount = getPlayableChapterSequence(book, startChapter).length;
+              return (
+                <option value={startChapter} selected={startChapter === defaultStartChapter}>
+                  Start at chapter {startChapter} · {sequenceCount} {sequenceCount === 1 ? 'video' : 'videos'}
+                </option>
+              );
+            })}
+          </select>
+          <a href={playAllUrl} class="btn btn-primary content-card-btn" id="chapter-play-all-link">
+            Play all from chapter {defaultStartChapter}{playAllCount > 0 ? ` (${playAllCount})` : ''}
+          </a>
+        </article>
+      )}
       <article class="content-card">
         <h2>About {book.name}</h2>
         <p>{book.description || `${book.name} is part of the Bible library on The Table Bible.`}</p>
@@ -163,7 +190,109 @@ const videoLd = videoId
   </section>
 </BaseLayout>
 
+<script define:vars={{
+  playMap: Object.fromEntries(availableStarts.map(startChapter => [startChapter, { url: getPlayAllUrl(book, startChapter), count: getPlayableChapterSequence(book, startChapter).length }])),
+  videoId,
+  nextFlowUrl,
+}}>
+  const playAllSelect = document.getElementById('chapter-play-all-start');
+  const playAllLink = document.getElementById('chapter-play-all-link');
+  const playMapData = playMap;
+
+  const syncPlayAllLink = () => {
+    if (!(playAllSelect instanceof HTMLSelectElement) || !(playAllLink instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    const selectedChapter = Number(playAllSelect.value);
+    const selected = playMapData[selectedChapter];
+    if (!selected?.url) {
+      return;
+    }
+
+    playAllLink.href = selected.url;
+    playAllLink.textContent = `Play all from chapter ${selectedChapter} (${selected.count})`;
+  };
+
+  syncPlayAllLink();
+  playAllSelect?.addEventListener('change', () => {
+    syncPlayAllLink();
+    if (playAllLink instanceof HTMLAnchorElement && playAllLink.href) {
+      window.location.href = playAllLink.href;
+    }
+  });
+
+  const playerFrame = document.getElementById('chapter-player-frame');
+  const pageParams = new URLSearchParams(window.location.search);
+  const flowEnabled = pageParams.get('flow') === '1';
+  const autoplayRequested = pageParams.get('autoplay') === '1';
+
+  const startChapterFlow = () => {
+    if (!(playerFrame instanceof HTMLIFrameElement) || !videoId || !window.YT?.Player) {
+      return;
+    }
+
+    const embedParams = new URLSearchParams({
+      enablejsapi: '1',
+      rel: '0',
+      playsinline: '1',
+      origin: window.location.origin,
+    });
+
+    if (autoplayRequested) {
+      embedParams.set('autoplay', '1');
+    }
+
+    playerFrame.src = `https://www.youtube-nocookie.com/embed/${videoId}?${embedParams.toString()}`;
+
+    new window.YT.Player(playerFrame, {
+      events: {
+        onReady: event => {
+          if (autoplayRequested) {
+            event.target.playVideo();
+          }
+        },
+        onStateChange: event => {
+          if (flowEnabled && nextFlowUrl && event.data === window.YT.PlayerState.ENDED) {
+            window.location.href = nextFlowUrl;
+          }
+        },
+      },
+    });
+  };
+
+  if (flowEnabled && playerFrame instanceof HTMLIFrameElement && videoId) {
+    if (window.YT?.Player) {
+      startChapterFlow();
+    } else {
+      const apiScript = document.createElement('script');
+      apiScript.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(apiScript);
+
+      const previousReady = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (typeof previousReady === 'function') {
+          previousReady();
+        }
+        startChapterFlow();
+      };
+    }
+  }
+</script>
+
 <style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .breadcrumb {
     padding: var(--space-lg) var(--space-lg) 0;
     font-size: 0.875rem;
@@ -273,6 +402,12 @@ const videoLd = videoId
     padding: var(--space-xl);
   }
 
+  .content-card-accent {
+    background:
+      radial-gradient(circle at top left, rgba(201, 168, 106, 0.12), transparent 55%),
+      var(--bg-card);
+  }
+
   .content-card h2 {
     margin-bottom: var(--space-md);
   }
@@ -280,6 +415,26 @@ const videoLd = videoId
   .content-card p {
     color: var(--text-muted);
     margin: 0;
+  }
+
+  .content-card-btn {
+    margin-top: var(--space-lg);
+  }
+
+  .chapter-play-all-select {
+    width: 100%;
+    margin-top: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(201, 168, 106, 0.25);
+    background: rgba(20, 17, 14, 0.82);
+    color: var(--cream);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+  }
+
+  .btn-queue {
+    border-color: rgba(201, 168, 106, 0.28);
   }
 
   .nav-grid {
