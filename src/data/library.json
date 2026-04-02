@@ -171,7 +171,19 @@
             "17": "YLUTNZh8M8A",
             "18": "FAtL_rUq4P4",
             "19": "hm8BaWfDoeM",
-            "20": "ZR3vYPnqlUM"
+            "20": "ZR3vYPnqlUM",
+            "21": "uFSif9ntl7c",
+            "22": "Ivdp7UG2qvo",
+            "23": "W6tb9FfY3e0",
+            "24": "O6IPzMx1iAg",
+            "25": "di29LOrMlPo",
+            "26": "pL3-erEW698",
+            "27": "ua7g5McB-xw",
+            "28": "Xh_HQXc5G7c",
+            "29": "ypBjCUT3pZo",
+            "30": "T7kjMsXoNus",
+            "31": "-OAyLzviHN4",
+            "32": "dCE3JnQcgIU"
           }
         },
         {
@@ -333,7 +345,19 @@
           "name": "Matthew",
           "chapters": 28,
           "slug": "matthew",
-          "description": "Written to a Jewish audience, Matthew presents Jesus as the long-awaited King — the fulfillment of every promise, the Son of David, the one greater than the Temple. From the Sermon on the Mount to the Great Commission, Matthew shows that the Kingdom of Heaven has come near."
+          "description": "Written to a Jewish audience, Matthew presents Jesus as the long-awaited King — the fulfillment of every promise, the Son of David, the one greater than the Temple. From the Sermon on the Mount to the Great Commission, Matthew shows that the Kingdom of Heaven has come near.",
+          "videos": {
+            "1": "q2fAerA6z7I",
+            "2": "Z8hcmcpxxLg",
+            "3": "dzZJMF5HN48",
+            "4": "P1uoe9bx0ao",
+            "5": "2cp2dh7aWFo",
+            "6": "jmdFj3Yvfd4",
+            "7": "yiD5Ezpe4SA",
+            "8": "qcJeWlifPRk",
+            "9": "feg5JZncKOw",
+            "10": "IEqy6udRrB0"
+          }
         },
         {
           "abbr": "MRK",
@@ -375,8 +399,10 @@
             "17": "syc8yqkTJz8",
             "18": "jVzc_JbM6P8",
             "19": "_FRZYH0H9Hw",
-            "20": "0JDwBwmU3xY"
-          }
+            "20": "0JDwBwmU3xY",
+            "21": "mrR67Mn1aFw"
+          },
+          "fullBookVideoId": "QCaiXDRUicE"
         }
       ]
     },
