@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# large binary assets served from Cloudflare R2
+public/audio/
+
+# YouTube cover images (not used by website)
+public/meta/

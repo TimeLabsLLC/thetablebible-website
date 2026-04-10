@@ -1,0 +1,73 @@
+---
+/**
+ * A subtle donate CTA banner shown at the bottom of content pages.
+ * Compact, non-intrusive, and consistent across all surfaces.
+ */
+---
+<aside class="donate-banner" data-pagefind-ignore>
+  <p class="donate-banner__text">
+    This content remains free because of generous givers like you.
+  </p>
+  <div class="donate-banner__buttons">
+    <a href="https://donate.stripe.com/dRmcN71tY1bg8Lj19NaZi00" target="_blank" rel="noopener" class="donate-banner__btn donate-banner__btn--primary">
+      Give with Card
+    </a>
+    <a href="https://www.paypal.com/ncp/payment/829Y8JMJBUC2J" target="_blank" rel="noopener" class="donate-banner__btn donate-banner__btn--secondary">
+      PayPal
+    </a>
+  </div>
+</aside>
+
+<style>
+  .donate-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 24px;
+    margin: 2.5rem 0 1rem;
+    padding: 16px 24px;
+    background: var(--gold-50);
+    border: 1px solid var(--gold-light);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .donate-banner__text {
+    margin: 0;
+    font-size: 14px;
+    color: var(--charcoal-muted);
+  }
+  .donate-banner__buttons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .donate-banner__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .donate-banner__btn--primary {
+    background: var(--gold);
+    color: white;
+  }
+  .donate-banner__btn--primary:hover {
+    background: var(--gold-light);
+  }
+  .donate-banner__btn--secondary {
+    background: white;
+    color: var(--charcoal);
+    border: 1px solid var(--cream-300);
+  }
+  .donate-banner__btn--secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold-dark);
+  }
+</style>

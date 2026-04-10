@@ -43,6 +43,10 @@ export function getFullBookThumbUrl(bookAbbr: string): string {
   return `/thumbs/${bookAbbr}_fullbook_thumb.webp?v=${THUMB_VERSION}`;
 }
 
+export function getBookCoverUrl(bookAbbr: string): string {
+  return `/covers/${bookAbbr}.webp`;
+}
+
 export function getFullBookVideoId(book: LibraryBook): string | null {
   return book.fullBookVideoId || book.fullbookVideoId || null;
 }

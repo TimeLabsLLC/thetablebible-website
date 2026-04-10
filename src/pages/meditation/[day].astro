@@ -1,0 +1,123 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DonateBanner from '../../components/DonateBanner.astro';
+import { getMeditationEntries, getBibleUrl, type MeditationEntry } from '../../utils/devotional';
+
+const year1 = getMeditationEntries(1);
+const year2 = getMeditationEntries(2);
+
+// Combine both years: year1 days 1-365, year2 as days 366-730
+const allEntries = [
+  ...year1.map(e => ({ ...e, globalDay: e.day })),
+  ...year2.map(e => ({ ...e, globalDay: e.day + 365 })),
+];
+
+export function getStaticPaths() {
+  const y1 = getMeditationEntries(1);
+  const y2 = getMeditationEntries(2);
+  const paths = [
+    ...y1.map(e => ({ params: { day: String(e.day) }, props: { entry: e, globalDay: e.day } })),
+    ...y2.map(e => ({ params: { day: String(e.day + 365) }, props: { entry: e, globalDay: e.day + 365 } })),
+  ];
+  return paths;
+}
+
+interface Props {
+  entry: MeditationEntry;
+  globalDay: number;
+}
+
+const { entry, globalDay } = Astro.props;
+const prevDay = globalDay > 1 ? globalDay - 1 : null;
+const nextDay = globalDay < 730 ? globalDay + 1 : null;
+
+const verseRange = entry.start_verse === entry.end_verse
+  ? `Psalm ${entry.psalm}:${entry.start_verse}`
+  : `Psalm ${entry.psalm}:${entry.start_verse}-${entry.end_verse}`;
+
+const title = `Day ${globalDay}: ${entry.title} — Selah Meditation`;
+const description = entry.teaching[0]?.slice(0, 155) || `Psalm meditation for day ${globalDay}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Day ${globalDay}: ${entry.title}`,
+  "description": description,
+  "author": { "@type": "Organization", "name": "The Table Bible" },
+  "publisher": { "@type": "Organization", "name": "The Table Bible" },
+};
+---
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <main class="container-reading py-12" data-pagefind-body data-pagefind-meta={`type:Meditation, title:Day ${globalDay} — ${entry.title}`} data-pagefind-filter="type:Meditation">
+    <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
+      <a href="/meditation/" class="hover:text-accent">Meditation</a>
+      <span class="mx-2">/</span>
+      <span>Day {globalDay}</span>
+    </nav>
+
+    <header class="mb-10">
+      <p class="text-sm uppercase tracking-wider text-gold-dark font-sans mb-2">
+        Day {globalDay} of 730
+      </p>
+      <h1 class="text-3xl leading-tight mb-3">{entry.title}</h1>
+      <p>
+        <a href={getBibleUrl('psalms', entry.psalm, entry.start_verse)} class="text-accent hover:text-accent-dark underline">
+          {verseRange}
+        </a>
+      </p>
+    </header>
+
+    {/* Teaching */}
+    <article class="mb-10">
+      {entry.teaching.map(paragraph => (
+        <p class="text-lg leading-relaxed mb-5">{paragraph}</p>
+      ))}
+    </article>
+
+    {/* Theologian Quote - parchment style */}
+    {entry.theologian_quote && (
+      <blockquote class="scripture-block my-10 text-lg">
+        <p class="mb-3">"{entry.theologian_quote}"</p>
+        <footer class="text-sm text-charcoal-muted not-italic">
+          — {entry.theologian_name}
+        </footer>
+      </blockquote>
+    )}
+
+    {/* Selah / Reflection */}
+    <div class="bg-cream-200 rounded-lg p-8 my-12 text-center">
+      <p class="text-2xl italic text-gold-dark mb-4">Selah</p>
+      <p class="text-lg leading-relaxed max-w-[540px] mx-auto">{entry.question}</p>
+    </div>
+
+    <DonateBanner />
+
+    {/* Topics */}
+    {entry.topics && entry.topics.length > 0 && (
+      <div class="flex flex-wrap gap-2 justify-center my-8" data-pagefind-weight="3">
+        {entry.topics.map(topic => (
+          <span class="px-3 py-1 bg-cream-200 text-charcoal-muted text-sm rounded-full">
+            {topic}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {/* Navigation */}
+    <nav class="flex justify-between items-center border-t border-cream-300 pt-6 mt-10">
+      {prevDay ? (
+        <a href={`/meditation/${prevDay}/`} class="btn-secondary text-sm">
+          &larr; Day {prevDay}
+        </a>
+      ) : <div />}
+      <a href="/meditation/" class="text-sm text-charcoal-muted hover:text-accent">
+        All Days
+      </a>
+      {nextDay ? (
+        <a href={`/meditation/${nextDay}/`} class="btn-secondary text-sm">
+          Day {nextDay} &rarr;
+        </a>
+      ) : <div />}
+    </nav>
+  </main>
+</BaseLayout>

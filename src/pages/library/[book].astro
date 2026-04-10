@@ -52,33 +52,33 @@ const bookLd = {
   jsonLd={[breadcrumbLd, bookLd]}
 >
   <!-- Breadcrumb -->
-  <nav class="breadcrumb container" aria-label="Breadcrumb">
-    <a href="/library/">Library</a>
-    <span class="separator">›</span>
-    <span class="current">{book.name}</span>
+  <nav class="container-page pt-4 text-sm text-charcoal-muted" aria-label="Breadcrumb">
+    <a href="/library/" class="text-accent hover:underline">Library</a>
+    <span class="mx-1.5">›</span>
+    <span>{book.name}</span>
   </nav>
 
   <!-- Book Header -->
-  <section class="book-hero">
-    <div class="container">
-      <h1>{book.name}</h1>
-      <p class="book-meta">{sectionTitle} · {book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</p>
+  <section class="py-8 text-center">
+    <div class="container-page">
+      <h1 class="text-4xl mb-2">{book.name}</h1>
+      <p class="text-gold-dark">{sectionTitle} · {book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</p>
       {book.description && (
-        <p class="book-description">{book.description}</p>
+        <p class="book-description max-w-[640px] mx-auto mt-4 font-serif text-base leading-relaxed text-left">{book.description}</p>
       )}
 
       {availableStarts.length > 0 && (
-        <div class="play-all-panel">
-          <div class="play-all-copy">
-            <span class="play-all-kicker">Play In Order</span>
-            <h2>Start this book anywhere and keep going</h2>
-            <p>
+        <div class="mt-8 mx-auto max-w-[920px] grid md:grid-cols-[1.6fr_minmax(260px,1fr)] gap-6 items-center p-6 border border-cream-300 rounded-2xl bg-cream-200 shadow-card">
+          <div class="text-left">
+            <span class="inline-block mb-2 text-gold-dark text-xs tracking-widest uppercase">Play In Order</span>
+            <h2 class="text-2xl mb-2">Start this book anywhere and keep going</h2>
+            <p class="text-charcoal-muted">
               Choose a chapter, open that chapter page, and continue through the remaining available chapters automatically.
             </p>
           </div>
-          <div class="play-all-controls">
+          <div class="grid gap-3">
             <label for="play-all-start" class="sr-only">Choose starting chapter</label>
-            <select id="play-all-start" class="play-all-select" data-base-book={book.name}>
+            <select id="play-all-start" class="play-all-select w-full px-4 py-3 rounded-lg border border-cream-300 bg-white font-sans text-sm" data-base-book={book.name}>
               {availableStarts.map(chapter => {
                 const sequenceCount = getPlayableChapterSequence(book, chapter).length;
                 return (
@@ -91,14 +91,14 @@ const bookLd = {
             {defaultPlayAllUrl && (
               <a
                 href={defaultPlayAllUrl}
-                class="btn btn-primary btn-lg play-all-button"
+                class="btn btn-primary w-full text-center"
                 id="play-all-link"
                 data-book-slug={book.slug}
               >
                 Play all from chapter {defaultStartChapter}{defaultPlayAllCount > 0 ? ` (${defaultPlayAllCount})` : ''}
               </a>
             )}
-            <p class="play-all-helper">Choose any available chapter and its chapter page starts the onward flow right away.</p>
+            <p class="text-charcoal-muted text-sm">Choose any available chapter and its chapter page starts the onward flow right away.</p>
           </div>
         </div>
       )}
@@ -106,80 +106,69 @@ const bookLd = {
   </section>
 
   <!-- Top Row: Full Book Video + MP3 -->
-  <section class="top-row container">
-    <div class="top-row-grid">
-      <div class="top-row-item">
-        <h2>📖 Full Book Video</h2>
+  <section class="container-page pb-12">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <h2 class="font-serif text-lg mb-3">Full Book Video</h2>
         {fullBookVideoId ? (
-          <a href={`/watch/?v=${fullBookVideoId}`} class="top-row-card">
-            <div class="top-row-thumb">
-              <img
-                src={getFullBookThumbUrl(book.abbr)}
-                alt={`${book.name} — Full Book`}
-                width="640" height="360"
-                loading="eager"
-              />
-              <div class="play-overlay">▶</div>
+          <a href={`/watch/?v=${fullBookVideoId}`} class="card block overflow-hidden no-underline hover:-translate-y-0.5 transition-transform">
+            <div class="relative aspect-video bg-cream-200">
+              <img src={getFullBookThumbUrl(book.abbr)} alt={`${book.name} — Full Book`} width="640" height="360" loading="eager" class="block w-full h-full object-cover" />
+              <div class="absolute inset-0 flex items-center justify-center text-5xl text-white bg-black/35 opacity-0 hover:opacity-100 transition-opacity">▶</div>
             </div>
-            <span class="top-row-label">Watch All {book.chapters} Chapters</span>
+            <span class="block p-3 text-sm text-center">Watch All {book.chapters} Chapters</span>
           </a>
         ) : (
-          <div class="top-row-card coming-soon">
-            <div class="top-row-thumb">
-              <img
-                src={getFullBookThumbUrl(book.abbr)}
-                alt={`${book.name} — Full Book`}
-                width="640" height="360"
-                loading="eager"
-              />
-              <div class="coming-overlay">Coming Soon</div>
+          <div class="card overflow-hidden opacity-70">
+            <div class="relative aspect-video bg-cream-200">
+              <img src={getFullBookThumbUrl(book.abbr)} alt={`${book.name} — Full Book`} width="640" height="360" loading="eager" class="block w-full h-full object-cover" />
+              <div class="absolute inset-0 flex items-center justify-center text-xl font-medium bg-black/55 text-white tracking-wide">Coming Soon</div>
             </div>
-            <span class="top-row-label">Full Book — Coming Soon</span>
+            <span class="block p-3 text-sm text-center">Full Book — Coming Soon</span>
           </div>
         )}
       </div>
 
-      <div class="top-row-item">
-        <h2>🎧 MP3 Audio</h2>
-        <div class="top-row-card coming-soon">
-          <div class="top-row-thumb mp3-thumb">
-            <div class="mp3-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
+      <div>
+        <h2 class="font-serif text-lg mb-3">MP3 Audio</h2>
+        <div class="card overflow-hidden opacity-70">
+          <div class="aspect-video bg-cream-200 flex items-center justify-center text-gold">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
           </div>
-          <span class="top-row-label">MP3 Download — Coming Soon</span>
+          <span class="block p-3 text-sm text-center">MP3 Download — Coming Soon</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Chapter Thumbnails Grid -->
-  <section class="chapters-section container">
-    <h2>Chapters</h2>
-    <div class="chapter-grid">
+  <section class="container-page pb-12">
+    <h2 class="font-serif text-xl text-gold-dark mb-6 pb-2 border-b border-cream-300">Chapters</h2>
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
       {chapters.map(ch => {
         const videoId = book.videos?.[String(ch)] || null;
         const playFromChapterUrl = videoId ? getPlayAllUrl(book, ch) : null;
         return (
           <a
             href={playFromChapterUrl || getChapterUrl(book.slug, ch)}
-            class:list={['chapter-card', { 'has-video': !!videoId, 'no-video': !videoId }]}
+            class:list={['chapter-card flex flex-col items-center text-center gap-1.5 no-underline transition-transform', { 'cursor-pointer hover:-translate-y-1': !!videoId, 'pointer-events-none opacity-60': !videoId }]}
             aria-label={videoId ? `${book.name} Chapter ${ch}, play from this chapter onward` : `${book.name} Chapter ${ch}`}
           >
-            <div class="card-thumb">
-              {videoId && <div class="play-icon" aria-hidden="true">▶</div>}
+            <div class="relative w-full rounded-lg overflow-hidden border border-cream-300 hover:border-gold transition-colors">
+              {videoId && <div class="absolute inset-0 flex items-center justify-center text-3xl text-white bg-black/30 opacity-0 hover:opacity-100 transition-opacity z-10">▶</div>}
               <img
                 src={getChapterThumbUrl(book.abbr, ch)}
                 alt={`${book.name} Chapter ${ch}`}
                 width="640" height="360"
                 loading="lazy"
                 decoding="async"
+                class="block w-full h-auto aspect-video object-cover bg-cream-200"
               />
             </div>
-            <span class="card-label">Chapter {ch}</span>
-            {videoId && <span class="card-status">Play from here</span>}
+            <span class="font-sans text-sm font-medium">Chapter {ch}</span>
+            {videoId && <span class="text-xs text-gold-dark uppercase tracking-wide">Play from here</span>}
           </a>
         );
       })}
@@ -187,7 +176,7 @@ const bookLd = {
   </section>
 
   <!-- Back to Library -->
-  <section class="back-section container">
+  <section class="container-page pb-16 text-center">
     <a href="/library/" class="btn btn-secondary">← Back to Library</a>
   </section>
 </BaseLayout>
@@ -221,286 +210,3 @@ const bookLd = {
   });
 </script>
 
-<style>
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .breadcrumb {
-    padding: var(--space-lg) var(--space-lg) 0;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-  .breadcrumb a { color: var(--gold-light); }
-  .breadcrumb a:hover { text-decoration: underline; }
-  .breadcrumb .separator { margin: 0 var(--space-sm); color: var(--text-muted); }
-  .breadcrumb .current { color: var(--cream); }
-
-  .book-hero {
-    padding: var(--space-2xl) 0;
-    text-align: center;
-  }
-  .book-hero h1 { margin-bottom: var(--space-sm); }
-  .book-meta { color: var(--gold-light); font-size: 1rem; }
-  .book-description {
-    max-width: 640px;
-    margin: var(--space-lg) auto 0;
-    font-family: var(--font-serif);
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--cream);
-    text-align: left;
-  }
-  .book-description::first-letter {
-    float: left;
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: 3.4em;
-    line-height: 0.8;
-    padding: 0.05em 0.12em 0 0;
-    margin-top: 0.05em;
-    color: #6B0F1A;
-    background: #C9A227;
-    border-radius: 3px;
-  }
-
-  .play-all-panel {
-    margin: var(--space-2xl) auto 0;
-    max-width: 920px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
-    gap: var(--space-xl);
-    align-items: center;
-    padding: var(--space-xl);
-    border: 1px solid rgba(201, 168, 106, 0.18);
-    border-radius: var(--radius-xl);
-    background:
-      radial-gradient(circle at top left, rgba(201, 168, 106, 0.12), transparent 45%),
-      linear-gradient(180deg, rgba(42, 35, 30, 0.98), rgba(30, 24, 20, 0.98));
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
-  }
-
-  .play-all-kicker {
-    display: inline-block;
-    margin-bottom: var(--space-sm);
-    color: var(--gold-light);
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .play-all-copy h2 {
-    margin-bottom: var(--space-sm);
-    font-size: clamp(1.35rem, 2.2vw, 1.8rem);
-  }
-
-  .play-all-copy p {
-    margin: 0;
-    color: var(--text-muted);
-  }
-
-  .play-all-controls {
-    display: grid;
-    gap: var(--space-md);
-  }
-
-  .play-all-helper {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.92rem;
-  }
-
-  .play-all-select {
-    width: 100%;
-    padding: var(--space-md) var(--space-lg);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(201, 168, 106, 0.25);
-    background: rgba(20, 17, 14, 0.82);
-    color: var(--cream);
-    font-family: var(--font-sans);
-    font-size: 0.95rem;
-  }
-
-  .play-all-button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* ── Top Row ─────────────────────────────────────────────────────── */
-  .top-row { padding-bottom: var(--space-3xl); }
-  .top-row-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-xl);
-  }
-  .top-row-item h2 {
-    font-family: var(--font-serif);
-    font-size: 1.125rem;
-    font-weight: 400;
-    color: var(--cream);
-    margin-bottom: var(--space-md);
-  }
-  .top-row-card {
-    display: block;
-    border: 1px solid rgba(201, 168, 106, 0.15);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    text-decoration: none;
-    color: inherit;
-    transition: border-color var(--transition-fast), transform var(--transition-base);
-  }
-  .top-row-card:hover:not(.coming-soon) {
-    border-color: var(--gold-light);
-    transform: translateY(-2px);
-  }
-  .top-row-thumb {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    background: var(--bg-secondary);
-  }
-  .top-row-thumb img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .play-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    color: white;
-    background: rgba(0, 0, 0, 0.35);
-    opacity: 0;
-    transition: opacity var(--transition-fast);
-  }
-  .top-row-card:hover .play-overlay { opacity: 1; }
-  .coming-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: var(--cream);
-    background: rgba(0, 0, 0, 0.55);
-    letter-spacing: 0.05em;
-  }
-  .top-row-label {
-    display: block;
-    padding: var(--space-md);
-    font-size: 0.9375rem;
-    color: var(--cream);
-    text-align: center;
-  }
-
-  .mp3-thumb {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold-light);
-  }
-
-  /* ── Chapter Grid ────────────────────────────────────────────────── */
-  .chapters-section {
-    padding-bottom: var(--space-3xl);
-  }
-  .chapters-section h2 {
-    font-family: var(--font-serif);
-    font-size: 1.375rem;
-    font-weight: 400;
-    color: var(--gold-light);
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-sm);
-    border-bottom: 1px solid rgba(201, 168, 106, 0.15);
-  }
-  .chapter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--space-lg);
-  }
-  .chapter-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--space-sm);
-    text-decoration: none;
-    color: inherit;
-    transition: transform var(--transition-base);
-  }
-  .chapter-card.has-video { cursor: pointer; }
-  .chapter-card.has-video:hover { transform: translateY(-3px); }
-  .chapter-card.no-video { pointer-events: none; }
-
-  .card-thumb {
-    position: relative;
-    width: 100%;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 1px solid rgba(201, 168, 106, 0.15);
-    transition: border-color var(--transition-fast);
-  }
-  .chapter-card.has-video:hover .card-thumb { border-color: var(--gold-light); }
-  .card-thumb img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    background: var(--bg-secondary);
-  }
-  .play-icon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-    background: rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: opacity var(--transition-fast);
-    z-index: 2;
-    pointer-events: none;
-  }
-  .chapter-card.has-video:hover .play-icon { opacity: 1; }
-  .card-label {
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--cream);
-  }
-
-  .card-status {
-    font-size: 0.75rem;
-    color: var(--gold-light);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .back-section {
-    padding-bottom: var(--space-4xl);
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
-    .play-all-panel {
-      grid-template-columns: 1fr;
-      text-align: left;
-    }
-
-    .top-row-grid { grid-template-columns: 1fr; }
-    .chapter-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  }
-</style>

@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getUniqueThemes, getQuotesByTheme, type QuoteEntry } from '../../../../utils/devotional';
+
+export function getStaticPaths() {
+  const themes = getUniqueThemes();
+  return themes.map(theme => ({
+    params: { theme: theme.toLowerCase().replace(/ /g, '-') },
+    props: { themeName: theme },
+  }));
+}
+
+interface Props {
+  themeName: string;
+}
+
+const { themeName } = Astro.props;
+const quotes = getQuotesByTheme(themeName).filter(q => q.source_url != null);
+
+const title = `${themeName} — Quotes by Theme`;
+const description = `${quotes.length} verified quotes about ${themeName.toLowerCase()} from famous Christians. Famous Words of Famous Christians.`;
+---
+<BaseLayout title={title} description={description}>
+  <main class="container-narrow py-12">
+    <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
+      <a href="/quotes/" class="hover:text-accent">Quotes</a>
+      <span class="mx-2">/</span>
+      <span>{themeName}</span>
+    </nav>
+
+    <header class="mb-10">
+      <h1 class="text-4xl mb-2">{themeName}</h1>
+      <p class="text-charcoal-muted">{quotes.length} verified {quotes.length === 1 ? 'quote' : 'quotes'}</p>
+    </header>
+
+    <section class="grid gap-8">
+      {quotes.map(quote => (
+        <article class="card p-6">
+          <p class="text-lg leading-relaxed italic mb-4">"{quote.quote}"</p>
+          <div class="flex items-center justify-between text-sm">
+            <a href={`/quotes/${quote.author_slug}/`} class="text-accent hover:text-accent-dark">
+              {quote.author}
+            </a>
+            {quote.source_url && (
+              <a
+                href={quote.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-charcoal-muted hover:text-accent"
+              >
+                Source
+              </a>
+            )}
+          </div>
+        </article>
+      ))}
+    </section>
+
+    {quotes.length === 0 && (
+      <p class="text-center text-charcoal-muted py-12">
+        No verified quotes for this theme yet. Check back soon.
+      </p>
+    )}
+
+    <div class="text-center mt-12">
+      <a href="/quotes/" class="btn-secondary">Browse All Themes</a>
+    </div>
+  </main>
+</BaseLayout>

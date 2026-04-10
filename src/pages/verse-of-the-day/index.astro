@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllVotdEntries, getBookSlug, getVotdUrl } from '../../utils/devotional';
+
+const entries = getAllVotdEntries();
+
+// Group by book
+const bookGroups = new Map<string, { name: string; slug: string; chapters: typeof entries }>();
+for (const entry of entries) {
+  const slug = getBookSlug(entry.book);
+  const group = bookGroups.get(slug) || { name: entry.book_name, slug, chapters: [] };
+  group.chapters.push(entry);
+  bookGroups.set(slug, group);
+}
+
+const title = "Verse of the Day — Browse Every Chapter";
+const description = "Explore a featured verse from every chapter of the Bible, with personal reflections and questions to take with you.";
+---
+<BaseLayout title={title} description={description}>
+  <main class="container-page py-12">
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl mb-3">Verse of the Day</h1>
+      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto">
+        A single verse from every chapter of the Bible, paired with a personal 
+        reflection and a question to carry into your day.
+      </p>
+    </header>
+
+    <section class="grid gap-8">
+      {[...bookGroups.values()].map(group => (
+        <div>
+          <h2 class="text-2xl mb-4 border-b border-cream-300 pb-2">{group.name}</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {group.chapters.map(entry => (
+              <a
+                href={getVotdUrl(group.slug, entry.chapter)}
+                class="card px-4 py-3 hover:border-gold transition-colors"
+              >
+                <span class="block font-sans text-sm text-gold-dark">
+                  {entry.book_name} {entry.chapter}:{entry.verse}
+                </span>
+                <span class="block text-sm text-charcoal mt-1 line-clamp-2 italic">
+                  "{entry.text.slice(0, 100)}{entry.text.length > 100 ? '...' : ''}"
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+  </main>
+</BaseLayout>

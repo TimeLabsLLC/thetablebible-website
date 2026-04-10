@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getVerifiedQuotes, getUniqueAuthors, getUniqueThemes, type QuoteEntry } from '../../utils/devotional';
+
+const quotes = getVerifiedQuotes();
+const authors = getUniqueAuthors();
+const themes = getUniqueThemes();
+
+const title = "Quotes Library — Famous Words of Famous Christians";
+const description = "Curated teachings and profound insights from 39 Christian authors and theologians, each with verified sources.";
+---
+<BaseLayout title={title} description={description}>
+  <main class="container-page py-12">
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl mb-3">Famous Words of Famous Christians</h1>
+      <p class="text-lg text-charcoal-muted max-w-[640px] mx-auto">
+        Not bumper-sticker quotes. These are complete thoughts, short teachings, and profound 
+        statements from Christian thinkers across the centuries — each with a real, checkable source.
+      </p>
+    </header>
+
+    {/* Authors Grid */}
+    <section class="mb-16">
+      <h2 class="text-2xl mb-6">Browse by Author</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        {authors.filter(a => a.count > 0).map(author => (
+          <a
+            href={`/quotes/${author.slug}/`}
+            class="card px-4 py-3 text-center hover:border-gold transition-colors"
+          >
+            <span class="block font-sans font-medium">{author.name}</span>
+            <span class="block text-xs text-charcoal-muted mt-1">
+              {author.count} {author.count === 1 ? 'quote' : 'quotes'}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    {/* Themes */}
+    <section class="mb-16">
+      <h2 class="text-2xl mb-6">Browse by Theme</h2>
+      <div class="flex flex-wrap gap-2">
+        {themes.map(theme => (
+          <a
+            href={`/quotes/theme/${theme.toLowerCase().replace(/ /g, '-')}/`}
+            class="px-4 py-2 bg-cream-200 hover:bg-gold-50 text-charcoal text-sm rounded-full transition-colors"
+          >
+            {theme}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    {/* Featured Quotes */}
+    <section>
+      <h2 class="text-2xl mb-6">Featured Quotes</h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        {quotes.slice(0, 12).map(quote => (
+          <div class="card p-6">
+            <p class="text-lg leading-relaxed italic mb-4">
+              "{quote.quote.slice(0, 200)}{quote.quote.length > 200 ? '...' : ''}"
+            </p>
+            <div class="flex items-center justify-between">
+              <a href={`/quotes/${quote.author_slug}/`} class="text-sm font-sans text-accent hover:text-accent-dark">
+                {quote.author}
+              </a>
+              {quote.source_url && (
+                <a
+                  href={quote.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-charcoal-muted hover:text-accent"
+                >
+                  Source
+                </a>
+              )}
+            </div>
+            {quote.themes && (
+              <div class="flex flex-wrap gap-1 mt-3">
+                {quote.themes.slice(0, 3).map(theme => (
+                  <span class="px-2 py-0.5 bg-cream-200 text-xs rounded-full">{theme}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

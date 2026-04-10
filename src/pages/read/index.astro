@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = "Read — The Table Bible";
+const description = "Daily devotionals, Verse of the Day, Psalm meditations, and the full Bible — hear it, read it, understand it.";
+---
+<BaseLayout title={title} description={description}>
+  <main class="container-page py-12">
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl mb-3">Read</h1>
+      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto">
+        Everything you need to walk through Scripture — one passage at a time.
+      </p>
+    </header>
+
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-[960px] mx-auto">
+      {/* Daily Devotional */}
+      <a href="/devotional/archive/" class="card p-8 text-center hover:shadow-card-hover transition-shadow group">
+        <div class="text-4xl mb-4">📖</div>
+        <h2 class="text-xl mb-2 group-hover:text-accent transition-colors">Daily Devotional</h2>
+        <p class="text-sm text-charcoal-muted">
+          Walk through the Bible chapter by chapter with teaching, theologian quotes, and reflection questions.
+        </p>
+        <span class="block mt-4 text-sm text-accent font-sans">Browse 1,189 chapters &rarr;</span>
+      </a>
+
+      {/* Verse of the Day */}
+      <a href="/verse-of-the-day/" class="card p-8 text-center hover:shadow-card-hover transition-shadow group">
+        <div class="text-4xl mb-4">✦</div>
+        <h2 class="text-xl mb-2 group-hover:text-accent transition-colors">Verse of the Day</h2>
+        <p class="text-sm text-charcoal-muted">
+          A single verse from every chapter, paired with a personal reflection and a question for your day.
+        </p>
+        <span class="block mt-4 text-sm text-accent font-sans">Browse all verses &rarr;</span>
+      </a>
+
+      {/* Meditation */}
+      <a href="/meditation/" class="card p-8 text-center hover:shadow-card-hover transition-shadow group">
+        <div class="text-4xl mb-4">🕊</div>
+        <h2 class="text-xl mb-2 group-hover:text-accent transition-colors">Selah — Daily Meditation</h2>
+        <p class="text-sm text-charcoal-muted">
+          A two-year journey through the Psalms with teaching, theologian insight, and quiet space to be with God.
+        </p>
+        <span class="block mt-4 text-sm text-accent font-sans">730 days &rarr;</span>
+      </a>
+
+      {/* Quotes */}
+      <a href="/quotes/" class="card p-8 text-center hover:shadow-card-hover transition-shadow group">
+        <div class="text-4xl mb-4">💬</div>
+        <h2 class="text-xl mb-2 group-hover:text-accent transition-colors">Famous Words</h2>
+        <p class="text-sm text-charcoal-muted">
+          Profound teachings from 39 Christian authors across the centuries — not bumper stickers, real substance.
+        </p>
+        <span class="block mt-4 text-sm text-accent font-sans">Browse the library &rarr;</span>
+      </a>
+
+      {/* Bible Reader */}
+      <a href="/bible/genesis/1/" class="card p-8 text-center hover:shadow-card-hover transition-shadow group">
+        <div class="text-4xl mb-4">📜</div>
+        <h2 class="text-xl mb-2 group-hover:text-accent transition-colors">Bible Reader</h2>
+        <p class="text-sm text-charcoal-muted">
+          The complete World English Bible with Strong's definitions, cross-references, footnotes, and audio narration.
+        </p>
+        <span class="block mt-4 text-sm text-accent font-sans">66 books &rarr;</span>
+      </a>
+    </div>
+  </main>
+</BaseLayout>

@@ -1,4 +1,9 @@
 ---
+import '../styles/global.css';
+import libraryData from '../data/library.json';
+import medYear1 from '../data/meditation-year1.json';
+import medYear2 from '../data/meditation-year2.json';
+
 export interface Props {
   title: string;
   description?: string;
@@ -9,7 +14,7 @@ export interface Props {
 
 const { 
   title, 
-  description = "The entire World English Bible, read aloud with word-by-word highlighting. Always free to watch, download, and share.",
+  description = "The complete World English Bible with audio narration, Strong's definitions, daily devotionals, and study tools. Always free.",
   image = "/images/banner_2560x1440.png",
   jsonLd,
   robots = "index,follow",
@@ -18,6 +23,71 @@ const {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const imageURL = new URL(image, Astro.site);
 const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+
+// Build compact book lookup: lowercaseKey → [displayName, slug, chapters]
+// Keys: full name, slug, abbreviation, singular/plural variants
+const bookMap: Record<string, [string, string, number]> = {};
+for (const section of (libraryData as any).sections) {
+  for (const book of section.books) {
+    const tuple: [string, string, number] = [book.name, book.slug, book.chapters];
+    const lower = book.name.toLowerCase();
+    bookMap[lower] = tuple;
+    bookMap[book.slug] = tuple;
+    bookMap[book.abbr.toLowerCase()] = tuple;
+    // Singular/plural: "psalm" ↔ "psalms", "proverb" ↔ "proverbs"
+    if (lower.endsWith('s') && !bookMap[lower.slice(0, -1)]) bookMap[lower.slice(0, -1)] = tuple;
+    if (!lower.endsWith('s')) bookMap[lower + 's'] = tuple;
+  }
+}
+// Common shorthand aliases
+const aliases: Record<string, string> = {
+  'matt': 'matthew', 'mk': 'mark', 'lk': 'luke', 'jn': 'john',
+  'rom': 'romans', '1 cor': '1 corinthians', '2 cor': '2 corinthians',
+  'gal': 'galatians', 'eph': 'ephesians', 'phil': 'philippians',
+  'col': 'colossians', '1 thess': '1 thessalonians', '2 thess': '2 thessalonians',
+  '1 tim': '1 timothy', '2 tim': '2 timothy', 'heb': 'hebrews',
+  'jas': 'james', '1 pet': '1 peter', '2 pet': '2 peter',
+  'rev': 'revelation', 'deut': 'deuteronomy', 'josh': 'joshua',
+  'judg': 'judges', '1 sam': '1 samuel', '2 sam': '2 samuel',
+  '1 kgs': '1 kings', '2 kgs': '2 kings', '1 chr': '1 chronicles',
+  '2 chr': '2 chronicles', 'neh': 'nehemiah', 'eccl': 'ecclesiastes',
+  'isa': 'isaiah', 'jer': 'jeremiah', 'lam': 'lamentations',
+  'ezek': 'ezekiel', 'dan': 'daniel', 'hos': 'hosea',
+  'mic': 'micah', 'nah': 'nahum', 'hab': 'habakkuk',
+  'zeph': 'zephaniah', 'hag': 'haggai', 'zech': 'zechariah',
+  'mal': 'malachi', 'psa': 'psalms', 'pro': 'proverbs', 'exo': 'exodus',
+  'lev': 'leviticus', 'num': 'numbers', 'gen': 'genesis',
+  'song of solomon': 'song of solomon', 'sos': 'song of solomon',
+};
+for (const [alias, canonical] of Object.entries(aliases)) {
+  if (bookMap[canonical] && !bookMap[alias]) bookMap[alias] = bookMap[canonical];
+}
+
+// Build meditation psalm→days map: { "23": [142, 507], ... }
+const medMap: Record<string, number[]> = {};
+for (const entry of (medYear1 as any[])) {
+  const k = String(entry.psalm);
+  if (!medMap[k]) medMap[k] = [];
+  medMap[k].push(entry.day);
+}
+for (const entry of (medYear2 as any[])) {
+  const k = String(entry.psalm);
+  if (!medMap[k]) medMap[k] = [];
+  medMap[k].push(entry.day + 365);
+}
+
+// Serialized data for client-side reference detection
+const bookMapJson = JSON.stringify(bookMap);
+const medMapJson = JSON.stringify(medMap);
+
+const navLinks = [
+  { href: '/bible/genesis/1/', label: 'Bible' },
+  { href: '/devotional/archive/', label: 'Devotional' },
+  { href: '/meditation/', label: 'Psalms' },
+  { href: '/quotes/', label: 'Quotes' },
+  { href: 'https://youtube.com/@thetablebibleorg', label: 'YouTube', external: true },
+  { href: '/about/', label: 'About' },
+];
 ---
 
 <!DOCTYPE html>
@@ -58,370 +128,850 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     "name": "The Table Bible",
     "url": "https://thetablebible.org",
     "logo": "https://thetablebible.org/images/profile_800x800.png",
-    "description": "The entire World English Bible, read aloud with word-by-word highlighting. Always free to watch, download, and share.",
-    "sameAs": ["https://youtube.com/@thetablebibleorg"]
+    "description": "The entire World English Bible, read aloud with word-by-word highlighting. Always free to read and listen.",
+    "sameAs": ["https://youtube.com/@thetablebibleorg", "https://www.instagram.com/thetablebible", "https://www.facebook.com/TheTableBible"]
   })} />
   {jsonLdItems.map(item => (
     <script type="application/ld+json" set:html={JSON.stringify(item)} />
   ))}
   
   <title>{title}</title>
+  <!-- Prevent flash of wrong theme -->
+  <script is:inline>
+    (function(){var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})();
+  </script>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-1/2 focus:-translate-x-1/2 focus:z-50 focus:px-6 focus:py-3 focus:bg-gold focus:text-white focus:rounded-lg">
+    Skip to main content
+  </a>
   
-  <header class="site-header">
-    <nav class="nav container">
-      <a href="/" class="nav-brand">
-        <div class="brand-initial">T</div>
-        <span class="brand-text">The Table Bible</span>
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-cream-300 shadow-nav">
+    <nav class="container-page flex items-center justify-between h-16 md:h-18">
+      <!-- Brand -->
+      <a href="/" class="flex items-center gap-3 no-underline">
+        <div class="flex items-center justify-center w-9 h-9 bg-accent rounded-md">
+          <span class="font-serif text-xl font-bold text-white leading-none">T</span>
+        </div>
+        <span class="hidden sm:inline font-serif text-lg text-charcoal tracking-wide">The Table Bible</span>
       </a>
       
-      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
+      <!-- Mobile toggle -->
+      <button id="nav-toggle" class="flex flex-col gap-1.5 p-2 md:hidden bg-transparent border-none cursor-pointer" aria-label="Toggle navigation" aria-expanded="false">
+        <span class="block w-6 h-0.5 bg-charcoal transition-all duration-150"></span>
+        <span class="block w-6 h-0.5 bg-charcoal transition-all duration-150"></span>
+        <span class="block w-6 h-0.5 bg-charcoal transition-all duration-150"></span>
       </button>
       
-      <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/library/">Library</a></li>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/contact/">Contact</a></li>
-        <li><a href="/donate/" class="nav-donate">Donate</a></li>
+      <!-- Desktop nav -->
+      <ul id="nav-links" class="hidden md:flex items-center gap-8 list-none m-0 p-0">
+        {navLinks.map(link => (
+          <li><a href={link.href} class="font-sans text-sm tracking-wide text-charcoal-light hover:text-accent no-underline transition-colors duration-150" {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}>{link.label}{link.external && <span class="text-xs ml-0.5 opacity-60">↗</span>}</a></li>
+        ))}
+        <li>
+          <button id="search-open" class="p-2 rounded-lg border border-cream-300 bg-transparent cursor-pointer transition-colors duration-150 hover:bg-cream-200" aria-label="Search" title="Search (Ctrl+K)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </li>
+        <li>
+          <a href="/donate/#ways-to-give" class="font-sans text-sm tracking-wide px-5 py-2 bg-gold text-white rounded-lg hover:bg-gold-light no-underline transition-all duration-150">
+            Give
+          </a>
+        </li>
+        <li>
+          <button id="theme-toggle" class="p-2 rounded-lg border border-cream-300 bg-transparent cursor-pointer transition-colors duration-150 hover:bg-cream-200" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+        </li>
       </ul>
     </nav>
+    
+    <!-- Mobile nav -->
+    <div id="mobile-nav" class="hidden md:hidden bg-white border-t border-cream-300">
+      <ul class="list-none m-0 p-0">
+        <li>
+          <button id="search-open-mobile" class="w-full text-left px-6 py-3 font-sans text-sm text-charcoal-light hover:text-accent hover:bg-cream-100 border-b border-cream-200 transition-colors duration-150 bg-transparent border-x-0 border-t-0 cursor-pointer">
+            🔍 Search
+          </button>
+        </li>
+        {navLinks.map(link => (
+          <li>
+            <a href={link.href} class="block px-6 py-3 font-sans text-sm text-charcoal-light hover:text-accent hover:bg-cream-100 no-underline border-b border-cream-200 transition-colors duration-150" {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}>
+              {link.label}{link.external && <span class="text-xs ml-1 opacity-60">↗</span>}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a href="/donate/#ways-to-give" class="block px-6 py-3 font-sans text-sm font-medium text-gold hover:text-gold-dark no-underline transition-colors duration-150">
+            Give
+          </a>
+        </li>
+      </ul>
+    </div>
   </header>
   
+  <!-- Main -->
   <main id="main-content">
     <slot />
   </main>
   
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <a href="/" class="footer-logo">
-            <div class="brand-initial">T</div>
-            <span>The Table Bible</span>
+  <!-- Footer -->
+  <footer class="bg-cream-200 border-t border-cream-300 pt-16 pb-8">
+    <div class="container-page">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <!-- Brand column -->
+        <div class="md:col-span-1">
+          <a href="/" class="flex items-center gap-3 no-underline mb-3">
+            <div class="flex items-center justify-center w-8 h-8 bg-accent rounded-md">
+              <span class="font-serif text-lg font-bold text-white leading-none">T</span>
+            </div>
+            <span class="font-serif text-lg text-charcoal">The Table Bible</span>
           </a>
-          <p class="footer-tagline">"Come to the Table."</p>
-          <p class="footer-ministry">A ministry of Come to the Table Ministries</p>
+          <p class="text-sm text-charcoal-muted italic mb-1">"Come to the Table."</p>
+          <p class="text-xs text-charcoal-muted">A ministry of The Table Bible Ministries</p>
         </div>
         
-        <div class="footer-links">
-          <div class="footer-column">
-            <h4>Watch</h4>
-            <ul>
-              <li><a href="https://youtube.com/@thetablebibleorg" target="_blank" rel="noopener">YouTube Channel</a></li>
-              <li><a href="/library/">Book Library</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-column">
-            <h4>Learn More</h4>
-            <ul>
-              <li><a href="/about/">About Us</a></li>
-              <li><a href="/about/#about-the-web">About the WEB</a></li>
-              <li><a href="/contact/">Contact</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-column">
-            <h4>Support</h4>
-            <ul>
-              <li><a href="/donate/">Donate</a></li>
-            </ul>
-          </div>
+        <!-- Read column -->
+        <div>
+          <h4 class="font-sans text-xs uppercase tracking-widest text-charcoal-muted mb-4">Read & Study</h4>
+          <ul class="list-none p-0 m-0 space-y-2">
+            <li><a href="/bible/genesis/1/" class="text-sm text-charcoal-light hover:text-accent no-underline">Bible Reader</a></li>
+            <li><a href="/devotional/archive/" class="text-sm text-charcoal-light hover:text-accent no-underline">Daily Devotional</a></li>
+            <li><a href="/meditation/" class="text-sm text-charcoal-light hover:text-accent no-underline">A Year in the Psalms</a></li>
+            <li><a href="/verse-of-the-day/" class="text-sm text-charcoal-light hover:text-accent no-underline">Verse of the Day</a></li>
+            <li><a href="/quotes/" class="text-sm text-charcoal-light hover:text-accent no-underline">Theologian Quotes</a></li>
+          </ul>
+        </div>
+        
+        <!-- Listen & Watch column -->
+        <div>
+          <h4 class="font-sans text-xs uppercase tracking-widest text-charcoal-muted mb-4">Listen & More</h4>
+          <ul class="list-none p-0 m-0 space-y-2">
+            <li><a href="/bible/genesis/1/" class="text-sm text-charcoal-light hover:text-accent no-underline">Audio Bible</a></li>
+            <li><a href="/library/" class="text-sm text-charcoal-light hover:text-accent no-underline">Video Library</a></li>
+            <li><a href="https://youtube.com/@thetablebibleorg" target="_blank" rel="noopener" class="text-sm text-charcoal-light hover:text-accent no-underline">YouTube</a></li>
+            <li><a href="https://www.instagram.com/thetablebible" target="_blank" rel="noopener" class="text-sm text-charcoal-light hover:text-accent no-underline">Instagram</a></li>
+          </ul>
+        </div>
+        
+        <!-- About column -->
+        <div>
+          <h4 class="font-sans text-xs uppercase tracking-widest text-charcoal-muted mb-4">About</h4>
+          <ul class="list-none p-0 m-0 space-y-2">
+            <li><a href="/about/" class="text-sm text-charcoal-light hover:text-accent no-underline">About Us</a></li>
+            <li><a href="/about/#about-the-web" class="text-sm text-charcoal-light hover:text-accent no-underline">About the WEB</a></li>
+            <li><a href="/contact/" class="text-sm text-charcoal-light hover:text-accent no-underline">Contact</a></li>
+            <li><a href="/donate/#ways-to-give" class="text-sm text-charcoal-light hover:text-accent no-underline">Donate</a></li>
+          </ul>
         </div>
       </div>
       
-      <div class="footer-bottom">
-        <p>Text: World English Bible (WEB) — Public Domain</p>
-        <p>&copy; {new Date().getFullYear()} Come to the Table Ministries. All content free to share.</p>
+      <!-- Bottom bar -->
+      <div class="pt-6 border-t border-cream-300 text-center">
+        <p class="text-xs text-charcoal-muted mb-1">Text: World English Bible (WEB)</p>
+        <p class="text-xs text-charcoal-muted">&copy; {new Date().getFullYear()} The Table Bible Ministries. All rights reserved.</p>
       </div>
     </div>
   </footer>
   
   <script>
-    // Mobile navigation toggle
-    const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    const toggle = document.getElementById('nav-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
     
-    navToggle?.addEventListener('click', () => {
-      const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-      navToggle.setAttribute('aria-expanded', (!expanded).toString());
-      navLinks?.classList.toggle('active');
+    toggle?.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', (!expanded).toString());
+      mobileNav?.classList.toggle('hidden');
+    });
+
+    // ── Theme toggle ─────────────────────────────────────
+    const themeBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+
+    function applyTheme(dark: boolean) {
+      if (dark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        if (sunIcon) sunIcon.style.display = '';
+        if (moonIcon) moonIcon.style.display = 'none';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = '';
+      }
+    }
+
+    // Init icons for current state
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark');
+
+    themeBtn?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      applyTheme(!isDark);
+    });
+  </script>
+
+  <!-- Search Data (for reference detection) -->
+  <script is:inline define:vars={{ bookMapJson, medMapJson }}>
+    window.__SEARCH_BOOKS = JSON.parse(bookMapJson);
+    window.__SEARCH_MED = JSON.parse(medMapJson);
+  </script>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal" role="dialog" aria-modal="true" aria-label="Search" style="display:none;">
+    <div class="search-backdrop" id="search-backdrop"></div>
+    <div class="search-container">
+      <div class="search-header">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search the Bible, devotionals, quotes..."
+          autocomplete="off"
+          class="search-input"
+        />
+        <button id="search-close" class="search-close" aria-label="Close search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="search-results" class="search-results">
+        <div class="search-empty">
+          <p class="text-sm text-charcoal-muted">Start typing to search across all content.</p>
+          <div class="search-hints">
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg> Bible</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Devotional</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg> Meditation</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg> Verse of the Day</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></svg> Quotes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style is:global>
+    .search-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 10vh;
+    }
+    .search-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+    .search-container {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      margin: 0 16px;
+      background: var(--surface-white);
+      border: 1px solid var(--cream-300);
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .search-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--cream-300);
+    }
+    .search-icon {
+      flex-shrink: 0;
+      color: var(--charcoal-muted);
+    }
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--charcoal);
+      background: transparent;
+    }
+    .search-input::placeholder {
+      color: var(--charcoal-muted);
+    }
+    .search-close {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--charcoal-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .search-close:hover {
+      background: var(--cream-200);
+      color: var(--charcoal);
+    }
+    .search-results {
+      overflow-y: auto;
+      padding: 8px 8px 12px;
+    }
+    .search-empty {
+      padding: 24px 16px;
+      text-align: center;
+    }
+    .search-hints {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--charcoal-muted);
+    }
+    .search-hints span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: var(--cream-200);
+      border-radius: 999px;
+    }
+    .search-hints svg, .search-group-label svg {
+      flex-shrink: 0;
+    }
+    .search-group-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 12px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--charcoal-muted);
+      border-top: 1px solid var(--cream-300);
+      margin-top: 4px;
+    }
+    .search-group-label:first-child {
+      border-top: none;
+      margin-top: 0;
+    }
+    .search-show-more {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--cream-100);
+      border: 1px solid var(--cream-300);
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      margin: 4px 0 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .search-show-more:hover {
+      background: var(--gold-50);
+      border-color: var(--gold-light);
+    }
+    .search-result-item {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--charcoal);
+      transition: background 0.12s;
+    }
+    .search-result-item:hover,
+    .search-result-item.active {
+      background: var(--cream-200);
+    }
+    .search-result-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+      flex-wrap: wrap;
+    }
+    .search-result-badge {
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .search-result-badge[data-type="Bible"] {
+      background: #dceadc; color: #1e4d2b;
+    }
+    .search-result-badge[data-type="Devotional"] {
+      background: #e6e0f0; color: #3d2d6b;
+    }
+    .search-result-badge[data-type="Meditation"] {
+      background: #dde6f2; color: #1e3a5f;
+    }
+    .search-result-badge[data-type="Verse of the Day"] {
+      background: #f2e6d0; color: #6b4e1d;
+    }
+    .search-result-badge[data-type="Quotes"] {
+      background: #ede0da; color: #5a3528;
+    }
+    .search-result-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1.3;
+    }
+    .search-result-subtitle {
+      font-size: 12px;
+      color: var(--charcoal-muted);
+      margin-bottom: 3px;
+      line-height: 1.3;
+    }
+    .search-result-excerpt {
+      font-size: 13px;
+      color: var(--charcoal-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .search-result-excerpt mark {
+      background: var(--gold-50);
+      color: var(--charcoal);
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .search-ref-header {
+      padding: 12px 16px 4px;
+    }
+    .search-no-results {
+      padding: 24px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--charcoal-muted);
+    }
+    .search-loading {
+      padding: 24px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--charcoal-muted);
+    }
+  </style>
+
+  <script>
+    // ── Search Modal ──────────────────────────────────────
+    const searchModal = document.getElementById('search-modal')!;
+    const searchBackdrop = document.getElementById('search-backdrop')!;
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results')!;
+    const searchOpen = document.getElementById('search-open');
+    const searchOpenMobile = document.getElementById('search-open-mobile');
+
+    let pagefind: any = null;
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
+    // Reference detection data (injected at build time)
+    const BOOKS: Record<string, [string, string, number]> = (window as any).__SEARCH_BOOKS || {};
+    const MED_DAYS: Record<string, number[]> = (window as any).__SEARCH_MED || {};
+
+    // Regex: "Book Chapter", "Book Chapter:Verse", "Book Chapter:Verse-Verse"
+    // Handles numbered books: "1 Corinthians 13", "2 Kings 5:1-14"
+    const REF_RE = /^(\d?\s*[a-z][a-z\s]*?)\s+(\d+)(?::(\d+)(?:\s*-\s*(\d+))?)?$/i;
+
+    /**
+     * Try to parse a Bible reference from the query.
+     * Returns null if not a reference, or { displayName, slug, chapter, verse?, verseTo? }
+     */
+    function parseReference(query: string): { displayName: string; slug: string; chapter: number; chapters: number; verse?: number; verseTo?: number } | null {
+      const q = query.trim();
+      const m = q.match(REF_RE);
+      if (!m) return null;
+
+      const bookInput = m[1].trim().toLowerCase();
+      const chapter = parseInt(m[2], 10);
+      const verse = m[3] ? parseInt(m[3], 10) : undefined;
+      const verseTo = m[4] ? parseInt(m[4], 10) : undefined;
+
+      const entry = BOOKS[bookInput];
+      if (!entry) return null;
+
+      const [displayName, slug, chapters] = entry;
+      if (chapter < 1 || chapter > chapters) return null;
+
+      return { displayName, slug, chapter, chapters, verse, verseTo };
+    }
+
+    /**
+     * Render direct links for a detected Bible reference.
+     * Returns HTML string with Bible, Devotional, VotD, and optionally Meditation links.
+     */
+    function renderReferenceResults(ref: { displayName: string; slug: string; chapter: number; chapters: number; verse?: number; verseTo?: number }): string {
+      const chLabel = `${ref.displayName} ${ref.chapter}`;
+      const verseLabel = ref.verse
+        ? (ref.verseTo ? `${chLabel}:${ref.verse}-${ref.verseTo}` : `${chLabel}:${ref.verse}`)
+        : chLabel;
+
+      type Link = { type: string; icon: string; title: string; subtitle: string; url: string };
+      const links: Link[] = [];
+
+      // Bible chapter
+      links.push({
+        type: 'Bible',
+        icon: ICON.book,
+        title: chLabel,
+        subtitle: 'Read chapter',
+        url: `/bible/${ref.slug}/${ref.chapter}/`,
+      });
+
+      // Devotional
+      links.push({
+        type: 'Devotional',
+        icon: ICON.pen,
+        title: chLabel,
+        subtitle: 'Daily devotional',
+        url: `/devotional/${ref.slug}/${ref.chapter}/`,
+      });
+
+      // Verse of the Day
+      links.push({
+        type: 'Verse of the Day',
+        icon: ICON.sparkles,
+        title: verseLabel,
+        subtitle: 'Verse of the Day',
+        url: `/verse-of-the-day/${ref.slug}/${ref.chapter}/`,
+      });
+
+      // Meditation (Psalms only)
+      const isPsalm = ref.slug === 'psalms';
+      if (isPsalm) {
+        const days = MED_DAYS[String(ref.chapter)];
+        if (days && days.length > 0) {
+          // Show up to 3 meditation days for this psalm
+          for (const day of days.slice(0, 3)) {
+            links.push({
+              type: 'Meditation',
+              icon: ICON.heart,
+              title: `Psalm ${ref.chapter} Meditation`,
+              subtitle: `Day ${day}`,
+              url: `/meditation/${day}/`,
+            });
+          }
+        }
+      }
+
+      // Build HTML grouped by type
+      let html = `<div class="search-ref-header">
+        <span style="font-size:13px;color:var(--charcoal-muted);font-style:italic;">Showing results for <strong>${escapeHtml(verseLabel)}</strong></span>
+      </div>`;
+
+      for (const link of links) {
+        html += `<a href="${link.url}" class="search-result-item">
+          <div class="search-result-top">
+            <span class="search-result-badge" data-type="${escapeHtml(link.type)}">${escapeHtml(link.type)}</span>
+            <span class="search-result-title">${escapeHtml(link.title)}</span>
+          </div>
+          <div class="search-result-subtitle">${escapeHtml(link.subtitle)}</div>
+        </a>`;
+      }
+
+      return html;
+    }
+
+    // Lucide icons (ISC license) — inline SVGs for crisp rendering at any size
+    const ICON = {
+      book: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>',
+      pen: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>',
+      heart: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>',
+      sparkles: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>',
+      quote: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></svg>',
+    };
+    const TYPE_ICONS: Record<string, string> = {
+      'Bible': ICON.book,
+      'Devotional': ICON.pen,
+      'Meditation': ICON.heart,
+      'Verse of the Day': ICON.sparkles,
+      'Quotes': ICON.quote,
+    };
+
+    /** Extract a user-friendly title and subtitle from pagefind result metadata */
+    function formatResult(item: any, type: string): { title: string; subtitle: string } {
+      const raw = item.meta?.title || 'Untitled';
+      switch (type) {
+        case 'Bible': {
+          // "Psalms 23" → title: Psalms 23, subtitle: Read chapter
+          return { title: raw, subtitle: 'Read chapter' };
+        }
+        case 'Meditation': {
+          // "Day 142 — Psalm 23:1-3" → title: Psalm 23:1-3, subtitle: Day 142 · Open meditation
+          const m = raw.match(/^Day\s+(\d+)\s*[—–-]\s*(.+)$/);
+          if (m) {
+            // Check for theologian in the title ("Psalm 23:1-3 / Charles Spurgeon")
+            const content = m[2];
+            const slash = content.indexOf(' / ');
+            if (slash > -1) {
+              return { title: content.slice(0, slash).trim(), subtitle: `Day ${m[1]} · ${content.slice(slash + 3).trim()}` };
+            }
+            return { title: content.trim(), subtitle: `Day ${m[1]}` };
+          }
+          return { title: raw, subtitle: 'Open meditation' };
+        }
+        case 'Devotional': {
+          // "Psalms 23 — The Good Shepherd" → title: Psalms 23, subtitle: The Good Shepherd
+          const d = raw.indexOf(' — ');
+          if (d > -1) {
+            return { title: raw.slice(0, d), subtitle: raw.slice(d + 3) };
+          }
+          return { title: raw, subtitle: 'Read devotional' };
+        }
+        case 'Verse of the Day': {
+          return { title: raw, subtitle: 'Verse of the Day' };
+        }
+        case 'Quotes': {
+          // "Charles Spurgeon — Quotes" → title: Charles Spurgeon, subtitle: Browse quotes
+          const q = raw.replace(/\s*[—–-]\s*Quotes$/i, '');
+          return { title: q, subtitle: 'Browse quotes' };
+        }
+        default:
+          return { title: raw, subtitle: '' };
+      }
+    }
+
+    function openSearch() {
+      searchModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      searchInput.value = '';
+      searchResults.innerHTML = `
+        <div class="search-empty">
+          <p style="font-size:14px;color:var(--charcoal-muted);">Start typing to search across all content.</p>
+          <div class="search-hints">
+            <span>${ICON.book} Bible</span><span>${ICON.pen} Devotional</span><span>${ICON.heart} Meditation</span><span>${ICON.sparkles} Verse of the Day</span><span>${ICON.quote} Quotes</span>
+          </div>
+        </div>`;
+      // Close mobile nav if open
+      document.getElementById('mobile-nav')?.classList.add('hidden');
+      setTimeout(() => searchInput.focus(), 50);
+      loadPagefind();
+    }
+
+    function closeSearch() {
+      searchModal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    async function loadPagefind() {
+      if (pagefind) return;
+      try {
+        // Load at runtime via script injection to avoid Vite bundling
+        const pfPath = '/pagefind/pagefind.js';
+        pagefind = await new Function('return import("' + pfPath + '")')();
+        await pagefind.init();
+      } catch {
+        // Pagefind not available (dev mode)
+        pagefind = null;
+      }
+    }
+
+    async function doSearch(query: string) {
+      if (!query.trim()) {
+        searchResults.innerHTML = `
+          <div class="search-empty">
+            <p style="font-size:14px;color:var(--charcoal-muted);">Start typing to search across all content.</p>
+            <div class="search-hints">
+              <span>${ICON.book} Bible</span><span>${ICON.pen} Devotional</span><span>${ICON.heart} Meditation</span><span>${ICON.sparkles} Verse of the Day</span><span>${ICON.quote} Quotes</span>
+            </div>
+          </div>`;
+        return;
+      }
+
+      // ── Reference mode: detect "Book Chapter" pattern ──
+      const ref = parseReference(query);
+      if (ref) {
+        searchResults.innerHTML = renderReferenceResults(ref);
+        return;
+      }
+
+      // ── Keyword mode: fall through to Pagefind ──
+      if (!pagefind) return;
+
+      searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+
+      const search = await pagefind.search(query);
+      const allData = await Promise.all(
+        search.results.slice(0, 80).map((r: any) => r.data())
+      );
+
+      if (allData.length === 0) {
+        searchResults.innerHTML = '<div class="search-no-results">No results found.</div>';
+        return;
+      }
+
+      // Score results: title match >> body-only match
+      const qLower = query.trim().toLowerCase();
+      // Normalize singular/plural for biblical books (psalms→psalm, etc.)
+      const normalize = (s: string) => s.toLowerCase().replace(/psalms\b/g, 'psalm').replace(/proverbs\b/g, 'proverb');
+      const nQuery = normalize(qLower);
+      const nWords = nQuery.split(/\s+/);
+
+      function relevanceScore(item: any): number {
+        const nTitle = normalize(item.meta?.title || '');
+        const nUrl = normalize(item.url || '');
+
+        // Exact query phrase in title (e.g. "psalm 23" in "Psalm 23")
+        if (nTitle.includes(nQuery)) return 100;
+
+        // Exact query as URL path segment (e.g. /bible/psalms/23/)
+        if (nUrl.includes(nQuery.replace(/\s+/g, '/'))) return 90;
+
+        // All query words in title
+        if (nWords.every(w => nTitle.includes(w))) return 80;
+
+        // Partial — body-only or weak partial match
+        const titleHits = nWords.filter(w => nTitle.includes(w)).length;
+        return 5 + titleHits * 10;
+      }
+
+      // Group by type first, then pick top results per group for diversity
+      const typeOrder = ['Bible', 'Devotional', 'Meditation', 'Verse of the Day', 'Quotes'];
+      const MAX_PER_GROUP = 3;
+
+      // Sort all results into type buckets, scored within each bucket
+      const buckets: Record<string, { item: any; score: number }[]> = {};
+      for (const item of allData) {
+        const type = item.filters?.type?.[0] || item.meta?.type || 'Other';
+        if (!buckets[type]) buckets[type] = [];
+        buckets[type].push({ item, score: relevanceScore(item) });
+      }
+      // Sort each bucket by score descending
+      for (const type of Object.keys(buckets)) {
+        buckets[type].sort((a, b) => b.score - a.score);
+      }
+
+      // Pick top N from each type
+      // Show 3 initially, rest behind "Show more" — store full buckets
+      const INITIAL_SHOW = 3;
+      const MAX_EXPANDED = 10;
+      const grouped: Record<string, any[]> = {};
+      for (const type of typeOrder) {
+        if (!buckets[type]) continue;
+        grouped[type] = buckets[type].slice(0, MAX_EXPANDED).map(s => s.item);
+      }
+
+      function renderItem(item: any, type: string): string {
+        const { title, subtitle } = formatResult(item, type);
+        const excerpt = item.excerpt || '';
+        return `<a href="${item.url}" class="search-result-item">
+          <div class="search-result-top">
+            <span class="search-result-badge" data-type="${escapeHtml(type)}">${escapeHtml(type)}</span>
+            <span class="search-result-title">${escapeHtml(title)}</span>
+          </div>
+          ${subtitle ? `<div class="search-result-subtitle">${escapeHtml(subtitle)}</div>` : ''}
+          <div class="search-result-excerpt">${excerpt}</div>
+        </a>`;
+      }
+
+      let html = '';
+      for (const type of typeOrder) {
+        const items = grouped[type];
+        if (!items || items.length === 0) continue;
+        const icon = TYPE_ICONS[type] || '';
+        html += `<div class="search-group-label">${icon} ${type}</div>`;
+        // Show first 3
+        for (let i = 0; i < Math.min(INITIAL_SHOW, items.length); i++) {
+          html += renderItem(items[i], type);
+        }
+        // Hidden overflow + Show more button
+        if (items.length > INITIAL_SHOW) {
+          const groupId = type.replace(/\s+/g, '-').toLowerCase();
+          html += `<div class="search-more-group" id="more-${groupId}" style="display:none;">`;
+          for (let i = INITIAL_SHOW; i < items.length; i++) {
+            html += renderItem(items[i], type);
+          }
+          html += `</div>`;
+          html += `<button class="search-show-more" data-group="${groupId}">Show ${items.length - INITIAL_SHOW} more ${type} results</button>`;
+        }
+      }
+
+      // Any ungrouped types
+      for (const type of Object.keys(buckets)) {
+        if (typeOrder.includes(type)) continue;
+        const items = buckets[type].slice(0, MAX_EXPANDED).map(s => s.item);
+        if (items.length === 0) continue;
+        html += `<div class="search-group-label">${type}</div>`;
+        for (let i = 0; i < Math.min(INITIAL_SHOW, items.length); i++) {
+          html += renderItem(items[i], type);
+        }
+        if (items.length > INITIAL_SHOW) {
+          const groupId = type.replace(/\s+/g, '-').toLowerCase();
+          html += `<div class="search-more-group" id="more-${groupId}" style="display:none;">`;
+          for (let i = INITIAL_SHOW; i < items.length; i++) {
+            html += renderItem(items[i], type);
+          }
+          html += `</div>`;
+          html += `<button class="search-show-more" data-group="${groupId}">Show ${items.length - INITIAL_SHOW} more results</button>`;
+        }
+      }
+
+      searchResults.innerHTML = html;
+
+      // Wire up "Show more" buttons
+      searchResults.querySelectorAll('.search-show-more').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const groupId = (btn as HTMLElement).dataset.group;
+          const moreDiv = document.getElementById(`more-${groupId}`);
+          if (moreDiv) {
+            moreDiv.style.display = 'block';
+            (btn as HTMLElement).remove();
+          }
+        });
+      });
+    }
+
+    function escapeHtml(text: string) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Event listeners
+    searchOpen?.addEventListener('click', openSearch);
+    searchOpenMobile?.addEventListener('click', openSearch);
+    searchBackdrop.addEventListener('click', closeSearch);
+    document.getElementById('search-close')?.addEventListener('click', closeSearch);
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => doSearch(searchInput.value), 200);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+K or Cmd+K to open
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        openSearch();
+      }
+      // Escape to close
+      if (e.key === 'Escape' && searchModal.style.display !== 'none') {
+        closeSearch();
+      }
     });
   </script>
 </body>
 </html>
-
-<style is:global>
-  @import '../styles/global.css';
-</style>
-
-<style>
-  /* ── Skip Link ───────────────────────────────────────────────────── */
-  .skip-link {
-    position: absolute;
-    top: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: var(--space-md) var(--space-lg);
-    background: var(--gold);
-    color: var(--espresso);
-    border-radius: var(--radius-md);
-    z-index: 1000;
-    transition: top var(--transition-fast);
-  }
-  
-  .skip-link:focus {
-    top: var(--space-md);
-  }
-  
-  /* ── Header ──────────────────────────────────────────────────────── */
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(26, 22, 18, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(201, 168, 106, 0.1);
-  }
-  
-  .nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 72px;
-  }
-  
-  .nav-brand {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    text-decoration: none;
-  }
-  
-  .brand-initial {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(145deg, var(--gold), var(--gold-dark));
-    border-radius: 6px;
-    font-family: var(--font-serif);
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--crimson);
-    line-height: 1;
-  }
-  
-  .brand-text {
-    font-family: var(--font-serif);
-    font-size: 1.25rem;
-    color: var(--cream);
-    letter-spacing: 0.02em;
-  }
-  
-  .nav-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    padding: 8px;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .nav-toggle span {
-    display: block;
-    width: 24px;
-    height: 2px;
-    background: var(--cream);
-    transition: all var(--transition-fast);
-  }
-  
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xl);
-    list-style: none;
-  }
-  
-  .nav-links a {
-    font-family: var(--font-serif);
-    font-size: 1rem;
-    color: var(--text-muted);
-    letter-spacing: 0.03em;
-    transition: color var(--transition-fast);
-  }
-  
-  .nav-links a:hover {
-    color: var(--cream);
-  }
-  
-  .nav-donate {
-    padding: var(--space-sm) var(--space-lg);
-    background: transparent;
-    border: 1px solid var(--gold-light);
-    border-radius: var(--radius-md);
-    color: var(--gold-light) !important;
-  }
-  
-  .nav-donate:hover {
-    background: rgba(201, 168, 106, 0.1);
-    color: var(--gold) !important;
-  }
-  
-  /* ── Footer ──────────────────────────────────────────────────────── */
-  .site-footer {
-    background: var(--bg-secondary);
-    border-top: 1px solid rgba(201, 168, 106, 0.1);
-    padding: var(--space-4xl) 0 var(--space-2xl);
-  }
-  
-  .footer-content {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: var(--space-3xl);
-    margin-bottom: var(--space-3xl);
-  }
-  
-  .footer-brand {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-  
-  .footer-logo {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    text-decoration: none;
-    color: var(--cream);
-    font-family: var(--font-serif);
-    font-size: 1.25rem;
-  }
-  
-  .footer-logo .brand-initial {
-    width: 36px;
-    height: 36px;
-    font-size: 20px;
-  }
-  
-  .footer-tagline {
-    font-style: italic;
-    color: var(--gold-light);
-    margin: 0;
-  }
-  
-  .footer-ministry {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    margin: 0;
-  }
-  
-  .footer-links {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-xl);
-  }
-  
-  .footer-column h4 {
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--gold-light);
-    margin-bottom: var(--space-md);
-  }
-  
-  .footer-column ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-  }
-  
-  .footer-column a {
-    font-size: 0.9375rem;
-    color: var(--text-muted);
-  }
-  
-  .footer-column a:hover {
-    color: var(--cream);
-  }
-  
-  .footer-bottom {
-    padding-top: var(--space-xl);
-    border-top: 1px solid rgba(201, 168, 106, 0.1);
-    text-align: center;
-  }
-  
-  .footer-bottom p {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    margin: var(--space-xs) 0;
-  }
-  
-  /* ── Mobile Responsive ───────────────────────────────────────────── */
-  @media (max-width: 768px) {
-    .nav-toggle {
-      display: flex;
-    }
-    
-    .nav-links {
-      position: absolute;
-      top: 72px;
-      left: 0;
-      right: 0;
-      flex-direction: column;
-      gap: 0;
-      background: rgba(26, 22, 18, 0.98);
-      border-bottom: 1px solid rgba(201, 168, 106, 0.1);
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height var(--transition-base);
-    }
-    
-    .nav-links.active {
-      max-height: 400px;
-    }
-    
-    .nav-links li {
-      width: 100%;
-    }
-    
-    .nav-links a {
-      display: block;
-      padding: var(--space-md) var(--space-lg);
-      border-bottom: 1px solid rgba(201, 168, 106, 0.05);
-    }
-    
-    .nav-donate {
-      margin: var(--space-md) var(--space-lg);
-      text-align: center;
-    }
-    
-    .footer-content {
-      grid-template-columns: 1fr;
-      gap: var(--space-2xl);
-    }
-    
-    .footer-links {
-      grid-template-columns: 1fr 1fr;
-    }
-    
-    .brand-text {
-      display: none;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .footer-links {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

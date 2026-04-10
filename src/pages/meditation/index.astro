@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getMeditationEntries, getBibleUrl, type MeditationEntry } from '../../utils/devotional';
+
+const year1 = getMeditationEntries(1);
+const year2 = getMeditationEntries(2);
+
+const title = "Selah — Daily Psalm Meditation";
+const description = "A 730-day journey through the Psalms. Teaching, theologian insight, and a Selah moment to sit with God — one passage at a time.";
+---
+<BaseLayout title={title} description={description}>
+  <main class="container-page py-12">
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl mb-3">Selah — Daily Psalm Meditation</h1>
+      <p class="text-lg text-charcoal-muted max-w-[640px] mx-auto">
+        A two-year walk through every Psalm. Each day brings a focused passage, 
+        teaching that draws you close to God, a theologian's insight, and a quiet 
+        moment to sit with what you have heard.
+      </p>
+    </header>
+
+    {/* Year 1 */}
+    <section class="mb-16">
+      <h2 class="text-2xl mb-6">Year 1 — Days 1-365</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {year1.map(entry => (
+          <a
+            href={`/meditation/${entry.day}/`}
+            class="card px-4 py-3 hover:border-gold transition-colors"
+          >
+            <span class="block font-sans text-sm text-gold-dark">
+              Day {entry.day} — {entry.title}
+            </span>
+            <span class="block text-xs text-charcoal-muted mt-1">
+              {entry.theologian_name}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    {/* Year 2 */}
+    <section>
+      <h2 class="text-2xl mb-6">Year 2 — Days 366-730</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {year2.map(entry => (
+          <a
+            href={`/meditation/${entry.day + 365}/`}
+            class="card px-4 py-3 hover:border-gold transition-colors"
+          >
+            <span class="block font-sans text-sm text-gold-dark">
+              Day {entry.day + 365} — {entry.title}
+            </span>
+            <span class="block text-xs text-charcoal-muted mt-1">
+              {entry.theologian_name}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

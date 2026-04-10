@@ -2,342 +2,121 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Contact — The Table Bible" description="Get in touch with Come to the Table Ministries. We'd love to hear from you.">
-  <section class="contact-hero">
-    <div class="container container-narrow">
-      <h1>Contact Us</h1>
+<BaseLayout title="Contact — The Table Bible" description="Get in touch with The Table Bible Ministries. We'd love to hear from you.">
+  <main class="container-narrow py-12">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl mb-4">Contact Us</h1>
       <div class="divider"></div>
-      <p class="contact-intro">
+      <p class="text-lg text-charcoal-muted max-w-[550px] mx-auto leading-relaxed mt-4">
         We'd love to hear from you. Whether you have questions, suggestions, 
         or just want to say hello — we're here.
       </p>
-    </div>
-  </section>
-  
-  <section class="contact-main">
-    <div class="container container-narrow">
-      <div class="contact-card">
-        <div class="contact-method">
-          <div class="contact-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="20" height="16" x="2" y="4" rx="2"/>
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-            </svg>
-          </div>
-          <h2>Email Us</h2>
-          <p>For all inquiries, reach us at:</p>
-          <a href="mailto:hello@TheTableBible.org" class="email-link">
-            hello@TheTableBible.org
-          </a>
-          <p class="response-time">
-            We typically respond within 2-3 business days.
+    </header>
+
+    <section class="card p-8 text-center mb-12">
+      <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-accent-50 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+          <rect width="20" height="16" x="2" y="4" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl mb-2">Email Us</h2>
+      <p class="text-charcoal-muted mb-3">For all inquiries, reach us at:</p>
+      <a href="mailto:hello@TheTableBible.org" class="text-xl text-accent hover:text-accent-dark underline">
+        hello@TheTableBible.org
+      </a>
+      <p class="text-sm text-charcoal-muted mt-3">
+        We typically respond within 2-3 business days.
+      </p>
+    </section>
+
+    <section class="mb-12">
+      <h3 class="text-xl mb-4">How Can We Help?</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <h4 class="font-sans font-medium mb-1">General Questions</h4>
+          <p class="text-sm text-charcoal-muted">
+            Questions about The Table Bible or how to use our resources? We're happy to help.
+          </p>
+        </div>
+        <div class="card p-5">
+          <h4 class="font-sans font-medium mb-1">Technical Issues</h4>
+          <p class="text-sm text-charcoal-muted">
+            Having trouble accessing content or experiencing a problem? Let us know and we'll work to fix it.
+          </p>
+        </div>
+        <div class="card p-5">
+          <h4 class="font-sans font-medium mb-1">Partnership Opportunities</h4>
+          <p class="text-sm text-charcoal-muted">
+            Interested in collaborating or featuring our content? We'd love to explore possibilities.
+          </p>
+        </div>
+        <div class="card p-5">
+          <h4 class="font-sans font-medium mb-1">Prayer Requests</h4>
+          <p class="text-sm text-charcoal-muted">
+            We believe in the power of prayer. Share your requests and we'll lift them up.
           </p>
         </div>
       </div>
-      
-      <div class="contact-topics">
-        <h3>How Can We Help?</h3>
-        <div class="topics-grid">
-          <div class="topic-item">
-            <h4>General Questions</h4>
-            <p>
-              Questions about The Table Bible, our videos, or how to use them? 
-              We're happy to help.
-            </p>
-          </div>
-          <div class="topic-item">
-            <h4>Technical Issues</h4>
-            <p>
-              Having trouble accessing content or experiencing a problem? 
-              Let us know and we'll work to fix it.
-            </p>
-          </div>
-          <div class="topic-item">
-            <h4>Partnership Opportunities</h4>
-            <p>
-              Interested in collaborating or featuring our content? 
-              We'd love to explore possibilities.
-            </p>
-          </div>
-          <div class="topic-item">
-            <h4>Prayer Requests</h4>
-            <p>
-              We believe in the power of prayer. Share your requests 
-              and we'll lift them up.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  <section class="contact-social">
-    <div class="container container-narrow">
-      <h3>Find Us Online</h3>
-      <div class="social-grid">
-        <a href="https://youtube.com/@thetablebibleorg" class="social-card" target="_blank" rel="noopener noreferrer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+    </section>
+
+    <section class="mb-12">
+      <h3 class="text-xl mb-4">Find Us Online</h3>
+      <div class="flex flex-wrap gap-3">
+        <a href="https://youtube.com/@thetablebibleorg" target="_blank" rel="noopener noreferrer" class="card p-4 inline-flex items-center gap-3 hover:border-gold transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-red-600">
             <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
           </svg>
           <span>YouTube</span>
         </a>
+        <a href="https://www.facebook.com/TheTableBible" target="_blank" rel="noopener noreferrer" class="card p-4 inline-flex items-center gap-3 hover:border-gold transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-blue-600">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span>Facebook</span>
+        </a>
+        <a href="https://www.instagram.com/thetablebible" target="_blank" rel="noopener noreferrer" class="card p-4 inline-flex items-center gap-3 hover:border-gold transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-pink-600">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+          <span>Instagram</span>
+        </a>
       </div>
-    </div>
-  </section>
-  
-  <section class="contact-faq">
-    <div class="container container-narrow">
-      <h3>Quick Answers</h3>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary>Can I use your videos in my church?</summary>
-          <p>
-            Absolutely! All Table Bible videos are free to use in church services, 
+    </section>
+
+    <section>
+      <h3 class="text-xl mb-4">Quick Answers</h3>
+      <div class="space-y-3">
+        <details class="card p-4 group">
+          <summary class="cursor-pointer font-sans font-medium">Can I use your content in my church?</summary>
+          <p class="text-charcoal-muted mt-3 text-sm leading-relaxed">
+            Absolutely! All Table Bible content is free to use in church services, 
             Bible studies, small groups, or any ministry setting. No permission needed.
           </p>
         </details>
-        <details class="faq-item">
-          <summary>Can I download the videos?</summary>
-          <p>
-            Yes. You can download from YouTube using various tools, or check our 
-            Library for direct download links (coming soon via Internet Archive).
+        <details class="card p-4 group">
+          <summary class="cursor-pointer font-sans font-medium">Can I share your content?</summary>
+          <p class="text-charcoal-muted mt-3 text-sm leading-relaxed">
+            Yes! Link to any page, share devotionals, or point your community to any 
+            resource on our site. We just ask that you share links rather than copying 
+            content to other platforms.
           </p>
         </details>
-        <details class="faq-item">
-          <summary>What translation do you use?</summary>
-          <p>
-            We use the World English Bible (WEB), a modern public domain translation. 
-            Learn more on our <a href="/about/#about-the-web">About the WEB</a> page.
+        <details class="card p-4 group">
+          <summary class="cursor-pointer font-sans font-medium">What translation do you use?</summary>
+          <p class="text-charcoal-muted mt-3 text-sm leading-relaxed">
+            We use the World English Bible (WEB), a modern and freely available translation. 
+            Learn more on our <a href="/about/#about-the-web" class="text-accent hover:text-accent-dark underline">About the WEB</a> page.
           </p>
         </details>
-        <details class="faq-item">
-          <summary>How can I support your ministry?</summary>
-          <p>
-            Visit our <a href="/donate/">Support</a> page for ways to give. 
-            Even subscribing on YouTube and sharing videos helps tremendously!
+        <details class="card p-4 group">
+          <summary class="cursor-pointer font-sans font-medium">How can I support your ministry?</summary>
+          <p class="text-charcoal-muted mt-3 text-sm leading-relaxed">
+            Visit our <a href="/donate/" class="text-accent hover:text-accent-dark underline">Support</a> page for ways to give. 
+            Even sharing our resources with someone who needs them helps tremendously!
           </p>
         </details>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 </BaseLayout>
-
-<style>
-  /* ── Contact Hero ────────────────────────────────────────────────── */
-  .contact-hero {
-    padding: var(--space-4xl) 0;
-    text-align: center;
-    background: var(--bg-secondary);
-  }
-  
-  .contact-intro {
-    font-size: 1.25rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-    max-width: 550px;
-    margin: 0 auto;
-  }
-  
-  /* ── Contact Main ────────────────────────────────────────────────── */
-  .contact-main {
-    padding: var(--space-4xl) 0;
-  }
-  
-  .contact-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(201, 168, 106, 0.1);
-    padding: var(--space-3xl);
-    text-align: center;
-    margin-bottom: var(--space-4xl);
-  }
-  
-  .contact-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto var(--space-xl);
-    color: var(--espresso);
-  }
-  
-  .contact-method h2 {
-    margin-bottom: var(--space-md);
-  }
-  
-  .contact-method > p {
-    color: var(--text-muted);
-    margin-bottom: var(--space-lg);
-  }
-  
-  .email-link {
-    display: inline-block;
-    font-size: 1.5rem;
-    font-family: var(--ff-serif);
-    color: var(--gold-light);
-    text-decoration: none;
-    padding: var(--space-md) var(--space-xl);
-    background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-  }
-  
-  .email-link:hover {
-    background: var(--espresso);
-    transform: translateY(-2px);
-  }
-  
-  .response-time {
-    margin-top: var(--space-lg);
-    font-size: 0.875rem;
-    color: var(--text-dim);
-  }
-  
-  /* ── Topics Grid ─────────────────────────────────────────────────── */
-  .contact-topics h3 {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-    color: var(--cream);
-  }
-  
-  .topics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--space-lg);
-  }
-  
-  .topic-item {
-    padding: var(--space-lg);
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(201, 168, 106, 0.1);
-  }
-  
-  .topic-item h4 {
-    font-family: var(--ff-sans);
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--gold-light);
-    margin-bottom: var(--space-sm);
-  }
-  
-  .topic-item p {
-    color: var(--text-muted);
-    font-size: 0.9375rem;
-    margin: 0;
-    line-height: 1.6;
-  }
-  
-  /* ── Social Section ──────────────────────────────────────────────── */
-  .contact-social {
-    padding: var(--space-3xl) 0;
-    background: var(--bg-secondary);
-    text-align: center;
-  }
-  
-  .contact-social h3 {
-    margin-bottom: var(--space-xl);
-    color: var(--cream);
-  }
-  
-  .social-grid {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-lg);
-    flex-wrap: wrap;
-  }
-  
-  .social-card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-md) var(--space-xl);
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
-    color: var(--cream);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: 1px solid rgba(201, 168, 106, 0.1);
-  }
-  
-  .social-card:hover {
-    background: var(--espresso);
-    transform: translateY(-2px);
-    color: var(--gold-light);
-  }
-  
-  .social-card svg {
-    color: var(--gold);
-  }
-  
-  /* ── FAQ Section ─────────────────────────────────────────────────── */
-  .contact-faq {
-    padding: var(--space-4xl) 0;
-  }
-  
-  .contact-faq h3 {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-    color: var(--cream);
-  }
-  
-  .faq-list {
-    display: grid;
-    gap: var(--space-md);
-  }
-  
-  .faq-item {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(201, 168, 106, 0.1);
-    overflow: hidden;
-  }
-  
-  .faq-item summary {
-    padding: var(--space-lg);
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--cream);
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-md);
-  }
-  
-  .faq-item summary::after {
-    content: '+';
-    font-size: 1.5rem;
-    color: var(--gold);
-    font-weight: 300;
-    transition: transform 0.2s ease;
-  }
-  
-  .faq-item[open] summary::after {
-    transform: rotate(45deg);
-  }
-  
-  .faq-item summary::-webkit-details-marker {
-    display: none;
-  }
-  
-  .faq-item p {
-    padding: 0 var(--space-lg) var(--space-lg);
-    color: var(--text-muted);
-    line-height: 1.7;
-    margin: 0;
-  }
-  
-  .faq-item a {
-    color: var(--gold-light);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  
-  .faq-item a:hover {
-    color: var(--gold);
-  }
-</style>

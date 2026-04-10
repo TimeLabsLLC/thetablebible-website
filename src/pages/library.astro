@@ -1,9 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import libraryData from '../data/library.json';
-import { getFullBookThumbUrl } from '../utils/library';
+import { getBookCoverUrl } from '../utils/library';
 
 const { sections } = libraryData;
+
+const otSections = sections.filter(s => ['pentateuch', 'history', 'wisdom', 'prophets'].includes(s.id));
+const ntSections = sections.filter(s => ['gospels', 'acts-letters'].includes(s.id));
+const apocryphaSections = sections.filter(s => s.id === 'apocrypha');
+const otBooks = otSections.flatMap(s => s.books);
+const ntBooks = ntSections.flatMap(s => s.books);
+const apocryphaBooks = apocryphaSections.flatMap(s => s.books);
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
@@ -15,238 +22,132 @@ const breadcrumbLd = {
 };
 ---
 
-<BaseLayout title="Library — The Table Bible" description="Browse all 66 books of the Bible plus 14 deuterocanonical books from the World English Bible. Watch chapters, full books, or volume collections." jsonLd={breadcrumbLd}>
-  <section class="library-hero">
-    <div class="container">
-      <h1>Library</h1>
-      <p>The complete Bible — all 66 books of the Old and New Testaments — plus 14 additional deuterocanonical books included in the World English Bible.</p>
-      
-      <div class="search-bar">
-        <input type="text" id="library-search" placeholder="Search by book name..." autocomplete="off" />
+<BaseLayout title="Bible Library — The Table Bible" description="Browse every book of the Bible. Read with Strong's definitions, cross-references, audio narration, and study tools. All 66 books plus 14 deuterocanonical books." jsonLd={breadcrumbLd}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <h1 class="text-4xl mb-3">Bible Library</h1>
+      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto mb-6">
+        Every book of the Bible — read, listen, and study. Choose a book to begin.
+      </p>
+      <div class="max-w-[400px] mx-auto">
+        <input type="text" id="library-search" placeholder="Search books..." autocomplete="off"
+          class="w-full px-5 py-2.5 font-sans text-base bg-white border border-cream-300 rounded-full outline-none focus:border-gold transition-colors" />
       </div>
     </div>
   </section>
-  
-  <section class="library-nav">
-    <div class="container">
-      <nav class="section-tabs" aria-label="Bible sections">
-        {sections.map(section => (
-          <a href={`#${section.id}`} class="section-tab">{section.title}</a>
-        ))}
-      </nav>
+
+  <section class="container-page pb-16">
+    <!-- Old Testament -->
+    <h2 class="text-2xl mb-6 pb-2 border-b border-cream-300">Old Testament</h2>
+    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mb-14">
+      {otBooks.map(book => (
+        <a href={`/bible/${book.slug}/1/`} class="book-card group" data-book={book.name.toLowerCase()}>
+          <div class="book-card__cover">
+            <img src={getBookCoverUrl(book.abbr)} alt={book.name} width="160" height="225" loading="lazy" />
+          </div>
+          <p class="book-card__name">{book.name}</p>
+          <p class="book-card__meta">{book.chapters} chapters</p>
+        </a>
+      ))}
     </div>
-  </section>
-  
-  <div class="library-content container">
-    {sections.map(section => (
-      <section id={section.id} class="book-section">
-        <div class="section-header">
-          <h2>{section.title}</h2>
-          <p>{section.subtitle}</p>
-        </div>
-        
-        <div class="book-grid">
-          {section.books.map(book => (
-            <a href={`/library/${book.slug}/`} class="book-card" data-book={book.name.toLowerCase()}>
-              <div class="book-card-thumb">
-                <img
-                  src={getFullBookThumbUrl(book.abbr)}
-                  alt={book.name}
-                  width="640"
-                  height="360"
-                  loading="lazy"
-                  decoding="async"
-                />
+
+    <!-- New Testament -->
+    <h2 class="text-2xl mb-6 pb-2 border-b border-cream-300">New Testament</h2>
+    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mb-14">
+      {ntBooks.map(book => (
+        <a href={`/bible/${book.slug}/1/`} class="book-card group" data-book={book.name.toLowerCase()}>
+          <div class="book-card__cover">
+            <img src={getBookCoverUrl(book.abbr)} alt={book.name} width="160" height="225" loading="lazy" />
+          </div>
+          <p class="book-card__name">{book.name}</p>
+          <p class="book-card__meta">{book.chapters} chapters</p>
+        </a>
+      ))}
+    </div>
+
+    {apocryphaBooks.length > 0 && (
+      <>
+        <h2 class="text-2xl mb-6 pb-2 border-b border-cream-300">Deuterocanonical Books</h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mb-14">
+          {apocryphaBooks.map(book => (
+            <a href={`/bible/${book.slug}/1/`} class="book-card group" data-book={book.name.toLowerCase()}>
+              <div class="book-card__cover">
+                <img src={getBookCoverUrl(book.abbr)} alt={book.name} width="160" height="225" loading="lazy" />
               </div>
-              <span class="book-card-name">{book.name}</span>
-              <span class="book-card-count">{book.chapters} {book.chapters === 1 ? 'chapter' : 'chapters'}</span>
+              <p class="book-card__name">{book.name}</p>
+              <p class="book-card__meta">{book.chapters} chapters</p>
             </a>
           ))}
         </div>
-      </section>
-    ))}
-  </div>
-  
-  <section class="library-cta">
-    <div class="container container-narrow">
-      <div class="cta-card">
-        <h2>Subscribe for Updates</h2>
-        <p>Be the first to know when new chapters are uploaded</p>
-        <a href="https://youtube.com/@thetablebibleorg?sub_confirmation=1" target="_blank" rel="noopener" class="btn btn-primary">
-          Subscribe on YouTube
-        </a>
-      </div>
+      </>
+    )}
+  </section>
+
+  <section class="bg-cream-200 py-12">
+    <div class="container-narrow text-center">
+      <h2 class="text-2xl mb-3">Pay It Forward</h2>
+      <p class="text-charcoal-muted mb-6">Every book here is free because someone gave so it could be. Be the reason the next person finds this.</p>
+      <a href="/donate/#ways-to-give" class="btn btn-primary">
+        Pay It Forward
+      </a>
     </div>
   </section>
 </BaseLayout>
 
-<script>
-  const searchInput = document.getElementById('library-search') as HTMLInputElement;
-  const bookCards = document.querySelectorAll('.book-card[data-book]');
-  const bookSections = document.querySelectorAll('.book-section');
-
-  searchInput?.addEventListener('input', () => {
-    const q = searchInput.value.toLowerCase().trim();
-    
-    if (!q) {
-      bookCards.forEach(c => (c as HTMLElement).style.display = '');
-      bookSections.forEach(s => (s as HTMLElement).style.display = '');
-      return;
-    }
-
-    bookCards.forEach(card => {
-      const name = (card as HTMLElement).dataset.book || '';
-      (card as HTMLElement).style.display = name.includes(q) ? '' : 'none';
-    });
-
-    bookSections.forEach(section => {
-      const cards = section.querySelectorAll('.book-card[data-book]');
-      const anyVisible = Array.from(cards).some(c => (c as HTMLElement).style.display !== 'none');
-      (section as HTMLElement).style.display = anyVisible ? '' : 'none';
-    });
-  });
-</script>
-
 <style>
-  .library-hero {
-    padding: var(--space-4xl) 0 var(--space-2xl);
-    text-align: center;
-    background: var(--bg-secondary);
-  }
-  .library-hero h1 { margin-bottom: var(--space-md); }
-  .library-hero p {
-    color: var(--text-muted);
-    font-size: 1.125rem;
-    margin-bottom: var(--space-xl);
-  }
-
-  .search-bar { max-width: 500px; margin: 0 auto; }
-  .search-bar input {
-    width: 100%;
-    padding: var(--space-md) var(--space-lg);
-    font-family: var(--font-sans);
-    font-size: 1rem;
-    color: var(--cream);
-    background: rgba(42, 35, 30, 0.8);
-    border: 1px solid rgba(201, 168, 106, 0.3);
-    border-radius: var(--radius-xl);
-    outline: none;
-    transition: border-color var(--transition-fast);
-  }
-  .search-bar input::placeholder { color: var(--text-muted); }
-  .search-bar input:focus { border-color: var(--gold-light); }
-
-  .library-nav {
-    position: sticky;
-    top: 72px;
-    z-index: 50;
-    background: rgba(26, 22, 18, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(201, 168, 106, 0.1);
-    padding: var(--space-md) 0;
-  }
-  .section-tabs {
-    display: flex;
-    gap: var(--space-sm);
-    overflow-x: auto;
-    padding-bottom: var(--space-xs);
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold-light) transparent;
-  }
-  .section-tabs::-webkit-scrollbar { height: 4px; }
-  .section-tabs::-webkit-scrollbar-thumb { background: var(--gold-light); border-radius: 2px; }
-  .section-tab {
-    flex-shrink: 0;
-    padding: var(--space-sm) var(--space-lg);
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    border: 1px solid rgba(201, 168, 106, 0.2);
-    border-radius: var(--radius-xl);
-    white-space: nowrap;
-    transition: all var(--transition-fast);
-  }
-  .section-tab:hover {
-    color: var(--cream);
-    border-color: var(--gold-light);
-    background: rgba(201, 168, 106, 0.1);
-  }
-
-  .library-content { padding: var(--space-3xl) var(--space-lg); }
-  .book-section { margin-bottom: var(--space-4xl); scroll-margin-top: 160px; }
-  .book-section .section-header { margin-bottom: var(--space-2xl); }
-  .book-section .section-header h2 { margin-bottom: var(--space-xs); }
-  .book-section .section-header p { color: var(--gold-light); font-size: 1rem; }
-
-  .book-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--space-lg);
-  }
-
   .book-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    gap: var(--space-sm);
-    border: 1px solid rgba(201, 168, 106, 0.15);
-    border-radius: var(--radius-md);
-    padding: var(--space-sm);
-    cursor: pointer;
-    transition: transform var(--transition-base), border-color var(--transition-fast), background var(--transition-fast);
     text-decoration: none;
-    color: inherit;
+    color: var(--charcoal);
+    transition: transform 0.15s;
   }
   .book-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--gold-light);
-    background: rgba(201, 168, 106, 0.05);
+    transform: translateY(-4px);
   }
-
-  .book-card-thumb {
+  .book-card__cover {
     width: 100%;
-    border-radius: var(--radius-sm);
+    aspect-ratio: 640 / 900;
+    border-radius: 6px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08);
+    transition: box-shadow 0.15s;
   }
-  .book-card-thumb img {
-    display: block;
+  .book-card:hover .book-card__cover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .book-card__cover img {
     width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
-    background: var(--bg-secondary);
+    display: block;
   }
-
-  .book-card-name {
-    font-family: var(--font-serif);
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--cream);
-  }
-  .book-card-count {
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-  }
-
-  .library-cta {
-    padding: var(--space-3xl) 0 var(--space-4xl);
-    background: var(--bg-secondary);
-  }
-  .cta-card {
+  .book-card__name {
+    margin: 8px 0 0;
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 13px;
     text-align: center;
-    padding: var(--space-3xl);
-    background: var(--bg-card);
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(201, 168, 106, 0.1);
+    line-height: 1.2;
   }
-  .cta-card h2 { margin-bottom: var(--space-md); }
-  .cta-card p { color: var(--text-muted); margin-bottom: var(--space-xl); }
-
-  @media (max-width: 768px) {
-    .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-    .library-nav { top: 56px; }
-    .book-section { scroll-margin-top: 140px; }
-    .book-card-name { font-size: 0.875rem; }
-    .book-card-count { font-size: 0.75rem; }
+  .book-card__meta {
+    margin: 2px 0 0;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 11px;
+    color: var(--charcoal-muted);
+    text-align: center;
   }
 </style>
+
+<script>
+  const searchInput = document.getElementById('library-search') as HTMLInputElement;
+  const bookCards = document.querySelectorAll('.book-card[data-book]');
+
+  searchInput?.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    bookCards.forEach(card => {
+      const name = (card as HTMLElement).dataset.book || '';
+      (card as HTMLElement).style.display = (!q || name.includes(q)) ? '' : 'none';
+    });
+  });
+</script>

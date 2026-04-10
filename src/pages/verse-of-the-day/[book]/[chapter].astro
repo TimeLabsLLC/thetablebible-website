@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import DonateBanner from '../../../components/DonateBanner.astro';
+import {
+  getAllVotdEntries,
+  getVotdEntry,
+  getBookSlug,
+  getVotdUrl,
+  getDevotionalUrl,
+  getBibleUrl,
+  type VotdEntry,
+} from '../../../utils/devotional';
+
+export function getStaticPaths() {
+  const entries = getAllVotdEntries();
+  return entries.map(entry => {
+    const slug = getBookSlug(entry.book);
+    return {
+      params: { book: slug, chapter: String(entry.chapter) },
+      props: { entry },
+    };
+  });
+}
+
+interface Props {
+  entry: VotdEntry;
+}
+
+const { entry } = Astro.props;
+const { book: bookSlug, chapter: chapterStr } = Astro.params;
+const chapter = Number(chapterStr);
+
+// Prev/next
+const bookEntries = getAllVotdEntries().filter(e => getBookSlug(e.book) === bookSlug);
+const currentIdx = bookEntries.findIndex(e => e.chapter === chapter);
+const prevEntry = currentIdx > 0 ? bookEntries[currentIdx - 1] : null;
+const nextEntry = currentIdx < bookEntries.length - 1 ? bookEntries[currentIdx + 1] : null;
+
+const verseRef = `${entry.book_name} ${chapter}:${entry.verse}`;
+const title = `${verseRef} — Verse of the Day`;
+const description = entry.text.slice(0, 155);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Verse of the Day: ${verseRef}`,
+  "description": description,
+  "author": { "@type": "Organization", "name": "The Table Bible" },
+  "publisher": { "@type": "Organization", "name": "The Table Bible" },
+};
+---
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <main class="container-narrow py-12" data-pagefind-body data-pagefind-meta={`type:Verse of the Day, title:${verseRef}`} data-pagefind-filter="type:Verse of the Day">
+    {/* Breadcrumb */}
+    <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
+      <a href="/verse-of-the-day/" class="hover:text-accent">Verse of the Day</a>
+      <span class="mx-2">/</span>
+      <span>{entry.book_name} {chapter}</span>
+    </nav>
+
+    {/* Verse Display */}
+    <header class="text-center mb-12">
+      <p class="text-sm uppercase tracking-wider text-gold-dark font-sans mb-4">Verse of the Day</p>
+      <blockquote class="text-2xl sm:text-3xl leading-relaxed italic text-charcoal max-w-[640px] mx-auto mb-6">
+        "{entry.text}"
+      </blockquote>
+      <p class="text-lg">
+        <a href={getBibleUrl(bookSlug!, chapter, entry.verse)} class="text-accent hover:text-accent-dark underline">
+          {verseRef}
+        </a>
+      </p>
+    </header>
+
+    <div class="divider" />
+
+    {/* Reflection */}
+    {entry.reflection && (
+      <section class="my-10">
+        <h2 class="text-sm uppercase tracking-wider text-charcoal-muted font-sans mb-4">Reflection</h2>
+        <p class="text-lg leading-relaxed">{entry.reflection}</p>
+      </section>
+    )}
+
+    {/* Question */}
+    {entry.question && (
+      <div class="bg-gold-50 border border-gold-light rounded-lg p-6 my-10">
+        <h2 class="text-sm uppercase tracking-wider text-gold-dark font-sans mb-3">Consider</h2>
+        <p class="text-lg italic">{entry.question}</p>
+      </div>
+    )}
+
+    {/* Link to full devotional */}
+    <div class="text-center my-10">
+      <a href={getDevotionalUrl(bookSlug!, chapter)} class="btn-primary">
+        Read the Full Devotional for {entry.book_name} {chapter}
+      </a>
+    </div>
+
+    {/* Topics */}
+    {entry.topics && entry.topics.length > 0 && (
+      <div class="flex flex-wrap gap-2 justify-center my-8" data-pagefind-weight="3">
+        {entry.topics.map(topic => (
+          <span class="px-3 py-1 bg-cream-200 text-charcoal-muted text-sm rounded-full">
+            {topic}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <DonateBanner />
+
+    {/* Navigation */}
+    <nav class="flex justify-between items-center border-t border-cream-300 pt-6 mt-10">
+      {prevEntry ? (
+        <a href={getVotdUrl(bookSlug!, prevEntry.chapter)} class="btn-secondary text-sm">
+          &larr; Chapter {prevEntry.chapter}
+        </a>
+      ) : <div />}
+      <a href="/verse-of-the-day/" class="text-sm text-charcoal-muted hover:text-accent">
+        All Verses
+      </a>
+      {nextEntry ? (
+        <a href={getVotdUrl(bookSlug!, nextEntry.chapter)} class="btn-secondary text-sm">
+          Chapter {nextEntry.chapter} &rarr;
+        </a>
+      ) : <div />}
+    </nav>
+  </main>
+</BaseLayout>

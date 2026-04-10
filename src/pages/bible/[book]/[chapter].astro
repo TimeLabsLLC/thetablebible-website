@@ -1,0 +1,1908 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import DonateBanner from '../../../components/DonateBanner.astro';
+import libraryData from '../../../data/library.json';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const OT_SECTIONS = ['pentateuch', 'history', 'wisdom', 'prophets'];
+const NT_SECTIONS = ['gospels', 'acts-letters'];
+
+interface Word {
+  text: string;
+  s?: string;
+  wj?: boolean;
+  break?: boolean;
+}
+
+interface Verse {
+  number: number;
+  words: Word[];
+  paragraphStart?: boolean;
+  heading?: string;
+  footnotes?: { ref: string; text: string }[];
+  crossRefs?: { ref: string; text: string }[];
+}
+
+interface ChapterData {
+  book: string;
+  abbr: string;
+  slug: string;
+  chapter: number;
+  totalChapters: number;
+  verses: Verse[];
+}
+
+const allSections = libraryData.sections as any[];
+const allBooks = allSections.flatMap((s: any) => s.books);
+const canonicalBooks = allSections
+  .filter((s: any) => [...OT_SECTIONS, ...NT_SECTIONS].includes(s.id))
+  .flatMap((s: any) => s.books);
+
+export function getStaticPaths() {
+  const paths: any[] = [];
+  for (const section of libraryData.sections as any[]) {
+    for (const book of section.books) {
+      for (let ch = 1; ch <= book.chapters; ch++) {
+        paths.push({
+          params: { book: book.slug, chapter: String(ch) },
+          props: { bookInfo: book, chapterNum: ch, sectionId: section.id },
+        });
+      }
+    }
+  }
+  return paths;
+}
+
+const { bookInfo, chapterNum, sectionId } = Astro.props;
+
+// Load chapter data
+const dataDir = path.join(process.cwd(), 'src', 'data', 'bible', bookInfo.slug);
+const chapterPath = path.join(dataDir, `${chapterNum}.json`);
+let chapterData: ChapterData | null = null;
+if (fs.existsSync(chapterPath)) {
+  chapterData = JSON.parse(fs.readFileSync(chapterPath, 'utf-8'));
+}
+
+const isNewTestament = NT_SECTIONS.includes(sectionId);
+const strongsFile = isNewTestament ? 'strongs-greek.json' : 'strongs-hebrew.json';
+
+// Navigation
+const prevCh = chapterNum > 1 ? chapterNum - 1 : null;
+const nextCh = chapterNum < bookInfo.chapters ? chapterNum + 1 : null;
+const bookIdx = allBooks.findIndex((b: any) => b.slug === bookInfo.slug);
+const prevBook = bookIdx > 0 ? allBooks[bookIdx - 1] : null;
+const nextBook = bookIdx < allBooks.length - 1 ? allBooks[bookIdx + 1] : null;
+
+// Cross-links
+const videoId = bookInfo.videos?.[String(chapterNum)] || null;
+const devotionalUrl = `/devotional/${bookInfo.slug}/${chapterNum}/`;
+const videoUrl = `/library/${bookInfo.slug}/chapter-${chapterNum}/`;
+
+// Drop cap: first character of first verse (if alphabetic)
+const firstWord = chapterData?.verses?.[0]?.words?.[0]?.text || '';
+const dropCapChar = /^[A-Za-z]/.test(firstWord) ? firstWord.charAt(0).toUpperCase() : '';
+const firstWordRemainder = dropCapChar ? firstWord.slice(1) : '';
+const firstWordStrongs = chapterData?.verses?.[0]?.words?.[0]?.s || '';
+const firstWordWj = chapterData?.verses?.[0]?.words?.[0]?.wj || false;
+
+// Wave SVG path (8 periods, wavelength 34, amplitude 10)
+const wavePath = 'M 0 10 Q 8.5 0, 17 10 Q 25.5 20, 34 10 Q 42.5 0, 51 10 Q 59.5 20, 68 10 Q 76.5 0, 85 10 Q 93.5 20, 102 10 Q 110.5 0, 119 10 Q 127.5 20, 136 10 Q 144.5 0, 153 10 Q 161.5 20, 170 10 Q 178.5 0, 187 10 Q 195.5 20, 204 10 Q 212.5 0, 221 10 Q 229.5 20, 238 10 Q 246.5 0, 255 10 Q 263.5 20, 272 10';
+
+const pageTitle = `${bookInfo.name} ${chapterNum} — Read the Bible Online`;
+const pageDesc = chapterData
+  ? `Read ${bookInfo.name} chapter ${chapterNum} with Strong's Greek and Hebrew definitions. Tap any word for its original meaning.`
+  : `${bookInfo.name} chapter ${chapterNum} — The Table Bible`;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Bible", "item": `https://thetablebible.org/bible/${bookInfo.slug}/1/` },
+    { "@type": "ListItem", "position": 2, "name": bookInfo.name, "item": `https://thetablebible.org/bible/${bookInfo.slug}/1/` },
+    { "@type": "ListItem", "position": 3, "name": `Chapter ${chapterNum}`, "item": `https://thetablebible.org/bible/${bookInfo.slug}/${chapterNum}/` },
+  ],
+};
+
+/**
+ * Render a single word token.
+ * Kept for potential future use but rendering is now inline in the template.
+ */
+---
+
+<BaseLayout title={pageTitle} description={pageDesc} jsonLd={breadcrumbLd}>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Reader navigation bar (sits between site header and book)
+       ═══════════════════════════════════════════════════════ -->
+  <div class="reader-bar">
+    <div class="reader-bar__inner">
+      <!-- Left: prev chapter -->
+      <div class="reader-bar__nav">
+        {prevCh ? (
+          <a href={`/bible/${bookInfo.slug}/${prevCh}/`} class="reader-bar__link" aria-label={`Previous: Chapter ${prevCh}`}>&larr;</a>
+        ) : prevBook ? (
+          <a href={`/bible/${prevBook.slug}/${prevBook.chapters}/`} class="reader-bar__link" aria-label={`Previous: ${prevBook.name}`}>&larr;</a>
+        ) : (
+          <span class="reader-bar__link reader-bar__link--disabled">&larr;</span>
+        )}
+      </div>
+
+      <!-- Center: book + chapter selectors -->
+      <div class="reader-bar__selectors">
+        <select id="book-select" class="reader-bar__select" aria-label="Select book">
+          {canonicalBooks.map((b: any) => (
+            <option value={b.slug} selected={b.slug === bookInfo.slug}>{b.name}</option>
+          ))}
+        </select>
+        <select id="chapter-select" class="reader-bar__select reader-bar__select--ch" aria-label="Select chapter">
+          {Array.from({ length: bookInfo.chapters }, (_, i) => i + 1).map(n => (
+            <option value={n} selected={n === chapterNum}>{n}</option>
+          ))}
+        </select>
+      </div>
+
+      <!-- Right: audio + font size + next chapter + cross-links -->
+      <div class="reader-bar__nav">
+        <button id="audio-toggle" class="reader-bar__audio-btn" aria-label="Play audio" title="Listen to this chapter">
+          <svg id="audio-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
+          <svg id="audio-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="4" height="18" /><rect x="15" y="3" width="4" height="18" /></svg>
+        </button>
+        <button id="read-mode-toggle" class="reader-bar__mode-btn" aria-label="Toggle reading mode" title="Switch scroll / page mode">
+          <svg id="mode-icon-scroll" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="12" y1="2" x2="12" y2="22" /><line x1="8" y1="7" x2="10" y2="7" /><line x1="8" y1="11" x2="10" y2="11" /></svg>
+          <svg id="mode-icon-page" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none;"><line x1="5" y1="5" x2="19" y2="5" /><line x1="5" y1="9" x2="16" y2="9" /><line x1="5" y1="13" x2="19" y2="13" /><line x1="5" y1="17" x2="14" y2="17" /></svg>
+        </button>
+        <div id="page-nav" class="reader-bar__page-nav" style="display:none;">
+          <button id="page-prev" class="reader-bar__page-btn" aria-label="Previous page">&lsaquo;</button>
+          <span id="page-indicator" class="reader-bar__page-ind"></span>
+          <button id="page-next" class="reader-bar__page-btn" aria-label="Next page">&rsaquo;</button>
+        </div>
+        <div class="reader-bar__font-controls">
+          <button id="font-down" class="reader-bar__font-btn" aria-label="Decrease font size" title="Smaller text">A&minus;</button>
+          <button id="font-up" class="reader-bar__font-btn" aria-label="Increase font size" title="Larger text">A+</button>
+        </div>
+        <div class="reader-bar__links">
+          {videoId && <a href={videoUrl} class="reader-bar__xlink" title="Watch this chapter">Watch</a>}
+          <a href={devotionalUrl} class="reader-bar__xlink" title="Read devotional">Devotional</a>
+        </div>
+        {nextCh ? (
+          <a href={`/bible/${bookInfo.slug}/${nextCh}/`} class="reader-bar__link" aria-label={`Next: Chapter ${nextCh}`}>&rarr;</a>
+        ) : nextBook ? (
+          <a href={`/bible/${nextBook.slug}/1/`} class="reader-bar__link" aria-label={`Next: ${nextBook.name}`}>&rarr;</a>
+        ) : (
+          <span class="reader-bar__link reader-bar__link--disabled">&rarr;</span>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Book scene — open book photo with text overlays
+       Desktop (lg+): full two-page book visual
+       Mobile (<lg): single parchment card
+       ═══════════════════════════════════════════════════════ -->
+  <div class="book-scene" id="scripture-body" data-strongs-file={strongsFile} data-slug={bookInfo.slug} data-chapter={String(chapterNum)} data-book-name={bookInfo.name} data-pagefind-body data-pagefind-meta={`type:Bible, title:${bookInfo.name} ${chapterNum}`} data-pagefind-filter="type:Bible">
+
+    <!-- Book photograph (visible only on lg+) -->
+    <img
+      class="book-photo"
+      src="/images/book-open-full.webp"
+      alt=""
+      draggable="false"
+      loading="eager"
+    />
+
+    <!-- Aspect-ratio container matching the book image dimensions -->
+    <div class="book-frame">
+
+      <!-- ── LEFT PAGE ── Book name + chapter grid (lg+ only) -->
+      <div class="book-left">
+        <div class="book-page-inner">
+          <div class="page-title">{bookInfo.name}</div>
+          <svg class="page-wave" viewBox="0 0 272 20" preserveAspectRatio="none">
+            <path d={wavePath} fill="none" stroke="#8B7355" stroke-width="3.2" />
+          </svg>
+          <nav class="ch-grid" aria-label="Chapter navigation">
+            {Array.from({ length: bookInfo.chapters }, (_, i) => i + 1).map(n => (
+              <a
+                href={`/bible/${bookInfo.slug}/${n}/`}
+                class:list={['ch-pill', { 'ch-pill--active': n === chapterNum }]}
+                aria-label={`Chapter ${n}`}
+                aria-current={n === chapterNum ? 'page' : undefined}
+              >
+                {n}
+              </a>
+            ))}
+          </nav>
+          <div class="page-xlinks">
+            {videoId && <a href={videoUrl} class="page-xlinks__a">Watch Video</a>}
+            <a href={devotionalUrl} class="page-xlinks__a">Devotional</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RIGHT PAGE (desktop) / CARD (mobile) ── Scripture text -->
+      <div class="book-right">
+        <div class="book-page-inner">
+          <!-- Mobile: full title. Desktop: "Chapter N" header -->
+          <div class="page-title page-title--mobile">{bookInfo.name} {chapterNum}</div>
+          <div class="page-title page-title--desktop">Chapter {chapterNum}</div>
+          <svg class="page-wave" viewBox="0 0 272 20" preserveAspectRatio="none">
+            <path d={wavePath} fill="none" stroke="#8B7355" stroke-width="3.2" />
+          </svg>
+
+          <div class="page-body">
+            <div class="page-body__content">
+            {chapterData ? (
+              chapterData.verses.map((verse, vi) => {
+                // Word index counter (skips breaks)
+                let wi = 0;
+                return (
+                <Fragment>
+                  {verse.heading && <h3 class="verse-heading">{verse.heading}</h3>}
+                  <div class="verse-group" data-verse={verse.number}>
+                    {/* First verse: drop cap */}
+                    {vi === 0 && dropCapChar ? (
+                      <Fragment>
+                        <span class="dc-wrap">
+                          <span class="dc-letter">{dropCapChar}</span>
+                        </span>
+                        {firstWordRemainder && (
+                          firstWordStrongs
+                            ? <span class:list={['bk-word', { 'bk-word--red': firstWordWj }]} data-s={firstWordStrongs} data-v={verse.number} data-w={wi++}>{firstWordRemainder} </span>
+                            : <span class:list={['bk-word', { 'bk-word--red': firstWordWj }]} data-v={verse.number} data-w={wi++}>{firstWordRemainder} </span>
+                        )}
+                        {verse.words.slice(1).map((w) =>
+                          w.break ? (
+                            <span class="bk-break" />
+                          ) : (
+                            <span class:list={['bk-word', { 'bk-word--red': w.wj }]} data-s={w.s || undefined} data-v={verse.number} data-w={wi++}>{w.text} </span>
+                          )
+                        )}
+                      </Fragment>
+                    ) : (
+                      <Fragment>
+                        <span class="v-num">{verse.number}</span>
+                        {verse.words.map((w) =>
+                          w.break ? (
+                            <span class="bk-break" />
+                          ) : (
+                            <span class:list={['bk-word', { 'bk-word--red': w.wj }]} data-s={w.s || undefined} data-v={verse.number} data-w={wi++}>{w.text} </span>
+                          )
+                        )}
+                      </Fragment>
+                    )}
+                  </div>
+                </Fragment>
+                );
+              })
+            ) : (
+              <div class="no-data">
+                <p>Chapter data not available yet.</p>
+                <a href={`/bible/${bookInfo.slug}/1/`}>Go to chapter 1</a>
+              </div>
+            )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Footnotes & Cross References (below book)
+       ═══════════════════════════════════════════════════════ -->
+  {chapterData && (chapterData.verses.some(v => v.footnotes?.length) || chapterData.verses.some(v => v.crossRefs?.length)) && (
+    <div class="notes-section">
+      <div class="notes-inner">
+        {chapterData.verses.some(v => v.footnotes?.length) && (
+          <details class="notes-block">
+            <summary>Footnotes</summary>
+            <div class="notes-list">
+              {chapterData.verses.flatMap(v =>
+                (v.footnotes || []).map(fn => (
+                  <p><span class="notes-ref">{fn.ref}</span> {fn.text}</p>
+                ))
+              )}
+            </div>
+          </details>
+        )}
+        {chapterData.verses.some(v => v.crossRefs?.length) && (
+          <details class="notes-block">
+            <summary>Cross References</summary>
+            <div class="notes-list">
+              {chapterData.verses.flatMap(v =>
+                (v.crossRefs || []).map(xr => (
+                  <p><span class="notes-ref">{xr.ref}</span> {xr.text}</p>
+                ))
+              )}
+            </div>
+          </details>
+        )}
+      </div>
+    </div>
+  )}
+
+  <div class="container-page">
+    <DonateBanner />
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Bottom chapter navigation
+       ═══════════════════════════════════════════════════════ -->
+  <nav class="ch-nav" aria-label="Chapter navigation">
+    <div class="ch-nav__inner">
+      {prevCh ? (
+        <a href={`/bible/${bookInfo.slug}/${prevCh}/`} class="ch-nav__link">
+          <span>&larr;</span> Chapter {prevCh}
+        </a>
+      ) : prevBook ? (
+        <a href={`/bible/${prevBook.slug}/${prevBook.chapters}/`} class="ch-nav__link">
+          <span>&larr;</span> {prevBook.name} {prevBook.chapters}
+        </a>
+      ) : (
+        <span></span>
+      )}
+      <a href="/library/" class="ch-nav__center">All Books</a>
+      {nextCh ? (
+        <a href={`/bible/${bookInfo.slug}/${nextCh}/`} class="ch-nav__link">
+          Chapter {nextCh} <span>&rarr;</span>
+        </a>
+      ) : nextBook ? (
+        <a href={`/bible/${nextBook.slug}/1/`} class="ch-nav__link">
+          {nextBook.name} 1 <span>&rarr;</span>
+        </a>
+      ) : (
+        <span></span>
+      )}
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Strong's definition popup
+       ═══════════════════════════════════════════════════════ -->
+  <div id="strongs-popup" class="strongs-popup" style="display:none;">
+    <div class="strongs-popup__inner">
+      <div class="strongs-popup__content">
+        <div class="strongs-popup__head">
+          <span id="strongs-lemma" class="strongs-popup__lemma"></span>
+          <span id="strongs-translit" class="strongs-popup__translit"></span>
+          <span id="strongs-id" class="strongs-popup__id"></span>
+        </div>
+        <p id="strongs-def" class="strongs-popup__def"></p>
+        <p id="strongs-kjv" class="strongs-popup__kjv"></p>
+        <p id="strongs-deriv" class="strongs-popup__deriv"></p>
+        <p id="strongs-note" class="strongs-popup__note"></p>
+      </div>
+      <button id="strongs-close" class="strongs-popup__close" aria-label="Close definition">&times;</button>
+    </div>
+  </div>
+
+</BaseLayout>
+
+<!-- ═══════════════════════════════════════════════════════
+     Client-side interactivity
+     ═══════════════════════════════════════════════════════ -->
+<script>
+  // ── Book / Chapter navigation ──────────────────────────
+  const bookSelect = document.getElementById('book-select') as HTMLSelectElement;
+  const chapterSelect = document.getElementById('chapter-select') as HTMLSelectElement;
+
+  bookSelect?.addEventListener('change', () => {
+    window.location.href = `/bible/${bookSelect.value}/1/`;
+  });
+  chapterSelect?.addEventListener('change', () => {
+    const slug = bookSelect?.value || window.location.pathname.split('/')[2];
+    window.location.href = `/bible/${slug}/${chapterSelect.value}/`;
+  });
+
+  // ── Font size control ──────────────────────────────────
+  const FONT_STEPS = [0.95, 1.0, 1.1, 1.2, 1.35];
+  const FONT_KEY = 'bible-font-step';
+  let fontStep = parseInt(localStorage.getItem(FONT_KEY) || '1', 10);
+  if (fontStep < 0 || fontStep >= FONT_STEPS.length) fontStep = 1;
+
+  function applyFontSize() {
+    document.documentElement.style.setProperty('--bible-font-scale', String(FONT_STEPS[fontStep]));
+    localStorage.setItem(FONT_KEY, String(fontStep));
+    // Re-paginate if in paged mode (double rAF for reflow to settle)
+    if (currentMode === 'page') {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        recalcPages();
+        goToPage(currentPage);
+      }));
+    }
+  }
+
+  document.getElementById('font-down')?.addEventListener('click', () => {
+    if (fontStep > 0) { fontStep--; applyFontSize(); }
+  });
+  document.getElementById('font-up')?.addEventListener('click', () => {
+    if (fontStep < FONT_STEPS.length - 1) { fontStep++; applyFontSize(); }
+  });
+
+  // ── Reading mode: scroll vs. page ──────────────────────
+  // Page-flip uses VERTICAL scroll pagination with verse-boundary snapping.
+  // Like the longform video renderer, a verse is NEVER split across pages.
+  // We measure each .verse-group element and build a page-break map.
+  const MODE_KEY = 'bible-read-mode';
+  let currentMode: 'scroll' | 'page' = (localStorage.getItem(MODE_KEY) as any) || 'scroll';
+  const modeToggle = document.getElementById('read-mode-toggle');
+  const modeIconScroll = document.getElementById('mode-icon-scroll');
+  const modeIconPage = document.getElementById('mode-icon-page');
+  const pageNav = document.getElementById('page-nav');
+  const pagePrev = document.getElementById('page-prev');
+  const pageNext = document.getElementById('page-next');
+  const pageInd = document.getElementById('page-indicator');
+
+  const pageBody = document.querySelector('.book-right .page-body') as HTMLElement | null;
+  const pageContent = document.querySelector('.book-right .page-body__content') as HTMLElement | null;
+  let currentPage = 0;
+  let totalPages = 1;
+  /** Column width in px — cached so goToPage doesn't re-measure */
+  let _colWidth = 0;
+  /** Full page stride: column-width + gap (gap pushes next column beyond clip) */
+  let _pageStride = 0;
+  /** Pre-built map: verse-group element → page index (for audio highlight) */
+  const _versePageMap = new Map<HTMLElement, number>();
+
+  /**
+   * CSS Multi-Column Pagination (the proven e-reader approach).
+   *
+   * How it works:
+   * 1. Set height on .page-body__content = container visible height
+   * 2. Set column-width = container width → each column = one "page"
+   * 3. The browser distributes content into columns, respecting
+   *    break-inside:avoid on .verse-group (never splits a verse)
+   * 4. Navigate by translateX(-pageIndex * pageStride)
+   * 5. overflow:hidden on .page-body clips to show one column at a time
+   *
+   * Key detail: overflow:hidden clips to the PADDING BOX. If .page-body
+   * has padding, overflow columns can bleed into the padding area and
+   * be visible. Fix: column-gap > padding pushes column 2 entirely
+   * beyond the clip boundary. The gap is invisible (clipped).
+   */
+  function recalcPages() {
+    if (!pageBody || !pageContent || currentMode !== 'page') return;
+
+    // Reset column layout + transform so we can measure natural dimensions
+    pageContent.style.transform = '';
+    pageContent.style.columnWidth = '';
+    pageContent.style.height = '';
+    pageContent.style.columnGap = '';
+    pageContent.style.columnFill = '';
+    pageBody.style.height = '';
+    void pageContent.offsetHeight; // force reflow
+
+    let colH = pageBody.clientHeight;
+
+    // On mobile, .page-body has no fixed height (content-sized).
+    // Detect this and set a viewport-based height.
+    if (colH <= 0 || colH >= pageContent.scrollHeight - 2) {
+      const bodyRect = pageBody.getBoundingClientRect();
+      // visualViewport.height handles iOS Safari dynamic address bar
+      const vh = window.visualViewport?.height || window.innerHeight;
+      colH = Math.max(300, vh - bodyRect.top - 32);
+      pageBody.style.height = colH + 'px';
+    }
+
+    _colWidth = pageContent.clientWidth;
+    if (_colWidth <= 0) return;
+
+    // Measure parent padding — we need column-gap > padding to prevent
+    // the next column from bleeding into the padding box area.
+    const cs = getComputedStyle(pageBody);
+    const padRight = parseFloat(cs.paddingRight) || 0;
+    const gap = Math.ceil(padRight * 2 + 4); // generous: 2× padding + 4px safety
+
+    // Configure CSS multi-column: each column = one page
+    pageContent.style.height = colH + 'px';
+    pageContent.style.columnWidth = _colWidth + 'px';
+    pageContent.style.columnGap = gap + 'px';
+    pageContent.style.columnFill = 'auto';
+
+    // Force reflow to compute column layout
+    void pageContent.scrollWidth;
+
+    // Page stride = column + gap (accounts for the invisible gap between pages)
+    _pageStride = _colWidth + gap;
+    // scrollWidth = N*colWidth + (N-1)*gap = N*stride - gap
+    // So (scrollWidth + gap) / stride = N exactly, avoiding float drift
+    totalPages = Math.max(1, Math.round((pageContent.scrollWidth + gap) / _pageStride));
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+    // Build verse → page map for audio highlight auto-advance
+    _buildVersePageMap();
+
+    // Navigate to current page
+    pageContent.style.transform = `translateX(-${currentPage * _pageStride}px)`;
+    updatePageIndicator();
+  }
+
+  /** Map each .verse-group to its column index using getBoundingClientRect */
+  function _buildVersePageMap() {
+    _versePageMap.clear();
+    if (!pageBody || !pageContent || _pageStride <= 0) return;
+    const baseLeft = pageContent.getBoundingClientRect().left;
+    const verses = pageBody.querySelectorAll('.verse-group');
+    for (const el of verses) {
+      const rect = (el as HTMLElement).getBoundingClientRect();
+      const relLeft = rect.left - baseLeft;
+      // Math.round avoids accumulated float drift on later pages
+      const page = Math.max(0, Math.round(relLeft / _pageStride));
+      _versePageMap.set(el as HTMLElement, Math.min(totalPages - 1, page));
+    }
+  }
+
+  function updatePageIndicator() {
+    if (pageInd) pageInd.textContent = `${currentPage + 1} / ${totalPages}`;
+  }
+
+  function goToPage(n: number, autoAdvance = false) {
+    const target = Math.max(0, Math.min(totalPages - 1, n));
+    if (target === currentPage) return;
+    currentPage = target;
+    if (pageContent && _pageStride > 0) {
+      pageContent.style.transform = `translateX(-${currentPage * _pageStride}px)`;
+    }
+    updatePageIndicator();
+
+    // Manual flip while audio is playing → enter browse mode.
+    // Auto-tracking resumes only when the user returns to the active audio page.
+    if (!autoAdvance && audio && !audio.paused) {
+      _userBrowsing = true;
+    }
+  }
+
+  /** When true, audio keeps playing + highlighting but does NOT auto-navigate */
+  let _userBrowsing = false;
+
+  /** Given an element inside the paged body, return its page index */
+  function getPageOfElement(el: HTMLElement): number {
+    if (currentMode !== 'page' || totalPages <= 1) return 0;
+    const vg = el.closest('.verse-group') as HTMLElement | null;
+    if (vg && _versePageMap.has(vg)) return _versePageMap.get(vg)!;
+    return currentPage;
+  }
+
+  function enterPageMode() {
+    currentMode = 'page';
+    localStorage.setItem(MODE_KEY, 'page');
+    if (pageBody) {
+      pageBody.classList.add('page-body--paged');
+      pageBody.scrollTop = 0; // reset scroll position from scroll mode
+    }
+    if (modeIconScroll) modeIconScroll.style.display = 'none';
+    if (modeIconPage) modeIconPage.style.display = '';
+    if (pageNav) pageNav.style.display = '';
+    currentPage = 0;
+    requestAnimationFrame(() => recalcPages());
+  }
+
+  function enterScrollMode() {
+    currentMode = 'scroll';
+    localStorage.setItem(MODE_KEY, 'scroll');
+    if (pageBody) {
+      pageBody.classList.remove('page-body--paged');
+      pageBody.style.height = '';
+    }
+    if (pageContent) {
+      pageContent.style.transform = '';
+      pageContent.style.columnWidth = '';
+      pageContent.style.height = '';
+      pageContent.style.columnGap = '';
+      pageContent.style.columnFill = '';
+    }
+    if (modeIconScroll) modeIconScroll.style.display = '';
+    if (modeIconPage) modeIconPage.style.display = 'none';
+    if (pageNav) pageNav.style.display = 'none';
+  }
+
+  modeToggle?.addEventListener('click', () => {
+    if (currentMode === 'scroll') enterPageMode();
+    else enterScrollMode();
+  });
+
+  pagePrev?.addEventListener('click', () => goToPage(currentPage - 1));
+  pageNext?.addEventListener('click', () => goToPage(currentPage + 1));
+
+  // Swipe support for paged mode (horizontal swipe — like a real book)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  pageBody?.addEventListener('touchstart', (e) => {
+    if (currentMode !== 'page') return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  pageBody?.addEventListener('touchend', (e) => {
+    if (currentMode !== 'page') return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    // Horizontal swipe: left = next page, right = prev page
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) goToPage(currentPage + 1);
+      else goToPage(currentPage - 1);
+    }
+  }, { passive: true });
+
+  // Scroll-mode: detect manual scroll → enter browse mode
+  let _scrollFromAuto = false;
+  pageBody?.addEventListener('scroll', () => {
+    if (currentMode !== 'scroll' || !audio || audio.paused) return;
+    if (_scrollFromAuto) { _scrollFromAuto = false; return; }
+    _userBrowsing = true;
+  }, { passive: true });
+
+  // Recalc on window resize (debounced)
+  let _resizeTimer = 0;
+  function _onResize() {
+    if (currentMode !== 'page') return;
+    clearTimeout(_resizeTimer);
+    _resizeTimer = window.setTimeout(() => {
+      recalcPages();
+      goToPage(currentPage);
+    }, 150);
+  }
+  window.addEventListener('resize', _onResize);
+  // iOS Safari: visualViewport fires when address bar collapses/expands
+  window.visualViewport?.addEventListener('resize', _onResize);
+
+  // Apply saved font size + mode on load
+  applyFontSize();
+  if (currentMode === 'page') enterPageMode();
+  else enterScrollMode();
+
+  // ── Keyboard shortcuts ─────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hidePopup();
+    // Arrow keys: page nav in paged mode, chapter nav in scroll mode
+    const tag = (e.target as HTMLElement).tagName;
+    if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') {
+      if (currentMode === 'page' && currentPage > 0) {
+        goToPage(currentPage - 1);
+      } else {
+        const prev = document.querySelector('.ch-nav__link[href]') as HTMLAnchorElement;
+        if (prev) window.location.href = prev.href;
+      }
+    }
+    if (e.key === 'ArrowRight') {
+      if (currentMode === 'page' && currentPage < totalPages - 1) {
+        goToPage(currentPage + 1);
+      } else {
+        const links = document.querySelectorAll('.ch-nav__link[href]');
+        const next = links[links.length - 1] as HTMLAnchorElement;
+        if (next) window.location.href = next.href;
+      }
+    }
+  });
+
+  // ── Strong's definitions ───────────────────────────────
+  const body = document.getElementById('scripture-body');
+  const popup = document.getElementById('strongs-popup');
+  const lemmaEl = document.getElementById('strongs-lemma');
+  const translitEl = document.getElementById('strongs-translit');
+  const idEl = document.getElementById('strongs-id');
+  const defEl = document.getElementById('strongs-def');
+  const kjvEl = document.getElementById('strongs-kjv');
+  const derivEl = document.getElementById('strongs-deriv');
+  const noteEl = document.getElementById('strongs-note');
+  const closeBtn = document.getElementById('strongs-close');
+
+  let strongsCache: Record<string, { l: string; t: string; d?: string; k?: string; r?: string }> | null = null;
+  let loadingStrongs = false;
+  let activeStrongsId: string | null = null;
+
+  async function loadStrongs(): Promise<typeof strongsCache> {
+    if (strongsCache) return strongsCache;
+    if (loadingStrongs) {
+      return new Promise(resolve => {
+        const check = setInterval(() => {
+          if (strongsCache) { clearInterval(check); resolve(strongsCache); }
+        }, 50);
+      });
+    }
+    loadingStrongs = true;
+    const file = body?.dataset.strongsFile || 'strongs-greek.json';
+    try {
+      const resp = await fetch(`/data/${file}`);
+      strongsCache = await resp.json();
+    } catch {
+      strongsCache = {};
+    }
+    loadingStrongs = false;
+    return strongsCache;
+  }
+
+  function showPopup(entry: { l: string; t: string; d?: string; k?: string; r?: string }, strongId: string, clickedWord?: string) {
+    if (!popup || !lemmaEl || !translitEl || !defEl || !idEl) return;
+    lemmaEl.textContent = entry.l || '';
+    translitEl.textContent = entry.t ? `(${entry.t})` : '';
+    idEl.textContent = strongId;
+
+    // Full definition
+    defEl.textContent = entry.d || 'Definition not available.';
+
+    // KJV translation glosses
+    if (kjvEl) {
+      if (entry.k) {
+        kjvEl.textContent = `Translated as: ${entry.k}`;
+        kjvEl.style.display = '';
+      } else {
+        kjvEl.style.display = 'none';
+      }
+    }
+
+    // Derivation / etymology
+    if (derivEl) {
+      if (entry.r) {
+        derivEl.textContent = `Origin: ${entry.r}`;
+        derivEl.style.display = '';
+      } else {
+        derivEl.style.display = 'none';
+      }
+    }
+
+    if (noteEl) {
+      const lang = strongId.startsWith('H') ? 'Hebrew' : 'Greek';
+      noteEl.textContent = clickedWord
+        ? `Original ${lang} word linked to \u201c${clickedWord}\u201d in the English text.`
+        : `Original ${lang} word.`;
+    }
+    activeStrongsId = strongId;
+    popup.style.display = '';
+    requestAnimationFrame(() => {
+      popup.classList.add('strongs-popup--visible');
+    });
+  }
+
+  function hidePopup() {
+    if (!popup) return;
+    activeStrongsId = null;
+    popup.classList.remove('strongs-popup--visible');
+    setTimeout(() => { popup.style.display = 'none'; }, 200);
+  }
+
+  body?.addEventListener('click', async (e) => {
+    const target = (e.target as HTMLElement).closest('.bk-word[data-s]') as HTMLElement | null;
+    if (!target) { hidePopup(); return; }
+    const strongId = target.dataset.s;
+    if (!strongId) return;
+    // Toggle: click same word again to close
+    if (activeStrongsId === strongId) { hidePopup(); return; }
+    const dict = await loadStrongs();
+    if (!dict) return;
+    const entry = dict[strongId];
+    const clickedWord = target.textContent?.trim().replace(/[,.:;!?'"()\[\]]+$/, '') || '';
+    if (entry) {
+      showPopup(entry, strongId, clickedWord);
+    } else {
+      showPopup({ l: '', t: '', d: 'Definition not found.' }, strongId, clickedWord);
+    }
+  });
+
+  closeBtn?.addEventListener('click', hidePopup);
+
+  // ═══════════════════════════════════════════════════════
+  // Audio playback with word-level highlight sync
+  // Right-click (desktop) / double-tap (mobile) starts from that word
+  // ═══════════════════════════════════════════════════════
+  const slug = body?.dataset.slug || '';
+  const chapter = body?.dataset.chapter || '';
+  const audioToggle = document.getElementById('audio-toggle');
+  const iconPlay = document.getElementById('audio-icon-play');
+  const iconPause = document.getElementById('audio-icon-pause');
+
+  let audio: HTMLAudioElement | null = null;
+  let tsData: { verses: { verse: number; start: number; end: number; words: { word: string; start: number; end: number }[] }[] } | null = null;
+  let animFrame = 0;
+  let highlightedEl: HTMLElement | null = null;
+  let audioReady = false;
+
+  // ── Load timestamp data ────────────────────────────────
+  async function loadTimestamps() {
+    if (tsData) return tsData;
+    try {
+      const resp = await fetch(`/data/timestamps/${slug}/${chapter}.json`);
+      if (!resp.ok) return null;
+      tsData = await resp.json();
+      return tsData;
+    } catch { return null; }
+  }
+
+  // ── Audio base URL (empty = local /audio/, set to R2 domain for production) ──
+  const AUDIO_BASE = import.meta.env.PUBLIC_AUDIO_BASE || '';
+
+  // ── Get or create audio element ────────────────────────
+  function getAudio(): HTMLAudioElement {
+    if (!audio) {
+      audio = new Audio(`${AUDIO_BASE}/audio/${slug}/${chapter}.webm`);
+      audio.preload = 'none';
+      audio.addEventListener('ended', stopAudio);
+      audio.addEventListener('pause', () => updateIcons(false));
+      audio.addEventListener('play', () => updateIcons(true));
+    }
+    return audio;
+  }
+
+  function updateIcons(playing: boolean) {
+    if (iconPlay) iconPlay.style.display = playing ? 'none' : '';
+    if (iconPause) iconPause.style.display = playing ? '' : 'none';
+  }
+
+  // ── Clear highlight ────────────────────────────────────
+  function clearHighlight() {
+    if (highlightedEl) {
+      highlightedEl.classList.remove('bk-word--playing');
+      highlightedEl = null;
+    }
+  }
+
+  // ── Highlight loop (syncs word highlights to audio time)
+  function highlightLoop() {
+    if (!audio || audio.paused || !tsData) return;
+    const t = audio.currentTime;
+
+    // Find the current word
+    for (const verse of tsData.verses) {
+      if (t < verse.start || t > verse.end) continue;
+      for (let wi = 0; wi < verse.words.length; wi++) {
+        const w = verse.words[wi];
+        if (t >= w.start && t < w.end) {
+          const el = body?.querySelector(
+            `.bk-word[data-v="${verse.verse}"][data-w="${wi}"]`
+          ) as HTMLElement | null;
+          if (el && el !== highlightedEl) {
+            clearHighlight();
+            el.classList.add('bk-word--playing');
+            highlightedEl = el;
+            // In paged mode: auto-advance only if user hasn't flipped away.
+            // In scroll mode: auto-scroll only if user hasn't scrolled away.
+            // In both modes: resume auto-tracking when user returns to
+            // where the audio is (same page, or word visible in viewport).
+            if (currentMode === 'page') {
+              const wordPage = getPageOfElement(el);
+              if (wordPage === currentPage) {
+                // User is on the same page as the audio — resume tracking
+                _userBrowsing = false;
+              } else if (!_userBrowsing) {
+                goToPage(wordPage, true);
+              }
+            } else {
+              // Scroll mode — scroll inside .page-body, not the window
+              if (_userBrowsing) {
+                // Check if highlighted word is visible within the page-body container
+                if (pageBody) {
+                  const cRect = pageBody.getBoundingClientRect();
+                  const wRect = el.getBoundingClientRect();
+                  const inView = wRect.top >= cRect.top && wRect.bottom <= cRect.bottom;
+                  if (inView) _userBrowsing = false;
+                }
+              }
+              if (!_userBrowsing && pageBody) {
+                // Position highlighted word ~1/3 from top of the page-body container.
+                // Industry standard for read-along: context above, preview below.
+                const cRect = pageBody.getBoundingClientRect();
+                const wRect = el.getBoundingClientRect();
+                const targetY = cRect.top + cRect.height * 0.33;
+                const offset = wRect.top - targetY;
+                if (Math.abs(offset) > 4) {
+                  _scrollFromAuto = true;
+                  pageBody.scrollBy({ top: offset, behavior: 'smooth' });
+                }
+              }
+            }
+          }
+          animFrame = requestAnimationFrame(highlightLoop);
+          return;
+        }
+      }
+      // Between words in this verse (silence gap)
+      animFrame = requestAnimationFrame(highlightLoop);
+      return;
+    }
+    // Between verses
+    animFrame = requestAnimationFrame(highlightLoop);
+  }
+
+  // ── Start audio from a specific time ───────────────────
+  async function playFrom(startTime: number) {
+    const ts = await loadTimestamps();
+    if (!ts) return;
+    _userBrowsing = false; // user explicitly chose a start point — track it
+    const a = getAudio();
+    a.currentTime = startTime;
+    try {
+      await a.play();
+      audioReady = true;
+      clearHighlight();
+      animFrame = requestAnimationFrame(highlightLoop);
+    } catch { /* autoplay blocked */ }
+  }
+
+  // ── Stop / pause audio ─────────────────────────────────
+  function stopAudio() {
+    if (audio) {
+      audio.pause();
+    }
+    cancelAnimationFrame(animFrame);
+    clearHighlight();
+    updateIcons(false);
+    _userBrowsing = false;
+  }
+
+  // ── Toggle play / pause (toolbar button) ───────────────
+  audioToggle?.addEventListener('click', async () => {
+    if (audio && !audio.paused) {
+      stopAudio();
+    } else {
+      // Resume from current position, or start from beginning
+      const a = getAudio();
+      if (!audioReady) {
+        await playFrom(0);
+      } else {
+        try {
+          await a.play();
+          animFrame = requestAnimationFrame(highlightLoop);
+        } catch {}
+      }
+    }
+  });
+
+  // ── Right-click on word → play from that word (desktop)
+  body?.addEventListener('contextmenu', async (e) => {
+    const target = (e.target as HTMLElement).closest('.bk-word[data-v]') as HTMLElement | null;
+    if (!target) return;
+    e.preventDefault();
+    const v = parseInt(target.dataset.v || '0', 10);
+    const w = parseInt(target.dataset.w || '0', 10);
+    const ts = await loadTimestamps();
+    if (!ts) return;
+    const verse = ts.verses.find(vs => vs.verse === v);
+    if (!verse) return;
+    const wordTs = verse.words[w];
+    const startTime = wordTs ? wordTs.start : verse.start;
+    await playFrom(startTime);
+  });
+
+  // ── Double-tap on word → play from that word (mobile) ──
+  let lastTapTarget: HTMLElement | null = null;
+  let lastTapTime = 0;
+
+  body?.addEventListener('touchend', async (e) => {
+    const target = (e.target as HTMLElement).closest('.bk-word[data-v]') as HTMLElement | null;
+    if (!target) return;
+    const now = Date.now();
+    if (lastTapTarget === target && now - lastTapTime < 400) {
+      // Double-tap detected
+      e.preventDefault();
+      lastTapTarget = null;
+      lastTapTime = 0;
+      const v = parseInt(target.dataset.v || '0', 10);
+      const w = parseInt(target.dataset.w || '0', 10);
+      const ts = await loadTimestamps();
+      if (!ts) return;
+      const verse = ts.verses.find(vs => vs.verse === v);
+      if (!verse) return;
+      const wordTs = verse.words[w];
+      const startTime = wordTs ? wordTs.start : verse.start;
+      await playFrom(startTime);
+    } else {
+      lastTapTarget = target;
+      lastTapTime = now;
+    }
+  });
+
+  // ── Verse deep-linking (#v5 → scroll/page to verse 5) ──
+  function navigateToHashVerse() {
+    const hash = window.location.hash;
+    const match = hash.match(/^#v(\d+)$/);
+    if (!match) return;
+    const verseNum = parseInt(match[1], 10);
+    const verseEl = pageBody?.querySelector(`.verse-group[data-verse="${verseNum}"]`) as HTMLElement | null;
+    if (!verseEl) return;
+
+    if (currentMode === 'page') {
+      // Wait for pagination to settle, then jump to the verse's page
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const page = getPageOfElement(verseEl);
+        goToPage(page);
+        updatePageIndicator();
+      }));
+    } else {
+      // Scroll mode: scroll the verse into view
+      requestAnimationFrame(() => {
+        verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+    // Brief highlight effect
+    verseEl.classList.add('verse-group--linked');
+    setTimeout(() => verseEl.classList.remove('verse-group--linked'), 2000);
+  }
+  // Navigate on initial load
+  navigateToHashVerse();
+  // Navigate on hash change (e.g. clicking a cross-reference link)
+  window.addEventListener('hashchange', navigateToHashVerse);
+
+  // ── Reading position bookmark ──────────────────────────
+  // Save current position to localStorage so the user can resume later.
+  const BOOKMARK_KEY = 'bible-bookmark';
+  const _bodyEl = document.getElementById('scripture-body');
+  const _bkSlug = _bodyEl?.dataset.slug || '';
+  const _bkChapter = parseInt(_bodyEl?.dataset.chapter || '1', 10);
+  const _bkName = _bodyEl?.dataset.bookName || '';
+
+  function saveBookmark() {
+    const bk: Record<string, any> = {
+      slug: _bkSlug,
+      chapter: _bkChapter,
+      name: _bkName,
+      mode: currentMode,
+      ts: Date.now(),
+    };
+    if (currentMode === 'page') {
+      bk.page = currentPage;
+    } else if (pageBody) {
+      bk.scrollTop = pageBody.scrollTop;
+    }
+    try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify(bk)); } catch {}
+  }
+
+  // Save on page flip
+  const _origGoToPage = goToPage;
+  // Wrap goToPage to also save bookmark
+  const _goToPageOrig = goToPage.bind(undefined as any);
+  // Instead, we listen for page changes via a MutationObserver on transform changes.
+  // Simpler: debounce save on any page/scroll change.
+  let _bookmarkTimer = 0;
+  function debouncedSaveBookmark() {
+    clearTimeout(_bookmarkTimer);
+    _bookmarkTimer = window.setTimeout(saveBookmark, 500);
+  }
+
+  // Hook into page navigation
+  pagePrev?.addEventListener('click', debouncedSaveBookmark);
+  pageNext?.addEventListener('click', debouncedSaveBookmark);
+  pageBody?.addEventListener('touchend', debouncedSaveBookmark, { passive: true });
+  pageBody?.addEventListener('scroll', debouncedSaveBookmark, { passive: true });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') debouncedSaveBookmark();
+  });
+  // Also save immediately on page load (opening a chapter = reading it)
+  saveBookmark();
+
+  // Restore scroll/page position if returning to the same chapter
+  try {
+    const saved = JSON.parse(localStorage.getItem(BOOKMARK_KEY) || '{}');
+    if (saved.slug === _bkSlug && saved.chapter === _bkChapter) {
+      if (saved.mode === 'page' && currentMode === 'page' && saved.page > 0) {
+        // Wait for pagination to settle then restore page
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          goToPage(saved.page);
+          updatePageIndicator();
+        }));
+      } else if (saved.mode === 'scroll' && currentMode === 'scroll' && saved.scrollTop > 0 && pageBody) {
+        requestAnimationFrame(() => { pageBody.scrollTop = saved.scrollTop; });
+      }
+    }
+  } catch {}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     Styles — Book visual e-reader
+     Mobile-first, desktop override at lg (1024px)
+     ═══════════════════════════════════════════════════════ -->
+<style is:global>
+  /* ── Reader bar ─────────────────────────────────────────── */
+  .reader-bar {
+    background: #1a1510;
+    border-bottom: 1px solid rgba(139, 115, 85, 0.3);
+    position: sticky;
+    top: 64px; /* below site header */
+    z-index: 40;
+  }
+  .reader-bar__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1.25rem;
+    gap: 0.75rem;
+  }
+  .reader-bar__nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .reader-bar__link {
+    color: #C9A227;
+    font-size: 1.25rem;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .reader-bar__link:hover { background: rgba(201, 162, 39, 0.15); }
+  .reader-bar__link--disabled { color: rgba(201, 162, 39, 0.3); pointer-events: none; }
+  .reader-bar__selectors {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .reader-bar__select {
+    background: rgba(255,255,255,0.08);
+    color: #f5f0e6;
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+  }
+  .reader-bar__select:focus { border-color: #C9A227; }
+  .reader-bar__select--ch { width: 4.5rem; }
+  .reader-bar__select option { background: #1a1510; color: #f5f0e6; }
+  .reader-bar__links {
+    display: none;
+  }
+  .reader-bar__xlink {
+    color: #C9A227;
+    font-size: 0.8rem;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .reader-bar__xlink:hover { text-decoration: underline; }
+
+  @media (min-width: 768px) {
+    .reader-bar__links { display: flex; gap: 0.75rem; }
+  }
+
+  /* ── Book scene — mobile first ──────────────────────────── */
+  .book-scene {
+    padding: 1rem 1.25rem 1.5rem;
+    background: #faf8f3;
+  }
+  .book-photo {
+    display: none;
+  }
+  .book-frame {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .book-left {
+    display: none;
+  }
+  .book-right {
+    background: #f5f0e6;
+    border-radius: 8px;
+    box-shadow:
+      0 2px 16px rgba(0, 0, 0, 0.08),
+      0 1px 4px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+  }
+  .book-page-inner {
+    padding: 1.5rem 1.5rem 2rem;
+  }
+
+  /* ── Page title ─────────────────────────────────────────── */
+  .page-title {
+    text-align: center;
+    font-family: 'EB Garamond', serif;
+    font-weight: bold;
+    color: #2A2520;
+    line-height: 1.2;
+  }
+  /* Mobile shows "Book N", desktop shows "Chapter N" */
+  .page-title--mobile {
+    display: block;
+    font-size: 1.75rem;
+    padding-top: 0.5rem;
+  }
+  .page-title--desktop { display: none; }
+
+  /* ── Decorative wave ────────────────────────────────────── */
+  .page-wave {
+    display: block;
+    margin: 0.6rem auto 0.8rem;
+    height: 10px;
+    width: 50%;
+  }
+
+  /* ── Page body (scripture text) ─────────────────────────── */
+  .page-body {
+    font-family: 'EB Garamond', serif;
+    font-size: calc(1.15rem * var(--bible-font-scale, 1));
+    line-height: 1.5;
+    color: #2A2520;
+  }
+
+  /* ── Verse blocks (one div per verse, like longform) ────── */
+  .verse-group {
+    display: block;
+  }
+  .verse-group--linked {
+    background: rgba(201, 162, 39, 0.15);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  .verse-group + .verse-group {
+    margin-top: 0.8em;
+  }
+  .verse-heading {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2A2520;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .bk-break { display: block; margin-top: 0.6rem; }
+
+  /* ── Verse numbers ──────────────────────────────────────── */
+  .v-num {
+    font-family: 'EB Garamond', serif;
+    font-weight: bold;
+    color: #6B4226;
+    margin-right: 0.3em;
+    font-size: 0.82em;
+  }
+
+  /* ── Word spans ─────────────────────────────────────────── */
+  .bk-word {
+    cursor: default;
+  }
+  .bk-word[data-s] {
+    cursor: pointer;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .bk-word[data-s]:hover {
+    color: #D4A017;
+    border-bottom-color: #C9A227;
+  }
+
+  /* ── Red letter (Words of Jesus) ────────────────────────── */
+  .bk-word--red {
+    color: #CC1100;
+  }
+  .bk-word--red[data-s]:hover {
+    color: #D4A017;
+  }
+
+  /* ── Audio playback word highlight ──────────────────────── */
+  .bk-word--playing {
+    background-color: var(--highlight-color, rgba(212, 160, 23, 0.35));
+    border-radius: 2px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background-color 0.08s ease;
+  }
+
+  /* ── Paginated reading mode (CSS multi-column, like e-readers) ─ */
+  .page-body--paged {
+    overflow: hidden !important;
+  }
+  .page-body__content {
+    will-change: transform;
+  }
+  /* Prevent verses from being split across pages */
+  .page-body--paged .verse-group {
+    break-inside: avoid;
+  }
+  .page-body--paged .verse-heading {
+    break-inside: avoid;
+    break-after: avoid;
+  }
+
+  /* ── Reading mode toggle button ─────────────────────────── */
+  .reader-bar__mode-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    color: #C9A227;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .reader-bar__mode-btn:hover {
+    background: rgba(201, 162, 39, 0.15);
+  }
+
+  /* ── Page navigation (prev / indicator / next) ──────────── */
+  .reader-bar__page-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+  .reader-bar__page-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    color: #C9A227;
+    font-size: 1.1rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    padding: 0;
+    line-height: 1;
+  }
+  .reader-bar__page-btn:hover {
+    background: rgba(201, 162, 39, 0.15);
+  }
+  .reader-bar__page-ind {
+    color: #8B7355;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    min-width: 3rem;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* ── Audio play button ──────────────────────────────────── */
+  .reader-bar__audio-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    color: #C9A227;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .reader-bar__audio-btn:hover {
+    background: rgba(201, 162, 39, 0.2);
+  }
+
+  /* ── Font size controls ─────────────────────────────────── */
+  .reader-bar__font-controls {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+  .reader-bar__font-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    color: #C9A227;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.15s;
+  }
+  .reader-bar__font-btn:hover {
+    background: rgba(201, 162, 39, 0.15);
+  }
+
+  /* ── Drop cap ───────────────────────────────────────────── */
+  .dc-wrap {
+    float: left;
+    width: 3.2rem;
+    height: 4.5rem;
+    margin-right: 0.3rem;
+  }
+  .dc-letter {
+    display: block;
+    font-family: 'UnifrakturMaguntia', serif;
+    font-size: 3.6rem;
+    line-height: 1;
+    text-align: center;
+    padding: 0.15rem;
+    background: rgba(201, 162, 39, 0.5);
+    color: #6B0F1A;
+    position: relative;
+    box-sizing: border-box;
+  }
+  .dc-letter::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 2px solid #C9A227;
+    pointer-events: none;
+  }
+
+  /* ── No data fallback ───────────────────────────────────── */
+  .no-data {
+    text-align: center;
+    padding: 3rem 0;
+    color: #7A7A8A;
+  }
+  .no-data a { color: #C9A227; text-decoration: underline; }
+
+  /* ── Footnotes / cross-refs ─────────────────────────────── */
+  .notes-section {
+    background: #faf8f3;
+    padding: 0 1.25rem 1.5rem;
+  }
+  .notes-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .notes-block {
+    border-top: 1px solid #EDE6DA;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .notes-block summary {
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #7A7A8A;
+  }
+  .notes-block summary:hover { color: #2A2520; }
+  .notes-list {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #4A4A5A;
+    line-height: 1.6;
+  }
+  .notes-list p { margin: 0.3rem 0; }
+  .notes-ref { font-weight: 500; }
+
+  /* ── Bottom chapter navigation ──────────────────────────── */
+  .ch-nav {
+    background: #F5F1EB;
+    padding: 1.25rem 1.25rem;
+  }
+  .ch-nav__inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ch-nav__link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #2A2520;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .ch-nav__link:hover { color: #C9A227; }
+  .ch-nav__center {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: #7A7A8A;
+    text-decoration: none;
+  }
+  .ch-nav__center:hover { color: #C9A227; }
+
+  /* ── Strong's popup ─────────────────────────────────────── */
+  .strongs-popup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #f5f0e6;
+    border-top: 2px solid #C9A227;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+    transition: transform 0.2s ease;
+    z-index: 50;
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  .strongs-popup--visible { transform: translateY(0); }
+  .strongs-popup__inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .strongs-popup__head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .strongs-popup__lemma {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.4rem;
+    color: #2A2520;
+    font-weight: 600;
+  }
+  .strongs-popup__translit {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #6B4226;
+  }
+  .strongs-popup__id {
+    font-family: monospace;
+    font-size: 0.72rem;
+    color: #7A7A8A;
+    background: rgba(0,0,0,0.05);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+  .strongs-popup__def {
+    font-size: 0.9rem;
+    color: #3A3A4A;
+    line-height: 1.6;
+    margin: 0.3rem 0 0;
+  }
+  .strongs-popup__kjv {
+    font-size: 0.82rem;
+    color: #5A5A6A;
+    line-height: 1.5;
+    margin: 0.35rem 0 0;
+    padding-top: 0.3rem;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .strongs-popup__deriv {
+    font-size: 0.8rem;
+    color: #6B6B7B;
+    line-height: 1.5;
+    margin: 0.3rem 0 0;
+    font-style: italic;
+  }
+  .strongs-popup__note {
+    font-size: 0.72rem;
+    color: #9A9AAA;
+    font-style: italic;
+    margin: 0.35rem 0 0;
+    line-height: 1.4;
+  }
+  .strongs-popup__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #7A7A8A;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .strongs-popup__close:hover { color: #2A2520; }
+
+  /* ═══════════════════════════════════════════════════════════
+     DESKTOP — Full book visual (lg: 1024px+)
+     ═══════════════════════════════════════════════════════════ */
+  @media (min-width: 1024px) {
+    .book-scene {
+      background: #1a1510;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 8rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Book photograph background */
+    .book-photo {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Aspect-ratio frame matching the book image */
+    .book-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 177.78vh; /* 4032/2268 * 100 */
+      max-height: 56.25vw; /* 2268/4032 * 100 */
+      aspect-ratio: 4032 / 2268;
+      margin: 0;
+    }
+
+    /* Left page overlay */
+    .book-left {
+      display: block;
+      position: absolute;
+      left: 30.43%;
+      top: 27.56%;
+      width: 18.06%;
+      height: 55.38%;
+      container-type: inline-size;
+      overflow: hidden;
+    }
+    .book-left .book-page-inner {
+      padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .book-left .page-title {
+      padding-top: 8.93cqw;
+      font-size: 9.34cqw;
+    }
+    .book-left .page-wave {
+      margin: 1.79cqw auto 1.92cqw;
+      height: 1.37cqw;
+      width: 50%;
+    }
+
+    /* Chapter grid on left page */
+    .ch-grid {
+      padding: 0 4cqw;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5cqw;
+      overflow-y: auto;
+      flex: 1;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(107, 66, 38, 0.2) transparent;
+    }
+    .ch-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 9cqw;
+      height: 9cqw;
+      border-radius: 2cqw;
+      font-family: 'EB Garamond', serif;
+      font-size: 4.5cqw;
+      color: #6B4226;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .ch-pill:hover {
+      background: rgba(201, 162, 39, 0.2);
+      color: #2A2520;
+    }
+    .ch-pill--active {
+      background: rgba(201, 162, 39, 0.5);
+      color: #2A2520;
+      font-weight: bold;
+    }
+
+    /* Cross-links at bottom of left page */
+    .page-xlinks {
+      display: flex;
+      justify-content: center;
+      gap: 3cqw;
+      padding: 2cqw 0 1cqw;
+    }
+    .page-xlinks__a {
+      font-family: 'EB Garamond', serif;
+      font-size: 4.5cqw;
+      color: #6B4226;
+      text-decoration: none;
+    }
+    .page-xlinks__a:hover { color: #D4A017; }
+
+    /* Right page overlay */
+    .book-right {
+      position: absolute;
+      left: 50.79%;
+      top: 28.26%;
+      width: 17.73%;
+      height: 54.94%;
+      container-type: inline-size;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+    }
+    .book-right .book-page-inner {
+      padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Title: desktop shows "Chapter N" only */
+    .page-title--mobile { display: none; }
+    .page-title--desktop { display: block; }
+    .book-right .page-title {
+      padding-top: 8.93cqw;
+      font-size: 9.34cqw;
+    }
+    .book-right .page-wave {
+      margin: 1.79cqw auto 1.92cqw;
+      height: 1.37cqw;
+      width: 50%;
+    }
+
+    /* Body text with cqw sizing */
+    .book-right .page-body {
+      padding: 0 8.24cqw;
+      font-size: calc(6.45cqw * var(--bible-font-scale, 1));
+      line-height: 1.5;
+      overflow-y: auto;
+      flex: 1;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(107, 66, 38, 0.2) transparent;
+    }
+    /* Desktop paged mode: clip content vertically */
+    .book-right .page-body--paged {
+      overflow: hidden !important;
+    }
+    .book-right .page-body::-webkit-scrollbar { width: 4px; }
+    .book-right .page-body::-webkit-scrollbar-track { background: transparent; }
+    .book-right .page-body::-webkit-scrollbar-thumb {
+      background: rgba(107, 66, 38, 0.25);
+      border-radius: 2px;
+    }
+
+    /* Verse block spacing at cqw scale */
+    .book-right .verse-group + .verse-group {
+      margin-top: 5.84cqw;
+    }
+    .book-right .verse-heading {
+      font-size: 5.5cqw;
+      margin: 3cqw 0 1.5cqw;
+    }
+    .book-right .bk-break { margin-top: 3cqw; }
+    .book-right .v-num {
+      font-size: 5.22cqw;
+      margin-right: 0.4em;
+    }
+
+    /* Drop cap at cqw scale */
+    .book-right .dc-wrap {
+      width: 21.77cqw;
+      height: 29.03cqw;
+      margin-right: 2.06cqw;
+    }
+    .book-right .dc-letter {
+      font-size: 19.02cqw;
+      padding: 1.37cqw;
+    }
+    .book-right .dc-letter::after {
+      inset: 0.27cqw;
+      border-width: 0.21cqw;
+    }
+
+    /* Notes section under book */
+    .notes-section {
+      background: #1a1510;
+      padding: 1rem 2rem;
+    }
+    .notes-inner {
+      max-width: 800px;
+    }
+    .notes-block {
+      border-top-color: rgba(139, 115, 85, 0.3);
+    }
+    .notes-block summary { color: #8B7355; }
+    .notes-block summary:hover { color: #C9A227; }
+    .notes-list { color: #a89880; }
+    .notes-ref { color: #C9A227; }
+
+    /* Bottom navigation under book */
+    .ch-nav {
+      background: #1a1510;
+      padding: 1rem 2rem;
+      border-top: 1px solid rgba(139, 115, 85, 0.3);
+    }
+    .ch-nav__inner { max-width: 800px; }
+    .ch-nav__link { color: #C9A227; }
+    .ch-nav__link:hover { color: #f5f0e6; }
+    .ch-nav__center { color: #8B7355; }
+    .ch-nav__center:hover { color: #C9A227; }
+
+    /* Strong's popup — dark theme on desktop */
+    .strongs-popup {
+      background: #2a2218;
+      border-top-color: #C9A227;
+    }
+    .strongs-popup__inner { max-width: 800px; }
+    .strongs-popup__lemma { color: #f5f0e6; }
+    .strongs-popup__translit { color: #C9A227; }
+    .strongs-popup__id { color: #8B7355; }
+    .strongs-popup__def { color: #a89880; }
+    .strongs-popup__note { color: #6B6355; }
+    .strongs-popup__close { color: #8B7355; }
+    .strongs-popup__close:hover { color: #C9A227; }
+  }
+
+  /* ── Hide elements not needed on mobile ─────────────────── */
+  .ch-grid { display: none; }
+  .page-xlinks { display: none; }
+
+  @media (min-width: 1024px) {
+    .ch-grid { display: flex; }
+    .page-xlinks { display: flex; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     DARK THEME — Reader overrides (mobile & desktop)
+     ═══════════════════════════════════════════════════════════ */
+  [data-theme="dark"] .book-scene {
+    background: #141218;
+  }
+  [data-theme="dark"] .book-right {
+    background: #1e1c24;
+    box-shadow:
+      0 2px 16px rgba(0, 0, 0, 0.25),
+      0 1px 4px rgba(0, 0, 0, 0.15);
+  }
+  [data-theme="dark"] .page-title {
+    color: #E4E2DC;
+  }
+  [data-theme="dark"] .page-wave path {
+    stroke: #5A5040;
+  }
+  [data-theme="dark"] .page-body {
+    color: #D8D4CC;
+  }
+  [data-theme="dark"] .verse-heading {
+    color: #D8D4CC;
+  }
+  [data-theme="dark"] .v-num {
+    color: #C9A227;
+  }
+  [data-theme="dark"] .bk-word--red {
+    color: #E85545;
+  }
+  [data-theme="dark"] .dc-letter {
+    background: rgba(201, 162, 39, 0.3);
+    color: #E85545;
+  }
+  [data-theme="dark"] .notes-section {
+    background: #141218;
+  }
+  [data-theme="dark"] .notes-block {
+    border-top-color: #363650;
+  }
+  [data-theme="dark"] .notes-block summary {
+    color: #8A887E;
+  }
+  [data-theme="dark"] .notes-block summary:hover {
+    color: #D8D4CC;
+  }
+  [data-theme="dark"] .notes-list {
+    color: #B0AEA6;
+  }
+  [data-theme="dark"] .ch-nav {
+    background: #1e1c24;
+  }
+  [data-theme="dark"] .ch-nav__link {
+    color: #D8D4CC;
+  }
+  [data-theme="dark"] .ch-nav__link:hover {
+    color: #C9A227;
+  }
+  [data-theme="dark"] .ch-nav__center {
+    color: #8A887E;
+  }
+  /* Strong's popup — dark on mobile */
+  [data-theme="dark"] .strongs-popup {
+    background: #1e1c24;
+  }
+  [data-theme="dark"] .strongs-popup__lemma { color: #E4E2DC; }
+  [data-theme="dark"] .strongs-popup__translit { color: #C9A227; }
+  [data-theme="dark"] .strongs-popup__def { color: #B0AEA6; }
+  [data-theme="dark"] .strongs-popup__kjv { color: #8A887E; border-top-color: rgba(255,255,255,0.06); }
+  [data-theme="dark"] .strongs-popup__id { background: rgba(255,255,255,0.08); color: #8A887E; }
+  [data-theme="dark"] .strongs-popup__close { color: #8A887E; }
+  [data-theme="dark"] .strongs-popup__close:hover { color: #E4E2DC; }
+  /* Verse link highlight in dark */
+  [data-theme="dark"] .verse-group--linked {
+    background: rgba(201, 162, 39, 0.2);
+  }
+</style>

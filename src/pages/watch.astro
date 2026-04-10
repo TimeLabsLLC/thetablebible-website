@@ -13,29 +13,33 @@ const breadcrumbLd = {
 ---
 
 <BaseLayout title="Watch — The Table Bible" description="Watch Bible chapters with word-by-word highlighted text." jsonLd={breadcrumbLd} robots="noindex,follow">
-  <div class="watch-page container">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/library/">Library</a>
-      <span class="separator">›</span>
-      <span class="current" id="crumb-title">Watch</span>
+  <div class="mx-auto max-w-[960px] px-4 pt-6 pb-16">
+    <nav class="mb-6 text-sm text-charcoal-muted" aria-label="Breadcrumb">
+      <a href="/library/" class="text-accent hover:underline">Library</a>
+      <span class="mx-1.5">›</span>
+      <span id="crumb-title">Watch</span>
     </nav>
 
-    <div class="player-wrapper">
-      <div class="player-frame" id="player-frame">
-        <p class="player-loading">Loading video…</p>
+    <div class="mb-6">
+      <div class="player-frame aspect-video w-full rounded-lg overflow-hidden bg-black flex items-center justify-center" id="player-frame">
+        <p class="text-charcoal-muted text-center p-6">Loading video…</p>
       </div>
     </div>
 
-    <div class="watch-sequence" id="watch-sequence" hidden>
-      <h2 id="watch-sequence-title">Chapter queue</h2>
-      <p id="watch-sequence-copy"></p>
+    <div class="mb-6 p-4 border border-cream-300 rounded-xl bg-cream-200 text-center" id="watch-sequence" hidden>
+      <h2 class="mb-1 text-lg text-gold-dark" id="watch-sequence-title">Chapter queue</h2>
+      <p class="text-charcoal-muted" id="watch-sequence-copy"></p>
     </div>
 
-    <div class="watch-actions">
+    <div class="text-center">
       <button class="btn btn-secondary" id="back-btn" onclick="history.back()">← Back</button>
     </div>
   </div>
 </BaseLayout>
+
+<style>
+  .player-frame iframe { width: 100%; height: 100%; }
+</style>
 
 <script>
   const params = new URLSearchParams(window.location.search);
@@ -82,67 +86,3 @@ const breadcrumbLd = {
   }
 </script>
 
-<style>
-  .watch-page {
-    padding: var(--space-xl) var(--space-lg) var(--space-4xl);
-    max-width: 960px;
-  }
-
-  .breadcrumb {
-    margin-bottom: var(--space-xl);
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-  .breadcrumb a { color: var(--gold-light); }
-  .breadcrumb a:hover { text-decoration: underline; }
-  .breadcrumb .separator { margin: 0 var(--space-sm); color: var(--text-muted); }
-  .breadcrumb .current { color: var(--cream); }
-
-  .player-wrapper {
-    margin-bottom: var(--space-xl);
-  }
-  .player-frame {
-    aspect-ratio: 16 / 9;
-    width: 100%;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .player-frame iframe {
-    width: 100%;
-    height: 100%;
-  }
-  .player-loading, .player-error {
-    color: var(--text-muted);
-    text-align: center;
-    padding: var(--space-xl);
-  }
-  .player-error a { color: var(--gold-light); }
-
-  .watch-actions {
-    text-align: center;
-  }
-
-  .watch-sequence {
-    margin: 0 0 var(--space-xl);
-    padding: var(--space-lg);
-    border: 1px solid rgba(201, 168, 106, 0.16);
-    border-radius: var(--radius-lg);
-    background: rgba(42, 35, 30, 0.72);
-    text-align: center;
-  }
-
-  .watch-sequence h2 {
-    margin-bottom: var(--space-sm);
-    font-size: 1.1rem;
-    color: var(--gold-light);
-  }
-
-  .watch-sequence p {
-    margin: 0;
-    color: var(--text-muted);
-  }
-</style>

@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getUniqueAuthors, getQuotesByAuthor, type QuoteEntry } from '../../../utils/devotional';
+
+export function getStaticPaths() {
+  const authors = getUniqueAuthors();
+  return authors.map(author => ({
+    params: { author: author.slug },
+    props: { authorName: author.name, authorSlug: author.slug },
+  }));
+}
+
+interface Props {
+  authorName: string;
+  authorSlug: string;
+}
+
+const { authorName, authorSlug } = Astro.props;
+const quotes = getQuotesByAuthor(authorSlug);
+const verified = quotes.filter(q => q.source_url != null);
+const unverified = quotes.filter(q => q.source_url == null);
+
+const title = `${authorName} — Quotes & Teachings`;
+const description = `${verified.length} verified quotes and teachings from ${authorName}. Famous Words of Famous Christians.`;
+---
+<BaseLayout title={title} description={description}>
+  <main class="container-narrow py-12" data-pagefind-body data-pagefind-meta={`type:Quotes, title:${authorName} — Quotes`} data-pagefind-filter="type:Quotes">
+    <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
+      <a href="/quotes/" class="hover:text-accent">Quotes</a>
+      <span class="mx-2">/</span>
+      <span>{authorName}</span>
+    </nav>
+
+    <header class="mb-10">
+      <h1 class="text-4xl mb-2">{authorName}</h1>
+      <p class="text-charcoal-muted">
+        {verified.length} verified {verified.length === 1 ? 'quote' : 'quotes'}
+        {unverified.length > 0 && ` · ${unverified.length} pending verification`}
+      </p>
+    </header>
+
+    <section class="grid gap-8">
+      {verified.map(quote => (
+        <article class="card p-6">
+          <p class="text-lg leading-relaxed italic mb-4">"{quote.quote}"</p>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-charcoal-muted">{quote.source_title || ''}</span>
+            {quote.source_url && (
+              <a
+                href={quote.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-accent hover:text-accent-dark"
+              >
+                View Source
+              </a>
+            )}
+          </div>
+          {quote.themes && (
+            <div class="flex flex-wrap gap-1 mt-3">
+              {quote.themes.map(theme => (
+                <a
+                  href={`/quotes/theme/${theme.toLowerCase().replace(/ /g, '-')}/`}
+                  class="px-2 py-0.5 bg-cream-200 hover:bg-gold-50 text-xs rounded-full transition-colors"
+                >
+                  {theme}
+                </a>
+              ))}
+            </div>
+          )}
+        </article>
+      ))}
+    </section>
+
+    <div class="text-center mt-12">
+      <a href="/quotes/" class="btn-secondary">Browse All Authors</a>
+    </div>
+  </main>
+</BaseLayout>

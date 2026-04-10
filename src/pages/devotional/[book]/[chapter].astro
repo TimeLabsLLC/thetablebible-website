@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import DonateBanner from '../../../components/DonateBanner.astro';
+import {
+  getAllTtbEntries,
+  getTtbEntry,
+  getVotdEntry,
+  getBookSlug,
+  getDevotionalUrl,
+  getBibleUrl,
+  type TtbEntry,
+} from '../../../utils/devotional';
+import { getLibrarySections } from '../../../utils/library';
+
+export function getStaticPaths() {
+  const entries = getAllTtbEntries();
+  return entries.map(entry => {
+    const slug = getBookSlug(entry.book);
+    return {
+      params: { book: slug, chapter: String(entry.chapter) },
+      props: { entry },
+    };
+  });
+}
+
+interface Props {
+  entry: TtbEntry;
+}
+
+const { entry } = Astro.props;
+const { book: bookSlug, chapter: chapterStr } = Astro.params;
+const chapter = Number(chapterStr);
+
+// Get matching VotD entry for this chapter
+const votd = getVotdEntry(bookSlug!, chapter);
+
+// Find prev/next chapters
+const bookEntries = getAllTtbEntries().filter(e => getBookSlug(e.book) === bookSlug);
+const currentIdx = bookEntries.findIndex(e => e.chapter === chapter);
+const prevEntry = currentIdx > 0 ? bookEntries[currentIdx - 1] : null;
+const nextEntry = currentIdx < bookEntries.length - 1 ? bookEntries[currentIdx + 1] : null;
+
+// Total chapters for this book (from library data)
+const allSections = getLibrarySections();
+const bookData = allSections.flatMap(s => s.books).find(b => b.slug === bookSlug);
+const totalChapters = bookData?.chapters || bookEntries.length;
+
+const title = `${entry.title || `${entry.book_name} ${chapter}`} — ${entry.book_name} ${chapter}`;
+const description = entry.teaching?.[0]?.slice(0, 160) || `Daily devotional for ${entry.book_name} chapter ${chapter}`;
+const verseRange = entry.start_verse === entry.end_verse
+  ? `${entry.book_name} ${chapter}:${entry.start_verse}`
+  : `${entry.book_name} ${chapter}:${entry.start_verse}-${entry.end_verse}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": entry.title,
+  "description": description,
+  "author": {
+    "@type": "Organization",
+    "name": "The Table Bible",
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Table Bible",
+  },
+};
+---
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <main class="container-narrow py-12" data-pagefind-body data-pagefind-meta={`type:Devotional, title:${entry.book_name} ${chapter} — ${entry.title || 'Devotional'}`} data-pagefind-filter="type:Devotional">
+    {/* Breadcrumb */}
+    <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
+      <a href="/devotional/archive/" class="hover:text-accent">Devotional</a>
+      <span class="mx-2">/</span>
+      <a href={`/devotional/archive/#${bookSlug}`} class="hover:text-accent">{entry.book_name}</a>
+      <span class="mx-2">/</span>
+      <span>Chapter {chapter}</span>
+    </nav>
+
+    {/* Header */}
+    <header class="mb-10">
+      <p class="text-sm uppercase tracking-wider text-gold-dark font-sans mb-2">
+        {entry.book_name} &middot; Chapter {chapter} of {totalChapters}
+      </p>
+      <h1 class="text-4xl leading-tight mb-3">{entry.title}</h1>
+      <p class="text-charcoal-muted">
+        <a href={getBibleUrl(bookSlug!, chapter, entry.start_verse)} class="text-accent hover:text-accent-dark underline">
+          {verseRange}
+        </a>
+      </p>
+    </header>
+
+    {/* Teaching */}
+    {entry.teaching && entry.teaching.length > 0 ? (
+      <article class="prose max-w-none mb-10">
+        {entry.teaching.map(paragraph => (
+          <p class="text-lg leading-relaxed mb-5">{paragraph}</p>
+        ))}
+      </article>
+    ) : (
+      <div class="bg-cream-200 rounded-lg p-8 my-10 text-center">
+        <p class="text-charcoal-muted">Devotional content for this chapter is coming soon.</p>
+      </div>
+    )}
+
+    {/* Theologian Quote */}
+    {entry.theologian_quote && (
+      <blockquote class="scripture-block my-10 text-lg">
+        <p class="mb-3">"{entry.theologian_quote}"</p>
+        <footer class="text-sm text-charcoal-muted not-italic">
+          — {entry.theologian_name}
+        </footer>
+      </blockquote>
+    )}
+
+    {/* Reflection Question */}
+    {entry.question && (
+      <div class="bg-gold-50 border border-gold-light rounded-lg p-6 my-10">
+        <h2 class="text-sm uppercase tracking-wider text-gold-dark font-sans mb-3">Reflect</h2>
+        <p class="text-lg italic">{entry.question}</p>
+      </div>
+    )}
+
+    {/* Verse of the Day for this chapter */}
+    {votd && (
+      <div class="bg-scripture-bg border border-scripture-border rounded-lg p-6 my-10">
+        <h2 class="text-sm uppercase tracking-wider text-accent-dark font-sans mb-3">
+          Verse of the Day — {entry.book_name} {chapter}:{votd.verse}
+        </h2>
+        <p class="text-lg italic mb-4">"{votd.text}"</p>
+        <p class="text-charcoal-muted">{votd.reflection}</p>
+      </div>
+    )}
+
+    {/* Topics */}
+    {entry.topics && entry.topics.length > 0 && (
+      <div class="flex flex-wrap gap-2 my-8" data-pagefind-weight="3">
+        {entry.topics.map(topic => (
+          <span class="px-3 py-1 bg-cream-200 text-charcoal-muted text-sm rounded-full">
+            {topic}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <DonateBanner />
+
+    {/* Navigation */}
+    <nav class="flex justify-between items-center border-t border-cream-300 pt-6 mt-10">
+      {prevEntry ? (
+        <a href={getDevotionalUrl(bookSlug!, prevEntry.chapter)} class="btn-secondary text-sm">
+          &larr; Chapter {prevEntry.chapter}
+        </a>
+      ) : <div />}
+      <a href="/devotional/archive/" class="text-sm text-charcoal-muted hover:text-accent">
+        All Chapters
+      </a>
+      {nextEntry ? (
+        <a href={getDevotionalUrl(bookSlug!, nextEntry.chapter)} class="btn-secondary text-sm">
+          Chapter {nextEntry.chapter} &rarr;
+        </a>
+      ) : <div />}
+    </nav>
+  </main>
+</BaseLayout>
