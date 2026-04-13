@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export function getStaticPaths() {
+  const indexPath = path.join(process.cwd(), 'public/data/mhcc/_index.json');
+  const books: { abbr: string; slug: string; name: string; chapters: number; sections: number; hasModern: boolean }[] = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+
+  const paths: { params: { book: string; chapter: string }; props: any }[] = [];
+  for (const book of books) {
+    if (!book.hasModern) continue;
+    const dataPath = path.join(process.cwd(), `public/data/mhcc/${book.slug}.json`);
+    const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+    for (let ch = 1; ch <= book.chapters; ch++) {
+      const chStr = String(ch);
+      if (data[chStr]) {
+        paths.push({
+          params: { book: book.slug, chapter: chStr },
+          props: { bookInfo: book, chapterNum: ch, sections: data[chStr] },
+        });
+      }
+    }
+  }
+  return paths;
+}
+
+const { bookInfo, chapterNum, sections } = Astro.props;
+const totalChapters = bookInfo.chapters;
+const prevCh = chapterNum > 1 ? chapterNum - 1 : null;
+const nextCh = chapterNum < totalChapters ? chapterNum + 1 : null;
+
+const pageTitle = `${bookInfo.name} ${chapterNum} — Matthew Henry's Commentary (Modern English)`;
+const pageDesc = `Read Matthew Henry's Commentary on ${bookInfo.name} chapter ${chapterNum} in modern English. Classic Bible exposition made accessible for today's reader.`;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": `https://thetablebible.org/commentary/matthew-henry/modern/${bookInfo.slug}/${chapterNum}/#breadcrumb`,
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Commentary", "item": "https://thetablebible.org/commentary/" },
+    { "@type": "ListItem", "position": 2, "name": "Matthew Henry", "item": "https://thetablebible.org/commentary/matthew-henry/" },
+    { "@type": "ListItem", "position": 3, "name": bookInfo.name, "item": `https://thetablebible.org/commentary/matthew-henry/${bookInfo.slug}/1/` },
+    { "@type": "ListItem", "position": 4, "name": `Chapter ${chapterNum} (Modern)`, "item": `https://thetablebible.org/commentary/matthew-henry/modern/${bookInfo.slug}/${chapterNum}/` },
+  ],
+};
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `${bookInfo.name} ${chapterNum} — Matthew Henry's Commentary (Modern English)`,
+  "author": { "@type": "Person", "name": "Matthew Henry" },
+  "datePublished": "1706-01-01",
+  "publisher": { "@type": "Organization", "name": "The Table Bible", "url": "https://thetablebible.org" },
+  "mainEntityOfPage": `https://thetablebible.org/commentary/matthew-henry/modern/${bookInfo.slug}/${chapterNum}/`,
+};
+---
+
+<BaseLayout title={pageTitle} description={pageDesc} jsonLd={[breadcrumbLd, articleLd]}>
+  <article class="commentary-page">
+    <header class="commentary-header">
+      <p class="commentary-back">
+        <a href="/commentary/matthew-henry/">&larr; All Books</a>
+      </p>
+      <h1 class="commentary-h1">{bookInfo.name} {chapterNum}</h1>
+      <p class="commentary-subtitle">Matthew Henry's Commentary &mdash; Modern English</p>
+      <div class="commentary-nav-top">
+        {prevCh && <a href={`/commentary/matthew-henry/modern/${bookInfo.slug}/${prevCh}/`} class="commentary-nav__link">&larr; Ch {prevCh}</a>}
+        <a href={`/bible/${bookInfo.slug}/${chapterNum}/`} class="commentary-nav__read">Read {bookInfo.name} {chapterNum}</a>
+        {nextCh && <a href={`/commentary/matthew-henry/modern/${bookInfo.slug}/${nextCh}/`} class="commentary-nav__link">Ch {nextCh} &rarr;</a>}
+      </div>
+    </header>
+
+    <div class="commentary-body">
+      {sections.map((s: { v: string; o: string; m: string }) => (
+        <section class="commentary-section" id={`v${s.v}`}>
+          <h2 class="section-verses">Verses {s.v}</h2>
+          <div class="section-text">{s.m || s.o}</div>
+        </section>
+      ))}
+    </div>
+
+    <div class="commentary-toggle-bar">
+      <a href={`/commentary/matthew-henry/${bookInfo.slug}/${chapterNum}/`} class="original-page-link">&larr; Read Original English</a>
+    </div>
+
+    <nav class="commentary-nav-bottom">
+      {prevCh ? (
+        <a href={`/commentary/matthew-henry/modern/${bookInfo.slug}/${prevCh}/`} class="commentary-nav__link">&larr; Chapter {prevCh}</a>
+      ) : <span></span>}
+      <a href={`/bible/${bookInfo.slug}/${chapterNum}/`} class="commentary-nav__read">Read in Bible</a>
+      {nextCh ? (
+        <a href={`/commentary/matthew-henry/modern/${bookInfo.slug}/${nextCh}/`} class="commentary-nav__link">Chapter {nextCh} &rarr;</a>
+      ) : <span></span>}
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .commentary-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+  .commentary-header { text-align: center; margin-bottom: 2.5rem; }
+  .commentary-back a {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #7A7A8A;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .commentary-back a:hover { color: #C9A227; }
+  .commentary-h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: 2.2rem;
+    color: #2A2520;
+    margin: 0.5rem 0 0.25rem;
+  }
+  .commentary-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #7A7A8A;
+    margin: 0 0 1.5rem;
+  }
+  .commentary-nav-top, .commentary-nav-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .commentary-nav-bottom {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(107, 66, 38, 0.12);
+  }
+  .commentary-nav__link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #6B4226;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .commentary-nav__link:hover { color: #C9A227; }
+  .commentary-nav__read {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: #7A7A8A;
+    text-decoration: none;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(107, 66, 38, 0.2);
+    border-radius: 99px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .commentary-nav__read:hover {
+    color: #6B4226;
+    border-color: #C9A227;
+  }
+
+  .commentary-section {
+    margin-bottom: 2rem;
+  }
+  .section-verses {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.15rem;
+    color: #6B4226;
+    margin: 0 0 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(107, 66, 38, 0.1);
+  }
+  .section-text {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.05rem;
+    color: #3A3A4A;
+    line-height: 1.75;
+    white-space: pre-line;
+  }
+
+  .commentary-toggle-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(107, 66, 38, 0.1);
+  }
+  .original-page-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: #6B4226;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .original-page-link:hover { color: #C9A227; }
+
+  [data-theme="dark"] .commentary-h1 { color: #E4E2DC; }
+  [data-theme="dark"] .commentary-subtitle { color: #8A887E; }
+  [data-theme="dark"] .commentary-nav__link { color: #C9A227; }
+  [data-theme="dark"] .commentary-nav__read { color: #8A887E; border-color: rgba(201, 162, 39, 0.2); }
+  [data-theme="dark"] .commentary-nav__read:hover { color: #C9A227; border-color: #C9A227; }
+  [data-theme="dark"] .section-verses { color: #C9A227; border-bottom-color: rgba(201, 162, 39, 0.15); }
+  [data-theme="dark"] .section-text { color: #B0AEA6; }
+  [data-theme="dark"] .commentary-nav-bottom { border-top-color: rgba(201, 162, 39, 0.1); }
+  [data-theme="dark"] .commentary-toggle-bar { border-top-color: rgba(201, 162, 39, 0.1); }
+  [data-theme="dark"] .original-page-link { color: #C9A227; }
+  [data-theme="dark"] .original-page-link:hover { color: #E4E2DC; }
+</style>

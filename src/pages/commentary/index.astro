@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://thetablebible.org/commentary/#breadcrumb",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Commentary", "item": "https://thetablebible.org/commentary/" },
+  ],
+};
+---
+
+<BaseLayout title="Bible Commentary — The Table Bible" description="Free Bible commentary from classic theologians. Read Matthew Henry's Complete Commentary on every book of the Bible, in original and modern English." jsonLd={breadcrumbLd}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <h1 class="text-4xl mb-3">Bible Commentary</h1>
+      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto mb-8">
+        Classic Bible commentaries from trusted theologians. Read alongside Scripture to deepen your understanding.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="max-w-[680px] mx-auto">
+      <a href="/commentary/matthew-henry/" class="commentator-card">
+        <div class="commentator-card__inner">
+          <h2 class="commentator-card__name">Matthew Henry</h2>
+          <p class="commentator-card__dates">1662 – 1714</p>
+          <p class="commentator-card__desc">
+            The most widely read Bible commentary in the English language. Matthew Henry's Complete Commentary covers every chapter of every book, offering warm pastoral insight and practical application. Available in both the original 18th-century English and a modern paraphrase.
+          </p>
+          <span class="commentator-card__cta">Browse all 66 books &rarr;</span>
+        </div>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .commentator-card {
+    display: block;
+    text-decoration: none;
+    background: #FDFBF7;
+    border: 1px solid rgba(107, 66, 38, 0.15);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .commentator-card:hover {
+    border-color: #C9A227;
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.12);
+  }
+  .commentator-card__name {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.6rem;
+    color: #2A2520;
+    margin: 0 0 0.25rem;
+  }
+  .commentator-card__dates {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #7A7A8A;
+    margin: 0 0 1rem;
+  }
+  .commentator-card__desc {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.05rem;
+    color: #3A3A4A;
+    line-height: 1.6;
+    margin: 0 0 1rem;
+  }
+  .commentator-card__cta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #6B4226;
+    transition: color 0.15s;
+  }
+  .commentator-card:hover .commentator-card__cta {
+    color: #C9A227;
+  }
+  [data-theme="dark"] .commentator-card {
+    background: #1e1c24;
+    border-color: rgba(201, 162, 39, 0.15);
+  }
+  [data-theme="dark"] .commentator-card:hover {
+    border-color: #C9A227;
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.08);
+  }
+  [data-theme="dark"] .commentator-card__name { color: #E4E2DC; }
+  [data-theme="dark"] .commentator-card__desc { color: #B0AEA6; }
+  [data-theme="dark"] .commentator-card__cta { color: #C9A227; }
+  [data-theme="dark"] .commentator-card:hover .commentator-card__cta { color: #E4E2DC; }
+</style>

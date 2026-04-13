@@ -215,8 +215,9 @@ const breadcrumbLd = {
             ))}
           </nav>
           <div class="page-xlinks">
-            {videoId && <a href={videoUrl} class="page-xlinks__a">Watch Video</a>}
-            <a href={devotionalUrl} class="page-xlinks__a">Devotional</a>
+            {videoId && <a href={videoUrl} class="page-xlinks__pill">Watch Video</a>}
+            <a href={devotionalUrl} class="page-xlinks__pill">Devotional</a>
+            <button type="button" class="page-xlinks__pill" id="xlink-commentary">Commentary</button>
           </div>
         </div>
       </div>
@@ -245,7 +246,7 @@ const breadcrumbLd = {
                     {vi === 0 && dropCapChar ? (
                       <Fragment>
                         <span class="dc-wrap">
-                          <span class="dc-letter">{dropCapChar}</span>
+                          <span class="dc-letter" data-verse="1" role="button" tabindex="0" aria-label="Commentary for verse 1">{dropCapChar}</span>
                         </span>
                         {firstWordRemainder && (
                           firstWordStrongs
@@ -262,7 +263,7 @@ const breadcrumbLd = {
                       </Fragment>
                     ) : (
                       <Fragment>
-                        <span class="v-num">{verse.number}</span>
+                        <span class="v-num" data-verse={verse.number} role="button" tabindex="0" aria-label={`Commentary for verse ${verse.number}`}>{verse.number}</span>
                         {verse.words.map((w) =>
                           w.break ? (
                             <span class="bk-break" />
@@ -365,6 +366,26 @@ const breadcrumbLd = {
       )}
     </div>
   </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MHCC Commentary popup
+       ═══════════════════════════════════════════════════════ -->
+  <div id="mhcc-popup" class="mhcc-popup" style="display:none;">
+    <div class="mhcc-popup__inner">
+      <div class="mhcc-popup__content">
+        <div class="mhcc-popup__head">
+          <span id="mhcc-title" class="mhcc-popup__title">Matthew Henry</span>
+          <span id="mhcc-verses" class="mhcc-popup__verses"></span>
+        </div>
+        <div id="mhcc-text" class="mhcc-popup__text"></div>
+        <div class="mhcc-popup__toggle">
+          <button type="button" id="mhcc-toggle-version" class="mhcc-popup__version-btn">Show Original</button>
+        </div>
+        <a id="mhcc-full-link" class="mhcc-popup__full-link" href="#">Read full commentary &rarr;</a>
+      </div>
+      <button id="mhcc-close" class="mhcc-popup__close" aria-label="Close commentary">&times;</button>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════════
        Strong's definition popup
@@ -802,6 +823,140 @@ const breadcrumbLd = {
   });
 
   closeBtn?.addEventListener('click', hidePopup);
+
+  // ═══════════════════════════════════════════════════════
+  // MHCC Commentary popup
+  // ═══════════════════════════════════════════════════════
+  const mhccPopup = document.getElementById('mhcc-popup');
+  const mhccTitle = document.getElementById('mhcc-title');
+  const mhccVerses = document.getElementById('mhcc-verses');
+  const mhccText = document.getElementById('mhcc-text');
+  const mhccToggle = document.getElementById('mhcc-toggle-version') as HTMLButtonElement | null;
+  const mhccFullLink = document.getElementById('mhcc-full-link') as HTMLAnchorElement | null;
+  const mhccCloseBtn = document.getElementById('mhcc-close');
+  const xlinkCommentary = document.getElementById('xlink-commentary');
+
+  type MhccSection = { v: string; o: string; m: string };
+  type MhccBook = Record<string, MhccSection[]>;
+
+  let mhccCache: MhccBook | null = null;
+  let loadingMhcc = false;
+  let mhccShowOriginal = false;
+  let mhccCurrentSection: MhccSection | null = null;
+
+  async function loadMhcc(): Promise<MhccBook | null> {
+    if (mhccCache) return mhccCache;
+    if (loadingMhcc) {
+      return new Promise(resolve => {
+        const check = setInterval(() => {
+          if (mhccCache) { clearInterval(check); resolve(mhccCache); }
+        }, 50);
+      });
+    }
+    loadingMhcc = true;
+    const slug = body?.dataset.slug;
+    if (!slug) { loadingMhcc = false; return null; }
+    try {
+      const resp = await fetch(`/data/mhcc/${slug}.json`);
+      if (!resp.ok) throw new Error(resp.statusText);
+      mhccCache = await resp.json();
+    } catch {
+      mhccCache = null;
+    }
+    loadingMhcc = false;
+    return mhccCache;
+  }
+
+  /** Check if verseNum falls within a range string like "1-2", "3-5", "14-19" */
+  function verseInRange(verseNum: number, rangeStr: string): boolean {
+    const parts = rangeStr.split('-');
+    const start = parseInt(parts[0], 10);
+    const end = parts.length > 1 ? parseInt(parts[1], 10) : start;
+    return verseNum >= start && verseNum <= end;
+  }
+
+  function findSection(ch: string, verseNum: number): MhccSection | null {
+    if (!mhccCache || !mhccCache[ch]) return null;
+    return mhccCache[ch].find(s => verseInRange(verseNum, s.v)) || null;
+  }
+
+  function showMhccPopup(section: MhccSection, ch: string) {
+    if (!mhccPopup || !mhccText || !mhccVerses) return;
+    mhccCurrentSection = section;
+    mhccShowOriginal = false;
+    mhccVerses.textContent = `Verses ${section.v}`;
+    mhccText.textContent = section.m || section.o;
+    if (mhccToggle) {
+      mhccToggle.textContent = 'Show Original';
+      mhccToggle.style.display = section.m ? '' : 'none';
+    }
+    const slug = body?.dataset.slug || '';
+    if (mhccFullLink) {
+      mhccFullLink.href = `/commentary/matthew-henry/${slug}/${ch}/`;
+    }
+    // hide Strongs if open
+    hidePopup();
+    mhccPopup.style.display = '';
+    requestAnimationFrame(() => {
+      mhccPopup.classList.add('mhcc-popup--visible');
+    });
+  }
+
+  function hideMhccPopup() {
+    if (!mhccPopup) return;
+    mhccCurrentSection = null;
+    mhccPopup.classList.remove('mhcc-popup--visible');
+    setTimeout(() => { mhccPopup.style.display = 'none'; }, 200);
+  }
+
+  // Toggle original / modern
+  mhccToggle?.addEventListener('click', () => {
+    if (!mhccCurrentSection || !mhccText || !mhccToggle) return;
+    mhccShowOriginal = !mhccShowOriginal;
+    mhccText.textContent = mhccShowOriginal ? mhccCurrentSection.o : (mhccCurrentSection.m || mhccCurrentSection.o);
+    mhccToggle.textContent = mhccShowOriginal ? 'Show Modern' : 'Show Original';
+  });
+
+  mhccCloseBtn?.addEventListener('click', hideMhccPopup);
+
+  // Verse number click handler
+  document.addEventListener('click', async (e) => {
+    const vnum = (e.target as HTMLElement).closest('.v-num[data-verse], .dc-letter[data-verse]') as HTMLElement | null;
+    if (!vnum) return;
+    e.stopPropagation();
+    const verseNum = parseInt(vnum.dataset.verse || '1', 10);
+    const ch = body?.dataset.chapter || '1';
+    const data = await loadMhcc();
+    if (!data) return;
+    const section = findSection(ch, verseNum);
+    if (section) {
+      showMhccPopup(section, ch);
+    } else {
+      // No MHCC section covers this verse
+      if (mhccText) mhccText.textContent = 'No commentary available for this verse.';
+      if (mhccVerses) mhccVerses.textContent = `Verse ${verseNum}`;
+      if (mhccToggle) mhccToggle.style.display = 'none';
+      if (mhccPopup) {
+        hidePopup();
+        mhccPopup.style.display = '';
+        requestAnimationFrame(() => mhccPopup.classList.add('mhcc-popup--visible'));
+      }
+    }
+  });
+
+  // Commentary pill on left page — show commentary for verse 1
+  xlinkCommentary?.addEventListener('click', async () => {
+    const ch = body?.dataset.chapter || '1';
+    const data = await loadMhcc();
+    if (!data) return;
+    const section = findSection(ch, 1);
+    if (section) showMhccPopup(section, ch);
+  });
+
+  // Escape key closes MHCC popup too
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hideMhccPopup();
+  });
 
   // ═══════════════════════════════════════════════════════
   // Audio playback with word-level highlight sync
@@ -1306,6 +1461,20 @@ const breadcrumbLd = {
     color: #6B4226;
     margin-right: 0.3em;
     font-size: 0.82em;
+    cursor: pointer;
+    transition: color 0.15s, transform 0.15s;
+    display: inline-block;
+  }
+  .v-num:hover {
+    color: #C9A227;
+    transform: scale(1.18);
+  }
+  .dc-letter[data-verse] {
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .dc-letter[data-verse]:hover {
+    color: #C9A227;
   }
 
   /* ── Word spans ─────────────────────────────────────────── */
@@ -1637,6 +1806,105 @@ const breadcrumbLd = {
   }
   .strongs-popup__close:hover { color: #2A2520; }
 
+  /* ── MHCC Commentary popup ──────────────────────────────── */
+  .mhcc-popup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #f5f0e6;
+    border-top: 2px solid #6B4226;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+    transition: transform 0.2s ease;
+    z-index: 51;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .mhcc-popup--visible { transform: translateY(0); }
+  .mhcc-popup__inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .mhcc-popup__content {
+    flex: 1;
+    min-width: 0;
+  }
+  .mhcc-popup__head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .mhcc-popup__title {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.2rem;
+    color: #6B4226;
+    font-weight: 600;
+  }
+  .mhcc-popup__verses {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: #7A7A8A;
+    background: rgba(0,0,0,0.05);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+  .mhcc-popup__text {
+    font-family: 'EB Garamond', serif;
+    font-size: 0.92rem;
+    color: #3A3A4A;
+    line-height: 1.65;
+    margin: 0;
+    white-space: pre-line;
+  }
+  .mhcc-popup__toggle {
+    margin-top: 0.6rem;
+  }
+  .mhcc-popup__version-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: #6B4226;
+    background: rgba(107, 66, 38, 0.08);
+    border: 1px solid rgba(107, 66, 38, 0.2);
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mhcc-popup__version-btn:hover {
+    background: rgba(107, 66, 38, 0.15);
+    color: #2A2520;
+  }
+  .mhcc-popup__full-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: #6B4226;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .mhcc-popup__full-link:hover { color: #C9A227; }
+  .mhcc-popup__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #7A7A8A;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .mhcc-popup__close:hover { color: #2A2520; }
+
   /* ═══════════════════════════════════════════════════════════
      DESKTOP — Full book visual (lg: 1024px+)
      ═══════════════════════════════════════════════════════════ */
@@ -1782,6 +2050,24 @@ const breadcrumbLd = {
       text-decoration: none;
     }
     .page-xlinks__a:hover { color: #D4A017; }
+    .page-xlinks__pill {
+      font-family: 'EB Garamond', serif;
+      font-size: 3.8cqw;
+      color: #6B4226;
+      text-decoration: none;
+      background: transparent;
+      border: 1px solid rgba(107, 66, 38, 0.3);
+      border-radius: 99px;
+      padding: 0.5cqw 2.5cqw;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .page-xlinks__pill:hover {
+      background: rgba(201, 162, 39, 0.15);
+      color: #2A2520;
+      border-color: #C9A227;
+    }
 
     /* Right page overlay */
     .book-right {
@@ -2001,5 +2287,36 @@ const breadcrumbLd = {
   /* Verse link highlight in dark */
   [data-theme="dark"] .verse-group--linked {
     background: rgba(201, 162, 39, 0.2);
+  }
+  /* MHCC popup — dark */
+  [data-theme="dark"] .mhcc-popup {
+    background: #1e1c24;
+    border-top-color: #C9A227;
+  }
+  [data-theme="dark"] .mhcc-popup__title { color: #C9A227; }
+  [data-theme="dark"] .mhcc-popup__verses { background: rgba(255,255,255,0.08); color: #8A887E; }
+  [data-theme="dark"] .mhcc-popup__text { color: #B0AEA6; }
+  [data-theme="dark"] .mhcc-popup__version-btn {
+    color: #C9A227;
+    background: rgba(201, 162, 39, 0.1);
+    border-color: rgba(201, 162, 39, 0.25);
+  }
+  [data-theme="dark"] .mhcc-popup__version-btn:hover {
+    background: rgba(201, 162, 39, 0.2);
+    color: #E4E2DC;
+  }
+  [data-theme="dark"] .mhcc-popup__full-link { color: #C9A227; }
+  [data-theme="dark"] .mhcc-popup__full-link:hover { color: #E4E2DC; }
+  [data-theme="dark"] .mhcc-popup__close { color: #8A887E; }
+  [data-theme="dark"] .mhcc-popup__close:hover { color: #E4E2DC; }
+  /* Pill buttons — dark */
+  [data-theme="dark"] .page-xlinks__pill {
+    color: #C9A227;
+    border-color: rgba(201, 162, 39, 0.3);
+  }
+  [data-theme="dark"] .page-xlinks__pill:hover {
+    background: rgba(201, 162, 39, 0.15);
+    color: #E4E2DC;
+    border-color: #C9A227;
   }
 </style>

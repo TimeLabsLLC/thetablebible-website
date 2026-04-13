@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const indexPath = path.join(process.cwd(), 'public/data/mhcc/_index.json');
+const books: { abbr: string; slug: string; name: string; chapters: number; sections: number; hasModern: boolean }[] = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+
+// Group books by testament using canonical order
+const OT_SLUGS = new Set([
+  'genesis','exodus','leviticus','numbers','deuteronomy',
+  'joshua','judges','ruth','1-samuel','2-samuel','1-kings','2-kings',
+  '1-chronicles','2-chronicles','ezra','nehemiah','esther',
+  'job','psalms','proverbs','ecclesiastes','song-of-solomon',
+  'isaiah','jeremiah','lamentations','ezekiel','daniel',
+  'hosea','joel','amos','obadiah','jonah','micah','nahum',
+  'habakkuk','zephaniah','haggai','zechariah','malachi',
+]);
+
+const OT_ORDER = [...OT_SLUGS];
+const NT_ORDER = [
+  'matthew','mark','luke','john','acts',
+  'romans','1-corinthians','2-corinthians','galatians','ephesians',
+  'philippians','colossians','1-thessalonians','2-thessalonians',
+  '1-timothy','2-timothy','titus','philemon',
+  'hebrews','james','1-peter','2-peter','1-john','2-john','3-john',
+  'jude','revelation',
+];
+
+const bookBySlug = Object.fromEntries(books.map(b => [b.slug, b]));
+const otBooks = OT_ORDER.filter(s => bookBySlug[s]).map(s => bookBySlug[s]);
+const ntBooks = NT_ORDER.filter(s => bookBySlug[s]).map(s => bookBySlug[s]);
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://thetablebible.org/commentary/matthew-henry/#breadcrumb",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Commentary", "item": "https://thetablebible.org/commentary/" },
+    { "@type": "ListItem", "position": 2, "name": "Matthew Henry", "item": "https://thetablebible.org/commentary/matthew-henry/" },
+  ],
+};
+---
+
+<BaseLayout title="Matthew Henry's Complete Commentary — The Table Bible" description="Read Matthew Henry's Complete Commentary on every book of the Bible. Available in original 18th-century English and modern paraphrase. Free online." jsonLd={breadcrumbLd}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <p class="text-sm text-charcoal-muted mb-2"><a href="/commentary/" class="hover:text-gold transition-colors">&larr; Commentary</a></p>
+      <h1 class="text-4xl mb-2" style="font-family: 'EB Garamond', serif;">Matthew Henry</h1>
+      <p class="text-base text-charcoal-muted mb-1">Complete Commentary on the Whole Bible</p>
+      <p class="text-sm text-charcoal-muted max-w-[540px] mx-auto mb-8">
+        First published in 1706, Matthew Henry's commentary remains the most beloved and widely read exposition of Scripture in the English language. Every chapter of every book, explained with warmth and pastoral wisdom.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="max-w-[800px] mx-auto">
+      <h2 class="section-heading">Old Testament</h2>
+      <div class="book-grid">
+        {otBooks.map(book => (
+          <a href={`/commentary/matthew-henry/${book.slug}/1/`} class="book-link">
+            <span class="book-link__name">{book.name}</span>
+            <span class="book-link__chapters">{book.chapters} ch</span>
+          </a>
+        ))}
+      </div>
+
+      <h2 class="section-heading mt-12">New Testament</h2>
+      <div class="book-grid">
+        {ntBooks.map(book => (
+          <a href={`/commentary/matthew-henry/${book.slug}/1/`} class="book-link">
+            <span class="book-link__name">{book.name}</span>
+            <span class="book-link__chapters">{book.chapters} ch</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.3rem;
+    color: #6B4226;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(107, 66, 38, 0.15);
+  }
+  .book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.6rem;
+  }
+  .book-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .book-link:hover {
+    background: rgba(201, 162, 39, 0.1);
+  }
+  .book-link__name {
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    color: #2A2520;
+  }
+  .book-link__chapters {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: #7A7A8A;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+  }
+  .book-link:hover .book-link__name { color: #6B4226; }
+  [data-theme="dark"] .section-heading { color: #C9A227; border-bottom-color: rgba(201, 162, 39, 0.2); }
+  [data-theme="dark"] .book-link:hover { background: rgba(201, 162, 39, 0.08); }
+  [data-theme="dark"] .book-link__name { color: #D8D4CC; }
+  [data-theme="dark"] .book-link:hover .book-link__name { color: #C9A227; }
+</style>

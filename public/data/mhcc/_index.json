@@ -1,0 +1,530 @@
+[
+  {
+    "abbr": "1CH",
+    "slug": "1-chronicles",
+    "name": "1 Chronicles",
+    "chapters": 11,
+    "sections": 26,
+    "hasModern": true
+  },
+  {
+    "abbr": "1CO",
+    "slug": "1-corinthians",
+    "name": "1 Corinthians",
+    "chapters": 16,
+    "sections": 58,
+    "hasModern": true
+  },
+  {
+    "abbr": "1JN",
+    "slug": "1-john",
+    "name": "1 John",
+    "chapters": 5,
+    "sections": 21,
+    "hasModern": true
+  },
+  {
+    "abbr": "1KI",
+    "slug": "1-kings",
+    "name": "1 Kings",
+    "chapters": 22,
+    "sections": 76,
+    "hasModern": true
+  },
+  {
+    "abbr": "1PE",
+    "slug": "1-peter",
+    "name": "1 Peter",
+    "chapters": 5,
+    "sections": 17,
+    "hasModern": true
+  },
+  {
+    "abbr": "1SA",
+    "slug": "1-samuel",
+    "name": "1 Samuel",
+    "chapters": 31,
+    "sections": 99,
+    "hasModern": true
+  },
+  {
+    "abbr": "1TH",
+    "slug": "1-thessalonians",
+    "name": "1 Thessalonians",
+    "chapters": 5,
+    "sections": 17,
+    "hasModern": true
+  },
+  {
+    "abbr": "1TI",
+    "slug": "1-timothy",
+    "name": "1 Timothy",
+    "chapters": 6,
+    "sections": 20,
+    "hasModern": true
+  },
+  {
+    "abbr": "2CH",
+    "slug": "2-chronicles",
+    "name": "2 Chronicles",
+    "chapters": 14,
+    "sections": 32,
+    "hasModern": true
+  },
+  {
+    "abbr": "2CO",
+    "slug": "2-corinthians",
+    "name": "2 Corinthians",
+    "chapters": 13,
+    "sections": 38,
+    "hasModern": true
+  },
+  {
+    "abbr": "2JN",
+    "slug": "2-john",
+    "name": "2 John",
+    "chapters": 1,
+    "sections": 4,
+    "hasModern": true
+  },
+  {
+    "abbr": "2KI",
+    "slug": "2-kings",
+    "name": "2 Kings",
+    "chapters": 24,
+    "sections": 78,
+    "hasModern": true
+  },
+  {
+    "abbr": "2PE",
+    "slug": "2-peter",
+    "name": "2 Peter",
+    "chapters": 3,
+    "sections": 9,
+    "hasModern": true
+  },
+  {
+    "abbr": "2SA",
+    "slug": "2-samuel",
+    "name": "2 Samuel",
+    "chapters": 23,
+    "sections": 76,
+    "hasModern": true
+  },
+  {
+    "abbr": "2TH",
+    "slug": "2-thessalonians",
+    "name": "2 Thessalonians",
+    "chapters": 3,
+    "sections": 10,
+    "hasModern": true
+  },
+  {
+    "abbr": "2TI",
+    "slug": "2-timothy",
+    "name": "2 Timothy",
+    "chapters": 4,
+    "sections": 15,
+    "hasModern": true
+  },
+  {
+    "abbr": "3JN",
+    "slug": "3-john",
+    "name": "3 John",
+    "chapters": 1,
+    "sections": 3,
+    "hasModern": true
+  },
+  {
+    "abbr": "ACT",
+    "slug": "acts",
+    "name": "Acts",
+    "chapters": 28,
+    "sections": 119,
+    "hasModern": true
+  },
+  {
+    "abbr": "AMO",
+    "slug": "amos",
+    "name": "Amos",
+    "chapters": 8,
+    "sections": 18,
+    "hasModern": true
+  },
+  {
+    "abbr": "COL",
+    "slug": "colossians",
+    "name": "Colossians",
+    "chapters": 4,
+    "sections": 15,
+    "hasModern": true
+  },
+  {
+    "abbr": "DAN",
+    "slug": "daniel",
+    "name": "Daniel",
+    "chapters": 12,
+    "sections": 35,
+    "hasModern": true
+  },
+  {
+    "abbr": "DEU",
+    "slug": "deuteronomy",
+    "name": "Deuteronomy",
+    "chapters": 34,
+    "sections": 108,
+    "hasModern": true
+  },
+  {
+    "abbr": "ECC",
+    "slug": "ecclesiastes",
+    "name": "Ecclesiastes",
+    "chapters": 12,
+    "sections": 41,
+    "hasModern": true
+  },
+  {
+    "abbr": "EPH",
+    "slug": "ephesians",
+    "name": "Ephesians",
+    "chapters": 6,
+    "sections": 25,
+    "hasModern": true
+  },
+  {
+    "abbr": "EST",
+    "slug": "esther",
+    "name": "Esther",
+    "chapters": 9,
+    "sections": 20,
+    "hasModern": true
+  },
+  {
+    "abbr": "EXO",
+    "slug": "exodus",
+    "name": "Exodus",
+    "chapters": 37,
+    "sections": 127,
+    "hasModern": true
+  },
+  {
+    "abbr": "EZK",
+    "slug": "ezekiel",
+    "name": "Ezekiel",
+    "chapters": 37,
+    "sections": 89,
+    "hasModern": true
+  },
+  {
+    "abbr": "EZR",
+    "slug": "ezra",
+    "name": "Ezra",
+    "chapters": 10,
+    "sections": 25,
+    "hasModern": true
+  },
+  {
+    "abbr": "GAL",
+    "slug": "galatians",
+    "name": "Galatians",
+    "chapters": 6,
+    "sections": 28,
+    "hasModern": true
+  },
+  {
+    "abbr": "GEN",
+    "slug": "genesis",
+    "name": "Genesis",
+    "chapters": 48,
+    "sections": 193,
+    "hasModern": true
+  },
+  {
+    "abbr": "HAB",
+    "slug": "habakkuk",
+    "name": "Habakkuk",
+    "chapters": 3,
+    "sections": 8,
+    "hasModern": true
+  },
+  {
+    "abbr": "HAG",
+    "slug": "haggai",
+    "name": "Haggai",
+    "chapters": 2,
+    "sections": 5,
+    "hasModern": true
+  },
+  {
+    "abbr": "HEB",
+    "slug": "hebrews",
+    "name": "Hebrews",
+    "chapters": 13,
+    "sections": 45,
+    "hasModern": true
+  },
+  {
+    "abbr": "HOS",
+    "slug": "hosea",
+    "name": "Hosea",
+    "chapters": 14,
+    "sections": 32,
+    "hasModern": true
+  },
+  {
+    "abbr": "ISA",
+    "slug": "isaiah",
+    "name": "Isaiah",
+    "chapters": 59,
+    "sections": 168,
+    "hasModern": true
+  },
+  {
+    "abbr": "JAS",
+    "slug": "james",
+    "name": "James",
+    "chapters": 5,
+    "sections": 15,
+    "hasModern": true
+  },
+  {
+    "abbr": "JDE",
+    "slug": "jude",
+    "name": "Jude",
+    "chapters": 1,
+    "sections": 5,
+    "hasModern": true
+  },
+  {
+    "abbr": "JDG",
+    "slug": "judges",
+    "name": "Judges",
+    "chapters": 17,
+    "sections": 62,
+    "hasModern": true
+  },
+  {
+    "abbr": "JER",
+    "slug": "jeremiah",
+    "name": "Jeremiah",
+    "chapters": 48,
+    "sections": 142,
+    "hasModern": true
+  },
+  {
+    "abbr": "JHN",
+    "slug": "john",
+    "name": "John",
+    "chapters": 21,
+    "sections": 116,
+    "hasModern": true
+  },
+  {
+    "abbr": "JOB",
+    "slug": "job",
+    "name": "Job",
+    "chapters": 39,
+    "sections": 124,
+    "hasModern": true
+  },
+  {
+    "abbr": "JOL",
+    "slug": "joel",
+    "name": "Joel",
+    "chapters": 3,
+    "sections": 9,
+    "hasModern": true
+  },
+  {
+    "abbr": "JON",
+    "slug": "jonah",
+    "name": "Jonah",
+    "chapters": 4,
+    "sections": 10,
+    "hasModern": true
+  },
+  {
+    "abbr": "JOS",
+    "slug": "joshua",
+    "name": "Joshua",
+    "chapters": 23,
+    "sections": 70,
+    "hasModern": true
+  },
+  {
+    "abbr": "LAM",
+    "slug": "lamentations",
+    "name": "Lamentations",
+    "chapters": 5,
+    "sections": 14,
+    "hasModern": true
+  },
+  {
+    "abbr": "LEV",
+    "slug": "leviticus",
+    "name": "Leviticus",
+    "chapters": 20,
+    "sections": 62,
+    "hasModern": true
+  },
+  {
+    "abbr": "LUK",
+    "slug": "luke",
+    "name": "Luke",
+    "chapters": 24,
+    "sections": 118,
+    "hasModern": true
+  },
+  {
+    "abbr": "MAL",
+    "slug": "malachi",
+    "name": "Malachi",
+    "chapters": 4,
+    "sections": 9,
+    "hasModern": true
+  },
+  {
+    "abbr": "MAT",
+    "slug": "matthew",
+    "name": "Matthew",
+    "chapters": 28,
+    "sections": 144,
+    "hasModern": true
+  },
+  {
+    "abbr": "MIC",
+    "slug": "micah",
+    "name": "Micah",
+    "chapters": 7,
+    "sections": 17,
+    "hasModern": true
+  },
+  {
+    "abbr": "MRK",
+    "slug": "mark",
+    "name": "Mark",
+    "chapters": 16,
+    "sections": 76,
+    "hasModern": true
+  },
+  {
+    "abbr": "NAM",
+    "slug": "nahum",
+    "name": "Nahum",
+    "chapters": 3,
+    "sections": 6,
+    "hasModern": true
+  },
+  {
+    "abbr": "NEH",
+    "slug": "nehemiah",
+    "name": "Nehemiah",
+    "chapters": 10,
+    "sections": 28,
+    "hasModern": true
+  },
+  {
+    "abbr": "NUM",
+    "slug": "numbers",
+    "name": "Numbers",
+    "chapters": 35,
+    "sections": 110,
+    "hasModern": true
+  },
+  {
+    "abbr": "OBA",
+    "slug": "obadiah",
+    "name": "Obadiah",
+    "chapters": 1,
+    "sections": 2,
+    "hasModern": true
+  },
+  {
+    "abbr": "PHM",
+    "slug": "philemon",
+    "name": "Philemon",
+    "chapters": 1,
+    "sections": 4,
+    "hasModern": true
+  },
+  {
+    "abbr": "PHP",
+    "slug": "philippians",
+    "name": "Philippians",
+    "chapters": 4,
+    "sections": 15,
+    "hasModern": true
+  },
+  {
+    "abbr": "PRO",
+    "slug": "proverbs",
+    "name": "Proverbs",
+    "chapters": 31,
+    "sections": 534,
+    "hasModern": true
+  },
+  {
+    "abbr": "PSA",
+    "slug": "psalms",
+    "name": "Psalms",
+    "chapters": 117,
+    "sections": 304,
+    "hasModern": true
+  },
+  {
+    "abbr": "REV",
+    "slug": "revelation",
+    "name": "Revelation",
+    "chapters": 22,
+    "sections": 62,
+    "hasModern": true
+  },
+  {
+    "abbr": "ROM",
+    "slug": "romans",
+    "name": "Romans",
+    "chapters": 16,
+    "sections": 70,
+    "hasModern": true
+  },
+  {
+    "abbr": "RUT",
+    "slug": "ruth",
+    "name": "Ruth",
+    "chapters": 4,
+    "sections": 13,
+    "hasModern": true
+  },
+  {
+    "abbr": "SNG",
+    "slug": "song-of-solomon",
+    "name": "Song of Solomon",
+    "chapters": 8,
+    "sections": 25,
+    "hasModern": true
+  },
+  {
+    "abbr": "TIT",
+    "slug": "titus",
+    "name": "Titus",
+    "chapters": 3,
+    "sections": 9,
+    "hasModern": true
+  },
+  {
+    "abbr": "ZEC",
+    "slug": "zechariah",
+    "name": "Zechariah",
+    "chapters": 11,
+    "sections": 26,
+    "hasModern": true
+  },
+  {
+    "abbr": "ZEP",
+    "slug": "zephaniah",
+    "name": "Zephaniah",
+    "chapters": 3,
+    "sections": 8,
+    "hasModern": true
+  }
+]
