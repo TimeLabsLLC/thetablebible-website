@@ -22,8 +22,17 @@ const unverified = quotes.filter(q => q.source_url == null);
 
 const title = `${authorName} — Quotes & Teachings`;
 const description = `${verified.length} verified quotes and teachings from ${authorName}. Famous Words of Famous Christians.`;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Quotes", "item": "https://thetablebible.org/quotes/" },
+    { "@type": "ListItem", "position": 2, "name": authorName, "item": `https://thetablebible.org/quotes/${authorSlug}/` },
+  ],
+};
 ---
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={breadcrumbLd}>
   <main class="container-narrow py-12" data-pagefind-body data-pagefind-meta={`type:Quotes, title:${authorName} — Quotes`} data-pagefind-filter="type:Quotes">
     <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
       <a href="/quotes/" class="hover:text-accent">Quotes</a>

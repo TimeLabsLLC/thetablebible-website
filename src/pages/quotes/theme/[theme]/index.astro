@@ -19,8 +19,17 @@ const quotes = getQuotesByTheme(themeName).filter(q => q.source_url != null);
 
 const title = `${themeName} — Quotes by Theme`;
 const description = `${quotes.length} verified quotes about ${themeName.toLowerCase()} from famous Christians. Famous Words of Famous Christians.`;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Quotes", "item": "https://thetablebible.org/quotes/" },
+    { "@type": "ListItem", "position": 2, "name": themeName, "item": `https://thetablebible.org/quotes/theme/${Astro.params.theme}/` },
+  ],
+};
 ---
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={breadcrumbLd}>
   <main class="container-narrow py-12">
     <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
       <a href="/quotes/" class="hover:text-accent">Quotes</a>

@@ -48,8 +48,17 @@ const jsonLd = {
   "author": { "@type": "Organization", "name": "The Table Bible" },
   "publisher": { "@type": "Organization", "name": "The Table Bible" },
 };
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Verse of the Day", "item": "https://thetablebible.org/verse-of-the-day/" },
+    { "@type": "ListItem", "position": 2, "name": `${entry.book_name} ${chapter}`, "item": `https://thetablebible.org/verse-of-the-day/${bookSlug}/${chapter}/` },
+  ],
+};
 ---
-<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+<BaseLayout title={title} description={description} jsonLd={[jsonLd, breadcrumbLd]}>
   <main class="container-narrow py-12" data-pagefind-body data-pagefind-meta={`type:Verse of the Day, title:${verseRef}`} data-pagefind-filter="type:Verse of the Day">
     {/* Breadcrumb */}
     <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">

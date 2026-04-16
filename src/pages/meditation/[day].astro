@@ -46,8 +46,17 @@ const jsonLd = {
   "author": { "@type": "Organization", "name": "The Table Bible" },
   "publisher": { "@type": "Organization", "name": "The Table Bible" },
 };
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Meditation", "item": "https://thetablebible.org/meditation/" },
+    { "@type": "ListItem", "position": 2, "name": `Day ${globalDay}`, "item": `https://thetablebible.org/meditation/${globalDay}/` },
+  ],
+};
 ---
-<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+<BaseLayout title={title} description={description} jsonLd={[jsonLd, breadcrumbLd]}>
   <main class="container-reading py-12" data-pagefind-body data-pagefind-meta={`type:Meditation, title:Day ${globalDay} — ${entry.title}`} data-pagefind-filter="type:Meditation">
     <nav class="text-sm text-charcoal-muted mb-8" aria-label="Breadcrumb">
       <a href="/meditation/" class="hover:text-accent">Meditation</a>
