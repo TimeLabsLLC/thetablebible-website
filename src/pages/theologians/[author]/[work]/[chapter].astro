@@ -1,0 +1,316 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export function getStaticPaths() {
+  const authors = ['spurgeon', 'ryle', 'pink'];
+  const paths: any[] = [];
+
+  for (const authorSlug of authors) {
+    const indexPath = path.join(process.cwd(), `public/data/library/${authorSlug}/_index.json`);
+    const authorData = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+
+    for (const work of authorData.works) {
+      if (work.chapters <= 1) continue; // skip single-chapter works
+
+      const workPath = path.join(process.cwd(), `public/data/library/${authorSlug}/${work.slug}.json`);
+      const workData = JSON.parse(fs.readFileSync(workPath, 'utf-8'));
+
+      for (let i = 0; i < workData.chapters.length; i++) {
+        paths.push({
+          params: { author: authorSlug, work: work.slug, chapter: String(i + 1) },
+          props: {
+            authorData,
+            workData: { title: workData.title, slug: workData.slug, author: workData.author },
+            chapterData: workData.chapters[i],
+            chapterNum: i + 1,
+            totalChapters: workData.chapters.length,
+            workMeta: work,
+          },
+        });
+      }
+    }
+  }
+  return paths;
+}
+
+const { authorData, workData, chapterData, chapterNum, totalChapters, workMeta } = Astro.props;
+const authorSlug = authorData.authorSlug;
+const prevCh = chapterNum > 1 ? chapterNum - 1 : null;
+const nextCh = chapterNum < totalChapters ? chapterNum + 1 : null;
+
+function formatWords(n: number): string {
+  if (n >= 1_000) return Math.round(n / 1_000) + 'K';
+  return String(n);
+}
+
+const wordCount = chapterData.text.split(' ').length;
+const pageTitle = `${chapterData.title} — ${workData.title} by ${authorData.author}`;
+const pageDesc = `Read "${chapterData.title}" from ${workData.title} by ${authorData.author}. Chapter ${chapterNum} of ${totalChapters}. Free online.`;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": `https://thetablebible.org/theologians/${authorSlug}/${workMeta.slug}/${chapterNum}/#breadcrumb`,
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Theologian Library", "item": "https://thetablebible.org/theologians/" },
+    { "@type": "ListItem", "position": 2, "name": authorData.author, "item": `https://thetablebible.org/theologians/${authorSlug}/` },
+    { "@type": "ListItem", "position": 3, "name": workData.title, "item": `https://thetablebible.org/theologians/${authorSlug}/${workMeta.slug}/` },
+    { "@type": "ListItem", "position": 4, "name": chapterData.title, "item": `https://thetablebible.org/theologians/${authorSlug}/${workMeta.slug}/${chapterNum}/` },
+  ],
+};
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `${chapterData.title} — ${workData.title}`,
+  "author": { "@type": "Person", "name": authorData.author },
+  "isPartOf": { "@type": "Book", "name": workData.title },
+  "publisher": { "@type": "Organization", "name": "The Table Bible", "url": "https://thetablebible.org" },
+  "mainEntityOfPage": `https://thetablebible.org/theologians/${authorSlug}/${workMeta.slug}/${chapterNum}/`,
+};
+
+const isLargeChapter = wordCount > 80000;
+const paragraphs = isLargeChapter ? [] : chapterData.text.split('\n\n');
+---
+
+<BaseLayout title={pageTitle} description={pageDesc} jsonLd={[breadcrumbLd, articleLd]}>
+  <article class="reader-page">
+    <p class="reader-back">
+      <a href={`/theologians/${authorSlug}/${workMeta.slug}/`}>&larr; {workData.title}</a>
+    </p>
+    <header class="reader-header parchment-card parchment-card--centered">
+      <h1 class="reader-title">{chapterData.title}</h1>
+      <p class="reader-subtitle">{workData.title} &mdash; {authorData.author}</p>
+      <p class="reader-meta">Chapter {chapterNum} of {totalChapters} &middot; {formatWords(wordCount)} words</p>
+      <a href={`/read/${authorSlug}/${workMeta.slug}/`} class="reader-ereader-btn">Open in E-Reader</a>
+
+      <div class="reader-nav-top">
+        {prevCh && <a href={`/theologians/${authorSlug}/${workMeta.slug}/${prevCh}/`} class="reader-nav__link">&larr; Previous</a>}
+        <a href={`/theologians/${authorSlug}/${workMeta.slug}/`} class="reader-nav__link reader-nav__link--subtle">Contents</a>
+        {nextCh && <a href={`/theologians/${authorSlug}/${workMeta.slug}/${nextCh}/`} class="reader-nav__link">Next &rarr;</a>}
+      </div>
+    </header>
+
+    {/* Normal rendering for standard chapters */}
+    {!isLargeChapter && (
+      <div class="reader-body">
+        {paragraphs.map((para: string) => (
+          <p>{para}</p>
+        ))}
+      </div>
+    )}
+
+    {/* Client-side paginated for very large chapters */}
+    {isLargeChapter && (
+      <div class="reader-body" id="reader-body">
+        <div class="reader-loading">
+          <p>Loading text...</p>
+        </div>
+      </div>
+    )}
+
+    <nav class="reader-nav-bottom">
+      {prevCh ? (
+        <a href={`/theologians/${authorSlug}/${workMeta.slug}/${prevCh}/`} class="reader-nav__link">&larr; Previous</a>
+      ) : <span></span>}
+      <a href={`/theologians/${authorSlug}/${workMeta.slug}/`} class="reader-nav__link reader-nav__link--subtle">Contents</a>
+      {nextCh ? (
+        <a href={`/theologians/${authorSlug}/${workMeta.slug}/${nextCh}/`} class="reader-nav__link">Next &rarr;</a>
+      ) : <span></span>}
+    </nav>
+  </article>
+</BaseLayout>
+
+{isLargeChapter && (
+  <script define:vars={{ dataUrl: `/data/library/${authorSlug}/${workMeta.slug}.json`, chIdx: chapterNum - 1 }}>
+    (function() {
+      const PAGE_SIZE = 200;
+      const body = document.getElementById('reader-body');
+      if (!body) return;
+
+      fetch(dataUrl)
+        .then(r => r.json())
+        .then(data => {
+          const text = data.chapters[chIdx].text;
+          const paragraphs = text.split('\n\n').filter(p => p.trim());
+          const totalPages = Math.ceil(paragraphs.length / PAGE_SIZE);
+          let currentPage = 0;
+
+          function renderPage(page) {
+            const start = page * PAGE_SIZE;
+            const end = Math.min(start + PAGE_SIZE, paragraphs.length);
+            const html = paragraphs.slice(start, end)
+              .map(p => '<p>' + p.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>')
+              .join('');
+
+            let nav = '';
+            if (totalPages > 1) {
+              nav = '<div class="reader-pagination">';
+              if (page > 0) nav += '<button class="reader-page-btn" data-page="' + (page - 1) + '">&larr; Previous</button>';
+              nav += '<span class="reader-page-info">Page ' + (page + 1) + ' of ' + totalPages + '</span>';
+              if (page < totalPages - 1) nav += '<button class="reader-page-btn" data-page="' + (page + 1) + '">Next &rarr;</button>';
+              nav += '</div>';
+            }
+
+            body.innerHTML = html + nav;
+
+            body.querySelectorAll('.reader-page-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const p = parseInt(btn.getAttribute('data-page'));
+                currentPage = p;
+                renderPage(p);
+                body.scrollIntoView({ behavior: 'smooth' });
+              });
+            });
+          }
+
+          renderPage(0);
+        })
+        .catch(() => {
+          body.innerHTML = '<p>Failed to load text. Please try refreshing the page.</p>';
+        });
+    })();
+  </script>
+)}
+
+<style>
+  .reader-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+  .reader-header { text-align: center; margin-bottom: 2.5rem; padding: 2rem 1.5rem; }
+  .reader-back { margin: 0 0 1rem; }
+  .reader-back a {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #6B4226;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .reader-back a:hover { color: #C9A227; }
+  .reader-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 2rem;
+    color: #2A2520;
+    margin: 0 0 0.25rem;
+    line-height: 1.2;
+  }
+  .reader-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.05rem;
+    color: #5A5A6A;
+    margin: 0 0 0.25rem;
+  }
+  .reader-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #7A7A8A;
+    margin: 0 0 0.75rem;
+  }
+  .reader-ereader-btn {
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.45rem 1.25rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    color: #6B0F1A;
+    background: rgba(201, 162, 39, 0.5);
+    border: 2px solid #C9A227;
+    border-radius: 99px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .reader-ereader-btn:hover {
+    background: rgba(201, 162, 39, 0.75);
+    color: #2A2520;
+  }
+  .reader-nav-top {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  .reader-nav__link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #6B4226;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .reader-nav__link:hover { color: #C9A227; }
+  .reader-nav__link--subtle { color: #7A7A8A; }
+  .reader-nav__link--subtle:hover { color: #6B4226; }
+
+  /* Reading body */
+  .reader-body {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.12rem;
+    line-height: 1.75;
+    color: #2A2520;
+  }
+  .reader-body p {
+    margin: 0 0 1.25rem;
+    text-indent: 0;
+  }
+  .reader-loading {
+    text-align: center;
+    padding: 3rem 0;
+    color: #7A7A8A;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  /* Pagination controls */
+  :global(.reader-pagination) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem 0 1rem;
+    border-top: 1px solid rgba(107, 66, 38, 0.12);
+    margin-top: 2rem;
+  }
+  :global(.reader-page-btn) {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #6B4226;
+    background: transparent;
+    border: 1px solid rgba(107, 66, 38, 0.2);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  :global(.reader-page-btn:hover) {
+    background: rgba(201, 162, 39, 0.08);
+    border-color: #C9A227;
+  }
+  :global(.reader-page-info) {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #7A7A8A;
+  }
+
+  .reader-nav-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0 0;
+    border-top: 1px solid rgba(107, 66, 38, 0.12);
+    margin-top: 2rem;
+  }
+
+  [data-theme="dark"] .reader-title { color: #E4E2DC; }
+  [data-theme="dark"] .reader-subtitle { color: #B0AEA6; }
+  [data-theme="dark"] .reader-back a { color: #C9A227; }
+  [data-theme="dark"] .reader-body { color: #D8D4CC; }
+  [data-theme="dark"] .reader-nav__link { color: #C9A227; }
+  [data-theme="dark"] .reader-nav__link--subtle { color: #8A8A94; }
+  [data-theme="dark"] .reader-nav__link--subtle:hover { color: #C9A227; }
+  [data-theme="dark"] .reader-nav-bottom { border-top-color: rgba(201, 162, 39, 0.15); }
+  [data-theme="dark"] :global(.reader-pagination) { border-top-color: rgba(201, 162, 39, 0.15); }
+  [data-theme="dark"] :global(.reader-page-btn) { color: #C9A227; border-color: rgba(201, 162, 39, 0.2); }
+  [data-theme="dark"] :global(.reader-page-btn:hover) { background: rgba(201, 162, 39, 0.06); }
+</style>

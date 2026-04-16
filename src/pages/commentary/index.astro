@@ -11,18 +11,21 @@ const breadcrumbLd = {
 };
 ---
 
-<BaseLayout title="Bible Commentary — The Table Bible" description="Free Bible commentary from classic theologians. Read Matthew Henry's Complete Commentary on every book of the Bible, in original and modern English." jsonLd={breadcrumbLd}>
+<BaseLayout title="Bible Commentary — The Table Bible" description="Free Bible commentary from classic theologians. Matthew Henry on every book, Spurgeon's Treasury of David on the Psalms, and J.C. Ryle on the Gospels." jsonLd={breadcrumbLd}>
   <section class="py-12 text-center">
     <div class="container-narrow">
       <h1 class="text-4xl mb-3">Bible Commentary</h1>
-      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto mb-8">
+      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto mb-4">
         Classic Bible commentaries from trusted theologians. Read alongside Scripture to deepen your understanding.
+      </p>
+      <p class="text-sm text-charcoal-muted">
+        Looking for complete books and sermons? Visit the <a href="/theologians/" class="text-gold hover:underline">Theologian Library</a>.
       </p>
     </div>
   </section>
 
   <section class="container-page pb-16">
-    <div class="max-w-[680px] mx-auto">
+    <div class="max-w-[680px] mx-auto commentator-list">
       <a href="/commentary/matthew-henry/" class="commentator-card">
         <div class="commentator-card__inner">
           <h2 class="commentator-card__name">Matthew Henry</h2>
@@ -31,6 +34,28 @@ const breadcrumbLd = {
             The most widely read Bible commentary in the English language. Matthew Henry's Complete Commentary covers every chapter of every book, offering warm pastoral insight and practical application. Available in both the original 18th-century English and a modern paraphrase.
           </p>
           <span class="commentator-card__cta">Browse all 66 books &rarr;</span>
+        </div>
+      </a>
+
+      <a href="/commentary/spurgeon/" class="commentator-card">
+        <div class="commentator-card__inner">
+          <h2 class="commentator-card__name">Charles Spurgeon</h2>
+          <p class="commentator-card__dates">1834 – 1892</p>
+          <p class="commentator-card__desc">
+            The Treasury of David is the most celebrated devotional commentary on the Psalms ever written. Published over sixteen years, Spurgeon's verse-by-verse exposition brings every psalm to life with rich practical application and insights gathered from centuries of commentators.
+          </p>
+          <span class="commentator-card__cta">Browse all 150 Psalms &rarr;</span>
+        </div>
+      </a>
+
+      <a href="/commentary/ryle/" class="commentator-card">
+        <div class="commentator-card__inner">
+          <h2 class="commentator-card__name">J.C. Ryle</h2>
+          <p class="commentator-card__dates">1816 – 1900</p>
+          <p class="commentator-card__desc">
+            Bishop Ryle's Expository Thoughts on the Gospels are among the finest devotional commentaries on Matthew, Mark, Luke, and John. Known for their directness and plain-spoken pastoral warmth, they make every passage of Christ's earthly life clear and personally relevant.
+          </p>
+          <span class="commentator-card__cta">Browse the four Gospels &rarr;</span>
         </div>
       </a>
     </div>
@@ -91,4 +116,5 @@ const breadcrumbLd = {
   [data-theme="dark"] .commentator-card__desc { color: #B0AEA6; }
   [data-theme="dark"] .commentator-card__cta { color: #C9A227; }
   [data-theme="dark"] .commentator-card:hover .commentator-card__cta { color: #E4E2DC; }
+  .commentator-list { display: flex; flex-direction: column; gap: 1.5rem; }
 </style>

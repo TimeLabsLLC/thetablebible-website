@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "matthew",
+    "name": "Matthew",
+    "chapters": 28,
+    "sections": 95
+  },
+  {
+    "slug": "mark",
+    "name": "Mark",
+    "chapters": 16,
+    "sections": 115
+  },
+  {
+    "slug": "luke",
+    "name": "Luke",
+    "chapters": 24,
+    "sections": 144
+  },
+  {
+    "slug": "john",
+    "name": "John",
+    "chapters": 21,
+    "sections": 99
+  }
+]

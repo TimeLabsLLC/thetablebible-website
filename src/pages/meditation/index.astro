@@ -45,11 +45,11 @@ const description = "A 730-day journey through the Psalms. Teaching, theologian 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {year2.map(entry => (
           <a
-            href={`/meditation/${entry.day + 365}/`}
+            href={`/meditation/${entry.day}/`}
             class="card px-4 py-3 hover:border-gold transition-colors"
           >
             <span class="block font-sans text-sm text-gold-dark">
-              Day {entry.day + 365} — {entry.title}
+              Day {entry.day} — {entry.title}
             </span>
             <span class="block text-xs text-charcoal-muted mt-1">
               {entry.theologian_name}

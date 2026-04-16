@@ -377,8 +377,10 @@ const breadcrumbLd = {
           <span id="mhcc-title" class="mhcc-popup__title">Matthew Henry</span>
           <span id="mhcc-verses" class="mhcc-popup__verses"></span>
         </div>
+        <div id="commentary-pills" class="commentary-pills"></div>
         <div id="mhcc-text" class="mhcc-popup__text"></div>
-        <div class="mhcc-popup__toggle">
+        <!-- Modern text toggle hidden until rewrite meets gold standard -->
+        <div class="mhcc-popup__toggle" style="display:none;">
           <button type="button" id="mhcc-toggle-version" class="mhcc-popup__version-btn">Show Original</button>
         </div>
         <a id="mhcc-full-link" class="mhcc-popup__full-link" href="#">Read full commentary &rarr;</a>
@@ -646,6 +648,7 @@ const breadcrumbLd = {
   arrowNext?.addEventListener('click', () => goToPage(currentPage + 1));
 
   // ── Swipe navigation (page flip within chapter, page mode only) ──
+  const body = document.getElementById('scripture-body');
   let touchStartX = 0;
   let touchStartY = 0;
   const _swipeTarget = body as HTMLElement;
@@ -719,7 +722,6 @@ const breadcrumbLd = {
   });
 
   // ── Strong's definitions ───────────────────────────────
-  const body = document.getElementById('scripture-body');
   const popup = document.getElementById('strongs-popup');
   const lemmaEl = document.getElementById('strongs-lemma');
   const translitEl = document.getElementById('strongs-translit');
@@ -825,7 +827,7 @@ const breadcrumbLd = {
   closeBtn?.addEventListener('click', hidePopup);
 
   // ═══════════════════════════════════════════════════════
-  // MHCC Commentary popup
+  // Commentary popup (multi-source: MHCC, Spurgeon, Ryle)
   // ═══════════════════════════════════════════════════════
   const mhccPopup = document.getElementById('mhcc-popup');
   const mhccTitle = document.getElementById('mhcc-title');
@@ -835,39 +837,77 @@ const breadcrumbLd = {
   const mhccFullLink = document.getElementById('mhcc-full-link') as HTMLAnchorElement | null;
   const mhccCloseBtn = document.getElementById('mhcc-close');
   const xlinkCommentary = document.getElementById('xlink-commentary');
+  const commentaryPills = document.getElementById('commentary-pills');
 
-  type MhccSection = { v: string; o: string; m: string };
-  type MhccBook = Record<string, MhccSection[]>;
+  type CommentarySection = { v: string; o?: string; m?: string; t?: string };
+  type CommentaryBook = Record<string, CommentarySection[]>;
+  type CommentaryIndex = Record<string, { name: string; short: string; path: string; books: string[] }>;
 
-  let mhccCache: MhccBook | null = null;
-  let loadingMhcc = false;
-  let mhccShowOriginal = false;
-  let mhccCurrentSection: MhccSection | null = null;
+  let commentaryIndex: CommentaryIndex | null = null;
+  let loadingIndex = false;
+  const commentaryCache: Record<string, CommentaryBook | null> = {};
+  const loadingFlags: Record<string, boolean> = {};
+  let activeSource = 'mhcc';
+  let lastVerseNum = 1;
 
-  async function loadMhcc(): Promise<MhccBook | null> {
-    if (mhccCache) return mhccCache;
-    if (loadingMhcc) {
+  /** Map source key to commentary page URL prefix */
+  const COMMENTARY_URL: Record<string, string> = {
+    'mhcc': '/commentary/matthew-henry',
+    'spurgeon-tod': '/commentary/spurgeon',
+    'ryle': '/commentary/ryle',
+  };
+
+  function getCommentaryHref(sourceKey: string, slug: string, ch: string): string {
+    const prefix = COMMENTARY_URL[sourceKey];
+    return prefix ? `${prefix}/${slug}/${ch}/` : '';
+  }
+
+  async function loadCommentaryIndex(): Promise<CommentaryIndex | null> {
+    if (commentaryIndex) return commentaryIndex;
+    if (loadingIndex) {
       return new Promise(resolve => {
         const check = setInterval(() => {
-          if (mhccCache) { clearInterval(check); resolve(mhccCache); }
+          if (commentaryIndex) { clearInterval(check); resolve(commentaryIndex); }
         }, 50);
       });
     }
-    loadingMhcc = true;
-    const slug = body?.dataset.slug;
-    if (!slug) { loadingMhcc = false; return null; }
+    loadingIndex = true;
     try {
-      const resp = await fetch(`/data/mhcc/${slug}.json`);
-      if (!resp.ok) throw new Error(resp.statusText);
-      mhccCache = await resp.json();
-    } catch {
-      mhccCache = null;
-    }
-    loadingMhcc = false;
-    return mhccCache;
+      const resp = await fetch('/data/commentary-index.json');
+      if (resp.ok) commentaryIndex = await resp.json();
+    } catch { /* ignore */ }
+    loadingIndex = false;
+    return commentaryIndex;
   }
 
-  /** Check if verseNum falls within a range string like "1-2", "3-5", "14-19" */
+  async function loadCommentaryData(sourceKey: string): Promise<CommentaryBook | null> {
+    if (commentaryCache[sourceKey] !== undefined) return commentaryCache[sourceKey];
+    if (loadingFlags[sourceKey]) {
+      return new Promise(resolve => {
+        const check = setInterval(() => {
+          if (commentaryCache[sourceKey] !== undefined) { clearInterval(check); resolve(commentaryCache[sourceKey]); }
+        }, 50);
+      });
+    }
+    loadingFlags[sourceKey] = true;
+    const idx = commentaryIndex || await loadCommentaryIndex();
+    if (!idx || !idx[sourceKey]) { commentaryCache[sourceKey] = null; loadingFlags[sourceKey] = false; return null; }
+    const info = idx[sourceKey];
+    const slug = body?.dataset.slug;
+    if (!slug) { commentaryCache[sourceKey] = null; loadingFlags[sourceKey] = false; return null; }
+    // Spurgeon has a single psalms.json; Ryle/MHCC have per-book files
+    const file = sourceKey === 'spurgeon-tod' ? 'psalms' : slug;
+    try {
+      const resp = await fetch(`${info.path}/${file}.json`);
+      if (!resp.ok) throw new Error(resp.statusText);
+      commentaryCache[sourceKey] = await resp.json();
+    } catch {
+      commentaryCache[sourceKey] = null;
+    }
+    loadingFlags[sourceKey] = false;
+    return commentaryCache[sourceKey];
+  }
+
   function verseInRange(verseNum: number, rangeStr: string): boolean {
     const parts = rangeStr.split('-');
     const start = parseInt(parts[0], 10);
@@ -875,26 +915,101 @@ const breadcrumbLd = {
     return verseNum >= start && verseNum <= end;
   }
 
-  function findSection(ch: string, verseNum: number): MhccSection | null {
-    if (!mhccCache || !mhccCache[ch]) return null;
-    return mhccCache[ch].find(s => verseInRange(verseNum, s.v)) || null;
+  function findSection(data: CommentaryBook, ch: string, verseNum: number): CommentarySection | null {
+    if (!data || !data[ch]) return null;
+    return data[ch].find(s => verseInRange(verseNum, s.v)) || null;
   }
 
-  function showMhccPopup(section: MhccSection, ch: string) {
-    if (!mhccPopup || !mhccText || !mhccVerses) return;
-    mhccCurrentSection = section;
-    mhccShowOriginal = false;
-    mhccVerses.textContent = `Verses ${section.v}`;
-    mhccText.textContent = section.m || section.o;
-    if (mhccToggle) {
-      mhccToggle.textContent = 'Show Original';
-      mhccToggle.style.display = section.m ? '' : 'none';
+  function getTextFromSection(section: CommentarySection): string {
+    return section.t || section.o || '';
+  }
+
+  function buildPills() {
+    if (!commentaryPills || !commentaryIndex) return;
+    const slug = body?.dataset.slug || '';
+    const available = Object.entries(commentaryIndex).filter(([_, info]) =>
+      info.books.includes(slug)
+    );
+    if (available.length <= 1) {
+      commentaryPills.style.display = 'none';
+      return;
     }
+    commentaryPills.innerHTML = '';
+    for (const [key, info] of available) {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'commentary-pill' + (key === activeSource ? ' commentary-pill--active' : '');
+      pill.textContent = info.short;
+      pill.dataset.source = key;
+      pill.addEventListener('click', () => switchSource(key));
+      commentaryPills.appendChild(pill);
+    }
+    commentaryPills.style.display = '';
+  }
+
+  async function switchSource(sourceKey: string) {
+    activeSource = sourceKey;
+    // Update pill active states
+    commentaryPills?.querySelectorAll('.commentary-pill').forEach(p => {
+      p.classList.toggle('commentary-pill--active', (p as HTMLElement).dataset.source === sourceKey);
+    });
+    // Update title
+    const idx = commentaryIndex;
+    if (idx && idx[sourceKey] && mhccTitle) {
+      mhccTitle.textContent = idx[sourceKey].name;
+    }
+    // Update full-link visibility
+    if (mhccFullLink) {
+      const slug = body?.dataset.slug || '';
+      const ch = body?.dataset.chapter || '1';
+      const href = getCommentaryHref(sourceKey, slug, ch);
+      if (href) {
+        mhccFullLink.href = href;
+        mhccFullLink.style.display = '';
+      } else {
+        mhccFullLink.style.display = 'none';
+      }
+    }
+    // Load and show data for the current verse
+    const ch = body?.dataset.chapter || '1';
+    const data = await loadCommentaryData(sourceKey);
+    if (!data) {
+      if (mhccText) mhccText.textContent = 'Commentary not available for this book.';
+      if (mhccVerses) mhccVerses.textContent = '';
+      return;
+    }
+    const section = findSection(data, ch, lastVerseNum);
+    if (section) {
+      if (mhccVerses) mhccVerses.textContent = `Verses ${section.v}`;
+      if (mhccText) mhccText.textContent = getTextFromSection(section);
+    } else {
+      if (mhccVerses) mhccVerses.textContent = `Verse ${lastVerseNum}`;
+      if (mhccText) mhccText.textContent = 'No commentary available for this verse.';
+    }
+  }
+
+  function showCommentaryPopup(section: CommentarySection, ch: string, sourceKey: string) {
+    if (!mhccPopup || !mhccText || !mhccVerses) return;
+    activeSource = sourceKey;
+    const idx = commentaryIndex;
+    if (idx && idx[sourceKey] && mhccTitle) {
+      mhccTitle.textContent = idx[sourceKey].name;
+    }
+    mhccVerses.textContent = `Verses ${section.v}`;
+    mhccText.textContent = getTextFromSection(section);
+    // Modern text toggle disabled
+    if (mhccToggle) mhccToggle.style.display = 'none';
     const slug = body?.dataset.slug || '';
     if (mhccFullLink) {
-      mhccFullLink.href = `/commentary/matthew-henry/${slug}/${ch}/`;
+      const href = getCommentaryHref(sourceKey, slug, ch);
+      if (href) {
+        mhccFullLink.href = href;
+        mhccFullLink.style.display = '';
+      } else {
+        mhccFullLink.style.display = 'none';
+      }
     }
-    // hide Strongs if open
+    buildPills();
     hidePopup();
     mhccPopup.style.display = '';
     requestAnimationFrame(() => {
@@ -904,38 +1019,33 @@ const breadcrumbLd = {
 
   function hideMhccPopup() {
     if (!mhccPopup) return;
-    mhccCurrentSection = null;
     mhccPopup.classList.remove('mhcc-popup--visible');
     setTimeout(() => { mhccPopup.style.display = 'none'; }, 200);
   }
 
-  // Toggle original / modern
-  mhccToggle?.addEventListener('click', () => {
-    if (!mhccCurrentSection || !mhccText || !mhccToggle) return;
-    mhccShowOriginal = !mhccShowOriginal;
-    mhccText.textContent = mhccShowOriginal ? mhccCurrentSection.o : (mhccCurrentSection.m || mhccCurrentSection.o);
-    mhccToggle.textContent = mhccShowOriginal ? 'Show Modern' : 'Show Original';
-  });
-
   mhccCloseBtn?.addEventListener('click', hideMhccPopup);
 
-  // Verse number click handler
+  // Verse number click handler — show commentary
   document.addEventListener('click', async (e) => {
     const vnum = (e.target as HTMLElement).closest('.v-num[data-verse], .dc-letter[data-verse]') as HTMLElement | null;
     if (!vnum) return;
     e.stopPropagation();
     const verseNum = parseInt(vnum.dataset.verse || '1', 10);
+    lastVerseNum = verseNum;
     const ch = body?.dataset.chapter || '1';
-    const data = await loadMhcc();
+    await loadCommentaryIndex();
+    const data = await loadCommentaryData(activeSource);
     if (!data) return;
-    const section = findSection(ch, verseNum);
+    const section = findSection(data, ch, verseNum);
     if (section) {
-      showMhccPopup(section, ch);
+      showCommentaryPopup(section, ch, activeSource);
     } else {
-      // No MHCC section covers this verse
+      if (mhccTitle) mhccTitle.textContent = commentaryIndex?.[activeSource]?.name || 'Commentary';
       if (mhccText) mhccText.textContent = 'No commentary available for this verse.';
       if (mhccVerses) mhccVerses.textContent = `Verse ${verseNum}`;
       if (mhccToggle) mhccToggle.style.display = 'none';
+      if (mhccFullLink) mhccFullLink.style.display = 'none';
+      buildPills();
       if (mhccPopup) {
         hidePopup();
         mhccPopup.style.display = '';
@@ -947,10 +1057,12 @@ const breadcrumbLd = {
   // Commentary pill on left page — show commentary for verse 1
   xlinkCommentary?.addEventListener('click', async () => {
     const ch = body?.dataset.chapter || '1';
-    const data = await loadMhcc();
+    lastVerseNum = 1;
+    await loadCommentaryIndex();
+    const data = await loadCommentaryData(activeSource);
     if (!data) return;
-    const section = findSection(ch, 1);
-    if (section) showMhccPopup(section, ch);
+    const section = findSection(data, ch, 1);
+    if (section) showCommentaryPopup(section, ch, activeSource);
   });
 
   // Escape key closes MHCC popup too
@@ -1904,6 +2016,34 @@ const breadcrumbLd = {
     margin-top: 0.1rem;
   }
   .mhcc-popup__close:hover { color: #2A2520; }
+  .commentary-pills {
+    display: flex;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .commentary-pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(107, 66, 38, 0.25);
+    background: transparent;
+    color: #6B4226;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .commentary-pill:hover {
+    background: rgba(107, 66, 38, 0.1);
+  }
+  .commentary-pill--active {
+    background: #6B4226;
+    color: #fff;
+    border-color: #6B4226;
+  }
+  .commentary-pill--active:hover {
+    background: #5a3620;
+  }
 
   /* ═══════════════════════════════════════════════════════════
      DESKTOP — Full book visual (lg: 1024px+)

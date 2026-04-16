@@ -45,16 +45,6 @@ const description = `${verified.length} verified quotes and teachings from ${aut
           <p class="text-lg leading-relaxed italic mb-4">"{quote.quote}"</p>
           <div class="flex items-center justify-between text-sm">
             <span class="text-charcoal-muted">{quote.source_title || ''}</span>
-            {quote.source_url && (
-              <a
-                href={quote.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-accent hover:text-accent-dark"
-              >
-                View Source
-              </a>
-            )}
           </div>
           {quote.themes && (
             <div class="flex flex-wrap gap-1 mt-3">

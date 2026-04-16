@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export function getStaticPaths() {
+  const authors = ['spurgeon', 'ryle', 'pink'];
+  return authors.map(slug => {
+    const indexPath = path.join(process.cwd(), `public/data/library/${slug}/_index.json`);
+    const data = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+    return { params: { author: slug }, props: { authorData: data } };
+  });
+}
+
+const { authorData } = Astro.props;
+const authorSlug = authorData.authorSlug;
+const totalWords = authorData.works.reduce((s: number, w: any) => s + w.words, 0);
+
+// Group works: multi-chapter vs single-chapter (short essays)
+const majorWorks = authorData.works.filter((w: any) => w.chapters > 1 || w.words >= 10000);
+const shortWorks = authorData.works.filter((w: any) => w.chapters <= 1 && w.words < 10000);
+
+function formatWords(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return Math.round(n / 1_000) + 'K';
+  return String(n);
+}
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": `https://thetablebible.org/theologians/${authorSlug}/#breadcrumb`,
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Theologian Library", "item": "https://thetablebible.org/theologians/" },
+    { "@type": "ListItem", "position": 2, "name": authorData.author, "item": `https://thetablebible.org/theologians/${authorSlug}/` },
+  ],
+};
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": authorData.author,
+  "description": authorData.description,
+};
+---
+
+<BaseLayout title={`${authorData.author} — Theologian Library`} description={`Read ${authorData.works.length} free works by ${authorData.author} (${authorData.dates}). ${authorData.description}`} jsonLd={[breadcrumbLd, personLd]}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <p class="text-sm text-charcoal-muted mb-2"><a href="/theologians/" class="hover:text-gold transition-colors">&larr; Theologian Library</a></p>
+      <h1 class="text-4xl mb-2" style="font-family: 'EB Garamond', serif;">{authorData.author}</h1>
+      <p class="text-sm text-charcoal-muted mb-1">{authorData.dates}</p>
+      <p class="text-base text-charcoal-muted max-w-[540px] mx-auto mb-2">{authorData.description}</p>
+      <p class="text-sm text-charcoal-muted">{authorData.works.length} works &middot; {formatWords(totalWords)} words</p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="max-w-[740px] mx-auto">
+      {majorWorks.length > 0 && (
+        <>
+          <h2 class="section-heading">Books &amp; Major Works</h2>
+          <div class="works-grid">
+            {majorWorks.map((w: any) => (
+              <a href={`/theologians/${authorSlug}/${w.slug}/`} class="work-card">
+                <span class="work-card__title">{w.title}</span>
+                <span class="work-card__meta">
+                  {w.chapters > 1 ? `${w.chapters} chapters` : ''}{w.chapters > 1 ? ' · ' : ''}{formatWords(w.words)} words
+                </span>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+
+      {shortWorks.length > 0 && (
+        <>
+          <h2 class="section-heading" style="margin-top: 2.5rem;">Essays &amp; Short Works</h2>
+          <div class="works-grid works-grid--compact">
+            {shortWorks.map((w: any) => (
+              <a href={`/theologians/${authorSlug}/${w.slug}/`} class="work-card work-card--small">
+                <span class="work-card__title">{w.title}</span>
+                <span class="work-card__meta">{formatWords(w.words)} words</span>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.3rem;
+    color: #6B4226;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(107, 66, 38, 0.15);
+  }
+  .works-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .work-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .work-card:hover {
+    background: rgba(201, 162, 39, 0.08);
+  }
+  .work-card__title {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
+    color: #2A2520;
+  }
+  .work-card__meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: #7A7A8A;
+    white-space: nowrap;
+    margin-left: 1rem;
+  }
+  .work-card--small .work-card__title { font-size: 1rem; }
+  .work-card--small .work-card__meta { font-size: 0.75rem; }
+  [data-theme="dark"] .section-heading { color: #C9A227; border-bottom-color: rgba(201, 162, 39, 0.2); }
+  [data-theme="dark"] .work-card:hover { background: rgba(201, 162, 39, 0.06); }
+  [data-theme="dark"] .work-card__title { color: #E4E2DC; }
+  [data-theme="dark"] .work-card__meta { color: #8A8A94; }
+</style>

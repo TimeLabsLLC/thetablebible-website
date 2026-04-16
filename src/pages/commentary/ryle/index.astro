@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const indexPath = path.join(process.cwd(), 'public/data/ryle/_index.json');
+const books: { slug: string; name: string; chapters: number; sections: number }[] = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://thetablebible.org/commentary/ryle/#breadcrumb",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Commentary", "item": "https://thetablebible.org/commentary/" },
+    { "@type": "ListItem", "position": 2, "name": "J.C. Ryle", "item": "https://thetablebible.org/commentary/ryle/" },
+  ],
+};
+---
+
+<BaseLayout title="Ryle's Expository Thoughts on the Gospels — The Table Bible" description="Read J.C. Ryle's Expository Thoughts on Matthew, Mark, Luke, and John. Clear, practical Gospel exposition from one of England's greatest evangelical bishops. Free online." jsonLd={breadcrumbLd}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <p class="text-sm text-charcoal-muted mb-2"><a href="/commentary/" class="hover:text-gold transition-colors">&larr; Commentary</a></p>
+      <h1 class="text-4xl mb-2" style="font-family: 'EB Garamond', serif;">J.C. Ryle</h1>
+      <p class="text-base text-charcoal-muted mb-1">Expository Thoughts on the Gospels</p>
+      <p class="text-sm text-charcoal-muted max-w-[540px] mx-auto mb-8">
+        Published between 1856 and 1873, Bishop Ryle's Expository Thoughts remain among the finest devotional commentaries on the four Gospels. Known for their clarity, directness, and pastoral warmth, they bring every passage of Christ's life home to the reader's heart.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="max-w-[800px] mx-auto">
+      <h2 class="section-heading">The Four Gospels</h2>
+      <div class="book-grid">
+        {books.map(book => (
+          <a href={`/commentary/ryle/${book.slug}/1/`} class="book-link">
+            <span class="book-link__name">{book.name}</span>
+            <span class="book-link__meta">{book.chapters} ch &middot; {book.sections} sections</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.3rem;
+    color: #6B4226;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(107, 66, 38, 0.15);
+  }
+  .book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.6rem;
+  }
+  .book-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.65rem 0.85rem;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .book-link:hover { background: rgba(201, 162, 39, 0.1); }
+  .book-link__name {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
+    color: #2A2520;
+  }
+  .book-link__meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: #7A7A8A;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+  }
+  .book-link:hover .book-link__name { color: #6B4226; }
+  [data-theme="dark"] .section-heading { color: #C9A227; border-bottom-color: rgba(201, 162, 39, 0.2); }
+  [data-theme="dark"] .book-link:hover { background: rgba(201, 162, 39, 0.08); }
+  [data-theme="dark"] .book-link__name { color: #D8D4CC; }
+  [data-theme="dark"] .book-link:hover .book-link__name { color: #C9A227; }
+</style>

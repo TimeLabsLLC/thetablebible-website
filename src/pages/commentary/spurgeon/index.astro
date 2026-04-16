@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://thetablebible.org/commentary/spurgeon/#breadcrumb",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Commentary", "item": "https://thetablebible.org/commentary/" },
+    { "@type": "ListItem", "position": 2, "name": "Charles Spurgeon", "item": "https://thetablebible.org/commentary/spurgeon/" },
+  ],
+};
+
+// Build list of 150 psalms
+const psalms = Array.from({ length: 150 }, (_, i) => i + 1);
+---
+
+<BaseLayout title="Spurgeon's Treasury of David — The Table Bible" description="Read Charles Spurgeon's Treasury of David. Verse-by-verse exposition of all 150 Psalms with rich devotional insight. Free online." jsonLd={breadcrumbLd}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <p class="text-sm text-charcoal-muted mb-2"><a href="/commentary/" class="hover:text-gold transition-colors">&larr; Commentary</a></p>
+      <h1 class="text-4xl mb-2" style="font-family: 'EB Garamond', serif;">Charles Spurgeon</h1>
+      <p class="text-base text-charcoal-muted mb-1">The Treasury of David</p>
+      <p class="text-sm text-charcoal-muted max-w-[540px] mx-auto mb-8">
+        Published between 1869 and 1885, Spurgeon's Treasury of David is the most celebrated devotional commentary on the Psalms ever written. Every psalm explored with verse-by-verse exposition, practical application, and collected insights from centuries of commentators.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="max-w-[800px] mx-auto">
+      <h2 class="section-heading">Psalms</h2>
+      <div class="psalm-grid">
+        {psalms.map(n => (
+          <a href={`/commentary/spurgeon/psalms/${n}/`} class="psalm-link">
+            Psalm {n}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.3rem;
+    color: #6B4226;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(107, 66, 38, 0.15);
+  }
+  .psalm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+  }
+  .psalm-link {
+    display: block;
+    padding: 0.45rem 0.6rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    color: #2A2520;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .psalm-link:hover {
+    background: rgba(201, 162, 39, 0.1);
+    color: #6B4226;
+  }
+  [data-theme="dark"] .section-heading { color: #C9A227; border-bottom-color: rgba(201, 162, 39, 0.2); }
+  [data-theme="dark"] .psalm-link { color: #D8D4CC; }
+  [data-theme="dark"] .psalm-link:hover { background: rgba(201, 162, 39, 0.08); color: #C9A227; }
+</style>

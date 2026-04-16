@@ -41,16 +41,6 @@ const description = `${quotes.length} verified quotes about ${themeName.toLowerC
             <a href={`/quotes/${quote.author_slug}/`} class="text-accent hover:text-accent-dark">
               {quote.author}
             </a>
-            {quote.source_url && (
-              <a
-                href={quote.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-charcoal-muted hover:text-accent"
-              >
-                Source
-              </a>
-            )}
           </div>
         </article>
       ))}

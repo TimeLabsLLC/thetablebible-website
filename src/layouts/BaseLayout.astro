@@ -80,14 +80,35 @@ for (const entry of (medYear2 as any[])) {
 const bookMapJson = JSON.stringify(bookMap);
 const medMapJson = JSON.stringify(medMap);
 
-const navLinks = [
-  { href: '/bible/genesis/1/', label: 'Bible' },
-  { href: '/devotional/archive/', label: 'Devotional' },
-  { href: '/meditation/', label: 'Psalms' },
-  { href: '/quotes/', label: 'Quotes' },
-  { href: 'https://youtube.com/@thetablebibleorg', label: 'YouTube', external: true },
-  { href: '/about/', label: 'About' },
+const navGroups = [
+  {
+    label: 'Read',
+    items: [
+      { href: '/bible/genesis/1/', label: 'Bible Reader' },
+      { href: '/theologians/', label: 'Theologian Library' },
+      { href: '/commentary/', label: 'Commentary' },
+    ],
+  },
+  {
+    label: 'Study',
+    items: [
+      { href: '/devotional/archive/', label: 'Daily Devotional' },
+      { href: '/meditation/', label: 'Psalms Meditation' },
+      { href: '/verse-of-the-day/', label: 'Verse of the Day' },
+      { href: '/quotes/', label: 'Theologian Quotes' },
+    ],
+  },
+  {
+    label: 'About',
+    items: [
+      { href: '/about/', label: 'Our Mission' },
+      { href: 'https://youtube.com/@thetablebibleorg', label: 'YouTube', external: true },
+      { href: '/donate/#ways-to-give', label: 'Support Us' },
+    ],
+  },
 ];
+// Flat list for mobile menu
+const navLinks = navGroups.flatMap(g => g.items);
 ---
 
 <!DOCTYPE html>
@@ -151,9 +172,7 @@ const navLinks = [
     <nav class="container-page flex items-center justify-between h-16 md:h-18">
       <!-- Brand -->
       <a href="/" class="flex items-center gap-3 no-underline">
-        <div class="flex items-center justify-center w-9 h-9 bg-accent rounded-md">
-          <span class="font-serif text-xl font-bold text-white leading-none">T</span>
-        </div>
+        <img src="/images/profile_800x800.png" alt="The Table Bible" class="w-9 h-9 rounded-md" width="36" height="36" />
         <span class="hidden sm:inline font-serif text-lg text-charcoal tracking-wide">The Table Bible</span>
       </a>
       
@@ -165,9 +184,22 @@ const navLinks = [
       </button>
       
       <!-- Desktop nav -->
-      <ul id="nav-links" class="hidden md:flex items-center gap-8 list-none m-0 p-0">
-        {navLinks.map(link => (
-          <li><a href={link.href} class="font-sans text-sm tracking-wide text-charcoal-light hover:text-accent no-underline transition-colors duration-150" {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}>{link.label}{link.external && <span class="text-xs ml-0.5 opacity-60">↗</span>}</a></li>
+      <ul id="nav-links" class="hidden md:flex items-center gap-6 list-none m-0 p-0">
+        {navGroups.map(group => (
+          <li class="nav-dropdown">
+            <button class="nav-dropdown__trigger font-sans text-sm tracking-wide text-charcoal-light hover:text-accent bg-transparent border-none cursor-pointer p-0 flex items-center gap-1 transition-colors duration-150">
+              {group.label}
+              <svg class="nav-dropdown__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="nav-dropdown__menu">
+              {group.items.map(link => (
+                <a href={link.href} class="nav-dropdown__link" {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}>
+                  {link.label}
+                  {link.external && <span class="text-xs opacity-50">↗</span>}
+                </a>
+              ))}
+            </div>
+          </li>
         ))}
         <li>
           <button id="search-open" class="p-2 rounded-lg border border-cream-300 bg-transparent cursor-pointer transition-colors duration-150 hover:bg-cream-200" aria-label="Search" title="Search (Ctrl+K)">
@@ -224,9 +256,7 @@ const navLinks = [
         <!-- Brand column -->
         <div class="md:col-span-1">
           <a href="/" class="flex items-center gap-3 no-underline mb-3">
-            <div class="flex items-center justify-center w-8 h-8 bg-accent rounded-md">
-              <span class="font-serif text-lg font-bold text-white leading-none">T</span>
-            </div>
+            <img src="/images/profile_800x800.png" alt="The Table Bible" class="w-8 h-8 rounded-md" width="32" height="32" />
             <span class="font-serif text-lg text-charcoal">The Table Bible</span>
           </a>
           <p class="text-sm text-charcoal-muted italic mb-1">"Come to the Table."</p>

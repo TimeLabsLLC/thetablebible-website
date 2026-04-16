@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const authors = ['spurgeon', 'ryle', 'pink'].map(slug => {
+  const indexPath = path.join(process.cwd(), `public/data/library/${slug}/_index.json`);
+  return JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+});
+
+const totalWorks = authors.reduce((sum, a) => sum + a.works.length, 0);
+const totalWords = authors.reduce((sum, a) => sum + a.works.reduce((ws: number, w: any) => ws + w.words, 0), 0);
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://thetablebible.org/theologians/#breadcrumb",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Theologian Library", "item": "https://thetablebible.org/theologians/" },
+  ],
+};
+
+const collectionLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Theologian Library — The Table Bible",
+  "description": `Free online library of ${totalWorks} classic Christian works by Charles Spurgeon, J.C. Ryle, and A.W. Pink.`,
+  "url": "https://thetablebible.org/theologians/",
+  "publisher": { "@type": "Organization", "name": "The Table Bible", "url": "https://thetablebible.org" },
+};
+
+function formatWords(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return Math.round(n / 1_000) + 'K';
+  return String(n);
+}
+---
+
+<BaseLayout title="Theologian Library — The Table Bible" description={`Free online library of ${totalWorks} classic Christian works by Charles Spurgeon, J.C. Ryle, and A.W. Pink. Complete books, sermons, and essays.`} jsonLd={[breadcrumbLd, collectionLd]}>
+  <section class="py-12 text-center">
+    <div class="container-narrow">
+      <h1 class="text-4xl mb-3" style="font-family: 'EB Garamond', serif;">Theologian Library</h1>
+      <p class="text-lg text-charcoal-muted max-w-[600px] mx-auto mb-2">
+        Complete books, sermons, and essays from classic Christian authors. Free to read online.
+      </p>
+      <p class="text-sm text-charcoal-muted">
+        {totalWorks} works &middot; {formatWords(totalWords)} words
+      </p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="max-w-[680px] mx-auto author-list">
+      {authors.map(author => {
+        const authorWords = author.works.reduce((s: number, w: any) => s + w.words, 0);
+        return (
+          <a href={`/theologians/${author.authorSlug}/`} class="author-card">
+            <div class="author-card__inner">
+              <h2 class="author-card__name">{author.author}</h2>
+              <p class="author-card__dates">{author.dates}</p>
+              <p class="author-card__desc">{author.description}</p>
+              <p class="author-card__stats">{author.works.length} works &middot; {formatWords(authorWords)} words</p>
+              <span class="author-card__cta">Browse all works &rarr;</span>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .author-list { display: flex; flex-direction: column; gap: 1.5rem; }
+  .author-card {
+    display: block;
+    text-decoration: none;
+    background: #FDFBF7;
+    border: 1px solid rgba(107, 66, 38, 0.15);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .author-card:hover {
+    border-color: #C9A227;
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.12);
+  }
+  .author-card__name {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.6rem;
+    color: #2A2520;
+    margin: 0 0 0.25rem;
+  }
+  .author-card__dates {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #7A7A8A;
+    margin: 0 0 0.75rem;
+  }
+  .author-card__desc {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.05rem;
+    color: #3A3A4A;
+    line-height: 1.6;
+    margin: 0 0 0.5rem;
+  }
+  .author-card__stats {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #7A7A8A;
+    margin: 0 0 0.75rem;
+  }
+  .author-card__cta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #6B4226;
+    transition: color 0.15s;
+  }
+  .author-card:hover .author-card__cta { color: #C9A227; }
+  [data-theme="dark"] .author-card {
+    background: #1e1c24;
+    border-color: rgba(201, 162, 39, 0.15);
+  }
+  [data-theme="dark"] .author-card:hover {
+    border-color: #C9A227;
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.08);
+  }
+  [data-theme="dark"] .author-card__name { color: #E4E2DC; }
+  [data-theme="dark"] .author-card__desc { color: #B0AEA6; }
+  [data-theme="dark"] .author-card__stats { color: #8A8A94; }
+  [data-theme="dark"] .author-card__cta { color: #C9A227; }
+  [data-theme="dark"] .author-card:hover .author-card__cta { color: #E4E2DC; }
+</style>

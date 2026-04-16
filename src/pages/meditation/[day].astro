@@ -6,10 +6,10 @@ import { getMeditationEntries, getBibleUrl, type MeditationEntry } from '../../u
 const year1 = getMeditationEntries(1);
 const year2 = getMeditationEntries(2);
 
-// Combine both years: year1 days 1-365, year2 as days 366-730
+// Combine both years: year1 days 1-365, year2 days 366-730 (already correct in data)
 const allEntries = [
   ...year1.map(e => ({ ...e, globalDay: e.day })),
-  ...year2.map(e => ({ ...e, globalDay: e.day + 365 })),
+  ...year2.map(e => ({ ...e, globalDay: e.day })),
 ];
 
 export function getStaticPaths() {
@@ -17,7 +17,7 @@ export function getStaticPaths() {
   const y2 = getMeditationEntries(2);
   const paths = [
     ...y1.map(e => ({ params: { day: String(e.day) }, props: { entry: e, globalDay: e.day } })),
-    ...y2.map(e => ({ params: { day: String(e.day + 365) }, props: { entry: e, globalDay: e.day + 365 } })),
+    ...y2.map(e => ({ params: { day: String(e.day) }, props: { entry: e, globalDay: e.day } })),
   ];
   return paths;
 }

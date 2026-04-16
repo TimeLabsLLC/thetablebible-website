@@ -65,16 +65,7 @@ const description = "Curated teachings and profound insights from 39 Christian a
               <a href={`/quotes/${quote.author_slug}/`} class="text-sm font-sans text-accent hover:text-accent-dark">
                 {quote.author}
               </a>
-              {quote.source_url && (
-                <a
-                  href={quote.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-xs text-charcoal-muted hover:text-accent"
-                >
-                  Source
-                </a>
-              )}
+
             </div>
             {quote.themes && (
               <div class="flex flex-wrap gap-1 mt-3">
