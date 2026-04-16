@@ -53,9 +53,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <h3 class="text-lg mb-2">Credit / Debit Card</h3>
           <p class="text-sm text-charcoal-muted mb-4">Secure payment via Stripe. Choose any amount — no account required.</p>
-          <a href="https://donate.stripe.com/dRmcN71tY1bg8Lj19NaZi00" target="_blank" rel="noopener" class="btn-primary w-full block text-center">
-            Give with Card
-          </a>
+          <stripe-buy-button
+            buy-button-id="buy_btn_1TMg7oPRVfVzhRgFJYJVmtLW"
+            publishable-key="pk_live_51T6vXBPRVfVzhRgF8GutZycSUvMS2Yet3yrKAO4aVFt3CLrxiMnHF09AOzgwGb7xXr7M6OwpPBM2XZjm1hzYxBTk007QQhMmrP"
+          ></stripe-buy-button>
         </div>
 
         <div class="card p-6 text-center">
@@ -114,3 +115,5 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </blockquote>
   </main>
 </BaseLayout>
+
+<script is:inline async src="https://js.stripe.com/v3/buy-button.js"></script>
