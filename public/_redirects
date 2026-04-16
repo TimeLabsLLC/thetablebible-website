@@ -1,0 +1,7 @@
+# Redirect old /library/[book]/chapter-[chapter]/ URLs to new /bible/[book]/[chapter]/
+# These pages were replaced in the site overhaul — 301 redirects preserve SEO equity
+
+/library/:book/chapter-:chapter/ /bible/:book/:chapter/ 301
+
+# Old /library/[book]/ index pages → /bible/[book]/1/
+/library/:book/ /bible/:book/1/ 301

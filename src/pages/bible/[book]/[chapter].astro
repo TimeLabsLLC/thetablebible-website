@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import DonateBanner from '../../../components/DonateBanner.astro';
 import libraryData from '../../../data/library.json';
+import { getVideoUploadDate } from '../../../utils/library';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -104,13 +105,26 @@ const breadcrumbLd = {
   ],
 };
 
+const uploadDate = getVideoUploadDate(videoId);
+const videoLd = videoId && uploadDate ? {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": `${bookInfo.name} Chapter ${chapterNum} — The Table Bible`,
+  "description": `Listen to ${bookInfo.name} chapter ${chapterNum} with word-by-word highlighted text narrated from the World English Bible.`,
+  "thumbnailUrl": `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+  "uploadDate": uploadDate,
+  "embedUrl": `https://www.youtube.com/embed/${videoId}`,
+  "url": `https://www.youtube.com/watch?v=${videoId}`,
+  "publisher": { "@type": "Organization", "name": "The Table Bible", "url": "https://thetablebible.org" },
+} : null;
+
 /**
  * Render a single word token.
  * Kept for potential future use but rendering is now inline in the template.
  */
 ---
 
-<BaseLayout title={pageTitle} description={pageDesc} jsonLd={breadcrumbLd}>
+<BaseLayout title={pageTitle} description={pageDesc} jsonLd={videoLd ? [breadcrumbLd, videoLd] : breadcrumbLd}>
 
   <!-- ═══════════════════════════════════════════════════════
        Reader navigation bar (sits between site header and book)
